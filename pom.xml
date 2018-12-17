@@ -1,0 +1,120 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.javatoday.common</groupId>
+    <artifactId>jpal</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <!-- default packaging is a jar <packaging>jar</packaging> -->
+
+    <name>jpal</name>
+    <description>This project contains several packages that I rely on for Java-based projects: string processing, new collection types, I/O, and so forth.</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
+        <jdk.sources.path>C:/Program Files/Java/jdk1.8.0_172/src</jdk.sources.path>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.5</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.3.1</version>
+            <scope>test</scope>
+        </dependency>        
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.3.1</version>
+            <scope>test</scope>
+        </dependency>        
+        
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+
+                <configuration>
+                    <sourcepath>${project.build.sourceDirectory}:${jdk.sources.path}</sourcepath>
+                    <subpackages>net.javatoday</subpackages>
+                    <quiet>false</quiet>
+                    <notimestamp>true</notimestamp>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <charset>UTF-8</charset>
+                    <show>public</show>
+                    <doclint>-html</doclint>
+                    <linksource>true</linksource>
+                    <doctitle>
+                        <![CDATA[
+                        ${project.name} ${project.version} API
+                        <p>
+                        <div style='font-weight:normal; font-size:smaller'>${project.description}</div>
+                        ]]>
+                    </doctitle>
+                    <detectJavaApiLink>true</detectJavaApiLink>
+                    <links>
+                        <link>https://google.github.io/guava/releases/27.0-jre/api/docs/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-docs</id>
+                    </execution>
+                    <execution>
+                        <id>generate-javadoc-site-report</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.9</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
+
+</project>

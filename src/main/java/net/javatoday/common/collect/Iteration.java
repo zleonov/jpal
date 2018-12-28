@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collections;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -16,7 +15,6 @@ import com.google.common.collect.ForwardingListIterator;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
-import com.google.common.collect.UnmodifiableIterator;
 import com.google.common.collect.UnmodifiableListIterator;
 
 /**
@@ -197,10 +195,11 @@ final public class Iteration {
      * elements returned from calls to {@code next()}.
      * <p>
      * The {@code remove()}, {@code set(E)}, and {@code add(E)} operations are not supported. Modifying the underlying
-     * {@code Iterator} yields unpredictable results.
+     * {@code Iterator} while the returned {@code ListIterator} is in use yields unpredictable results.
      * <p>
-     * Note: This method is provided for testing and convenience to the casual user. The underlying iterator must be finite
-     * to avoid running out of memory.
+     * <b>Note:</b> This method is provided as a convenience to the casual user. The only advantage it has over
+     * {@link MoreLists#newLinkedList(Iterator)}{@link List#listIterator() .listIterator()} is that it is lazy, and does not
+     * require the underlying iterator to be exhausted immediately, thus possibly avoiding an {@code OutOfMemoryError}.
      * 
      * @param iterator the underlying {@code Iterator}
      * @return a {@code UnmodifiableListIterator} backed by {@code iterator}
@@ -252,37 +251,6 @@ final public class Iteration {
             @Override
             public int previousIndex() {
                 return index;
-            }
-        };
-    }
-
-    /**
-     * Returns an {@code UnmodifiableIterator} which reverses the iteration order of the specified {@code Iterator}.
-     * <p>
-     * Note: This method is provided for testing and convenience to the casual user. The underlying iterator must be
-     * non-blocking and finite to avoid running out of memory, because it is necessary to iterate through all its elements
-     * on startup.
-     * 
-     * @param iterator the underlying {@code Iterator}
-     * @return a reverse view of {@code iterator}
-     */
-    public static <E> UnmodifiableIterator<E> reverseOrder(final Iterator<? extends E> iterator) {
-        checkNotNull(iterator, "iterator == null");
-
-        final Deque<E> stack = Lists.newLinkedList();
-
-        while (iterator.hasNext())
-            stack.push(iterator.next());
-
-        return new UnmodifiableIterator<E>() {
-            @Override
-            public boolean hasNext() {
-                return !stack.isEmpty();
-            }
-
-            @Override
-            public E next() {
-                return stack.pop();
             }
         };
     }
@@ -418,41 +386,41 @@ final public class Iteration {
      * Decorates the specified {@code ListIterator} to prevent {@link ListIterator#remove() remove()},
      * {@link ListIterator#add(Object) add(E)}, and {@link ListIterator#set(Object) set(E)}.
      * 
-     * @param iterator the underlying {@code ListIterator}
+     * @param listIterator the underlying {@code ListIterator}
      * @return an unmodifiable view of {@code listIterator}
      */
-    public static <E> UnmodifiableListIterator<E> unmodifiable(final ListIterator<? extends E> iterator) {
-        checkNotNull(iterator, "iterator == null");
+    public static <E> UnmodifiableListIterator<E> unmodifiable(final ListIterator<? extends E> listIterator) {
+        checkNotNull(listIterator, "listIterator == null");
 
         return new UnmodifiableListIterator<E>() {
             @Override
             public boolean hasNext() {
-                return iterator.hasNext();
+                return listIterator.hasNext();
             }
 
             @Override
             public boolean hasPrevious() {
-                return iterator.hasPrevious();
+                return listIterator.hasPrevious();
             }
 
             @Override
             public E next() {
-                return iterator.next();
+                return listIterator.next();
             }
 
             @Override
             public int nextIndex() {
-                return iterator.nextIndex();
+                return listIterator.nextIndex();
             }
 
             @Override
             public E previous() {
-                return iterator.previous();
+                return listIterator.previous();
             }
 
             @Override
             public int previousIndex() {
-                return iterator.previousIndex();
+                return listIterator.previousIndex();
             }
         };
     }
@@ -460,29 +428,29 @@ final public class Iteration {
     /**
      * Decorates the specified {@code PeekingIterator} to prevent {@link PeekingIterator#remove() remove()}.
      * 
-     * @param iterator the underlying {@code PeekingIterator}
+     * @param peekingIterator the underlying {@code PeekingIterator}
      * @return an unmodifiable view of {@code peekingIterator}
      */
-    public static <E> UnmodifiablePeekingIterator<E> unmodifiable(final PeekingIterator<? extends E> iterator) {
-        checkNotNull(iterator, "iterator == null");
+    public static <E> UnmodifiablePeekingIterator<E> unmodifiable(final PeekingIterator<? extends E> peekingIterator) {
+        checkNotNull(peekingIterator, "peekingIterator == null");
 
         return new UnmodifiablePeekingIterator<E>() {
 
             @Override
             public boolean hasNext() {
-                return iterator.hasNext();
+                return peekingIterator.hasNext();
             }
 
             @Override
             public E next() {
-                return iterator.next();
+                return peekingIterator.next();
             }
 
             @Override
             public E peek() {
-                return iterator.peek();
+                return peekingIterator.peek();
             }
         };
     }
-    
+
 }

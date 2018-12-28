@@ -21,10 +21,6 @@ import com.google.common.collect.Lists;
  * 
  * @author Zhenya Leonov
  * @see Lists
- * @see List#indexOf(Object)
- * @see Iterables#contains(Iterable, Object)
- * @see Iterables#any(Iterable, Predicate)
- * @see Iterables#indexOf(Iterable, Predicate)
  */
 public class MoreLists {
 
@@ -40,6 +36,7 @@ public class MoreLists {
      * @param fromIndex the index to start the search from
      * @return the index of the first occurrence of the specified element in the given list, starting the search at
      *         {@code fromIndex}, or -1 if there is no such element
+     * @see List#indexOf(Object)
      */
     public static <E> int indexOf(final List<E> list, final Object element, final int fromIndex) {
         checkNotNull(list, "list == null");
@@ -71,6 +68,7 @@ public class MoreLists {
      * @param fromIndex the index to start the search from (inclusive)
      * @return the index of the first occurrence in the specified list of an element which satisfies the given predicate,
      *         starting the search at {@code fromIndex}, or -1 if there is no such element
+     * @see Iterables#indexOf(Iterable, Predicate)
      */
     public static <E> int indexOf(final List<E> list, final Predicate<? super E> predicate, final int fromIndex) {
         checkNotNull(list, "list == null");
@@ -100,6 +98,8 @@ public class MoreLists {
      * @param fromIndex the index to start the search from
      * @return the index of the last occurrence in the specified element in the given list, searching backward starting at
      *         {@code fromIndex}, or -1 if there is no such element
+     * @see List#indexOf(Object)
+     * @see List#lastIndexOf(Object)
      */
     public static <E> int lastIndexOf(final List<E> list, final Object element, final int fromIndex) {
         checkNotNull(list, "list == null");
@@ -130,6 +130,7 @@ public class MoreLists {
      * @param predicate the given predicate
      * @return the index of the last occurrence in the specified list of an element which satisfies the given predicate, or
      *         -1 if there is no such element
+     * @see Iterables#indexOf(Iterable, Predicate)
      */
     public static <E> int lastIndexOf(final List<E> list, final Predicate<? super E> predicate) {
         return lastIndexOf(list, predicate, list.size() - 1);
@@ -146,7 +147,8 @@ public class MoreLists {
      * @param predicate the given predicate
      * @param fromIndex the index to start the search from
      * @return the index of the last occurrence in the specified list of an element which satisfies the given predicate,
-     *         searching backward starting at {@code fromIndex}, or -1 if there is no such element.
+     *         searching backward starting at {@code fromIndex}, or -1 if there is no such element
+     * @see Iterables#indexOf(Iterable, Predicate)
      */
     public static <E> int lastIndexOf(final List<E> list, final Predicate<? super E> predicate, final int fromIndex) {
         checkNotNull(list, "list == null");
@@ -170,8 +172,10 @@ public class MoreLists {
     /**
      * Creates a mutable {@code LinkedList} containing the specified initial elements.
      * 
-     * @param elements initial elements
-     * @return a {@code LinkedList} containing the specified initial elements
+     * @param elements the specified initial elements
+     * @return a mutable {@code LinkedList} containing the specified initial elements
+     * @see Lists#newLinkedList()
+     * @see Lists#newLinkedList(Iterable)
      */
     @SafeVarargs
     public static <E> LinkedList<E> newLinkedList(final E... elements) {
@@ -182,10 +186,27 @@ public class MoreLists {
     }
 
     /**
+     * Creates a mutable {@code LinkedList} containing the specified initial elements.
+     * 
+     * @param elements the specified initial elements
+     * @return a mutable {@code LinkedList} containing the specified initial elements
+     * @see Lists#newLinkedList()
+     * @see Lists#newLinkedList(Iterable)
+     */
+    public static <E> LinkedList<E> newLinkedList(final Iterator<? extends E> elements) {
+        checkNotNull(elements, "elements == null");
+        final LinkedList<E> linkedList = Lists.newLinkedList();
+        Iterators.addAll(linkedList, elements);
+        return linkedList;
+    }
+
+    /**
      * Creates a mutable {@code RankList} containing the specified initial elements.
      * 
-     * @param elements initial elements
-     * @return a {@code RankList} containing the specified initial elements
+     * @param elements the specified initial elements
+     * @return a mutable {@code RankList} containing the specified initial elements
+     * @see RankList#create()
+     * @see RankList#create(Iterable)
      */
     @SafeVarargs
     public static <E> RankList<E> newRankList(final E... elements) {
@@ -199,7 +220,9 @@ public class MoreLists {
      * Creates a mutable {@code RankList} containing the specified initial elements.
      * 
      * @param elements the specified initial elements
-     * @return a {@code RankList} containing the specified initial elements
+     * @return a mutable {@code RankList} containing the specified initial elements
+     * @see RankList#create()
+     * @see RankList#create(Iterable)
      */
     public static <E> RankList<E> newRankList(final Iterator<? extends E> elements) {
         checkNotNull(elements, "elements == null");

@@ -2,11 +2,8 @@ package net.javatoday.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.Iterator;
-import java.util.NavigableSet;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -23,45 +20,51 @@ public class Sortedlists {
     }
 
     /**
-     * Creates a {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
+     * Creates a mutable {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
      * ordering</i>.
      * 
-     * @param elements initial elements
-     * @return a {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
+     * @param elements the specified initial elements
+     * @return a mutable {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
      *         ordering</i>
+     * @see Skiplist#create()
+     * @see Skiplist#orderedBy(java.util.Comparator)
      */
     @SafeVarargs
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
     public static <E extends Comparable<? super E>> Skiplist<E> newSkiplist(final E... elements) {
         checkNotNull(elements, "elements == null");
-        final Skiplist<E> sl = Skiplist.create();
-        Collections.addAll(sl, elements);
-        return sl;
+        final Skiplist<E> skiplist = Skiplist.create();
+        Collections.addAll(skiplist, elements);
+        return skiplist;
     }
 
     /**
-     * Creates a {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
+     * Creates a mutable {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
      * ordering</i>.
      * 
-     * @param elements initial elements
-     * @return a {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
+     * @param elements the specified initial elements
+     * @return a mutable {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
      *         ordering</i>
+     * @see Skiplist#create()
+     * @see Skiplist#orderedBy(java.util.Comparator)
      */
-
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> Skiplist<E> newSkiplist(final Iterator<? extends E> elements) {
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> Skiplist<E> newSkiplist(final Iterator<? extends E> elements) {
         checkNotNull(elements, "elements == null");
-        final Skiplist<E> sl = Skiplist.create();
-        Iterators.addAll(sl, elements);
-        return sl;
+        final Skiplist<E> skiplist = Skiplist.create();
+        Iterators.addAll(skiplist, elements);
+        return skiplist;
     }
 
     /**
-     * Creates a {@code Treelist} containing the specified initial elements sorted according to their <i>natural
+     * Creates a mutable {@code Treelist} containing the specified initial elements sorted according to their <i>natural
      * ordering</i>.
      * 
-     * @param elements initial elements
-     * @return a {@code Treelist} containing the specified initial elements sorted according to their <i>natural
+     * @param elements the specified initial elements
+     * @return a mutable {@code Treelist} containing the specified initial elements sorted according to their <i>natural
      *         ordering</i>
+     * @see Treelist#create()
+     * @see Treelist#orderedBy(java.util.Comparator)
      */
     @SafeVarargs
     public static <E extends Comparable<? super E>> Treelist<E> newTreelist(final E... elements) {
@@ -72,40 +75,21 @@ public class Sortedlists {
     }
 
     /**
-     * Creates a {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
+     * Creates a mutable {@code Treelist} containing the specified initial elements sorted according to their <i>natural
      * ordering</i>.
      * 
-     * @param elements initial elements
-     * @return a {@code Skiplist} containing the specified initial elements sorted according to their <i>natural
+     * @param elements the specified initial elements
+     * @return a mutable {@code Treelist} containing the specified initial elements sorted according to their <i>natural
      *         ordering</i>
+     * @see Treelist#create()
+     * @see Treelist#orderedBy(java.util.Comparator)
      */
-
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> Treelist<E> newTreelist(final Iterator<? extends E> elements) {
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> Treelist<E> newTreelist(final Iterator<? extends E> elements) {
         checkNotNull(elements, "elements == null");
         final Treelist<E> treelist = Treelist.create();
         Iterators.addAll(treelist, elements);
         return treelist;
-    }
-
-    /**
-     * Returns an {@code Iterator} over the specified {@code Collection} in reverse sequential order. If the specified
-     * collection is an instance of {@code Deque} or {@code NavigableSet} the iterator is obtained by invoking the
-     * {@code descendingIterator()} method, else an unmodifiable iterator is returned by calling the
-     * {@code reverseOrder(Iterator)} method.
-     * 
-     * @param c the specified collection
-     * @return an iterator over the specified collection in reverse sequential order
-     */
-    @SuppressWarnings({ "unchecked" })
-    public static <E> Iterator<E> reverseOrder(final Collection<? extends E> c) {
-        checkNotNull(c, "c == null");
-        if (c instanceof Deque)
-            return ((Deque<E>) c).descendingIterator();
-        if (c instanceof NavigableSet<?>)
-            return (Iterator<E>) ((NavigableSet<?>) c).descendingIterator();
-        else
-            return Iteration.reverseOrder(c.iterator());
     }
 
 }

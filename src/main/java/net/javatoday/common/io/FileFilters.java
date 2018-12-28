@@ -132,9 +132,9 @@ final public class FileFilters {
     }
 
     /**
-     * Returns a {@code FileFilter} which tests if the specified {@code File} is a directory.
+     * Returns a {@code FileFilter} which determines if the specified {@code File} is a directory.
      * 
-     * @return a {@code FileFilter} which tests if the specified {@code File} is a directory
+     * @return a {@code FileFilter} which determines if the specified {@code File} is a directory
      */
     public static FileFilter isDirectory() {
         return IS_DIRECTORY;

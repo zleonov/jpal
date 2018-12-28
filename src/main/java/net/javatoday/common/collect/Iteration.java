@@ -163,7 +163,7 @@ final public class Iteration {
      * <i>for-each</i> loops.
      * <p>
      * <b>Warning</b>: Although not explicitly stated in the documentation it is generally assumed that an {@code Iterable}
-     * object is able to produce multiple independent {@code Iterator}. Thus the returned {@code Iterable} does not behave
+     * object is able to produce multiple independent {@code Iterator}s. Thus the returned {@code Iterable} does not behave
      * like a general purpose {@code Iterable} because it supports only a single call to {@link Iterable#iterator()}.
      * Invoking the {@code iterator()} method to obtain subsequent iterators will result in an
      * {@code IllegalStateException}.
@@ -484,4 +484,5 @@ final public class Iteration {
             }
         };
     }
+    
 }

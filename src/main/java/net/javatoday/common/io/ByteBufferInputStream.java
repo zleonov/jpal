@@ -8,11 +8,10 @@ import java.nio.ByteBuffer;
 /**
  * An {@link InputStream} which reads bytes from a {@link ByteBuffer}.
  * <p>
- * As long as the buffer is not modified externally this class is thread-safe. It is also safe to use multiple instances
- * of this class to independently read from the same buffer.
+ * As long as the buffer is not modified externally this class is thread-safe. Multiple instances of this class can be
+ * used to independently read from the same buffer.
  *
  * @author Zhenya Leonov
- *
  */
 
 // Buffers are inherently not thread-safe (even accessing a buffer using absolute positioning  from multiple threads is

@@ -37,7 +37,7 @@ import net.javatoday.common.base.MessageDigests;
  * <p>
  * This class is the {@link java.nio.file.Path} counterpart to the {@link MorePathsTest} class.
  * <p>
- * Bellow is table of common methods provided in this class and their Guava and Java 7+ equivalents:
+ * Below is table of common methods provided in this class and their Guava and Java 7+ equivalents:
  * 
  * <pre>
  * <table border="1" cellpadding="3" cellspacing="1">

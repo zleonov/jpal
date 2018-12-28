@@ -35,8 +35,7 @@ public final class Exceptions {
      * }
      * </pre>
      * 
-     * <b>Warning:</b> This method is provided for testing and convenience only. It breaks Java's exception handling
-     * paradigm and can lead to horrible errors when misused. See
+     * <b>Warning:</b> This method breaks Java's exception handling idiom and can lead to horrible errors when misused. See
      * <a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html">Unchecked Exceptions — The
      * Controversy</a> for further discussion.
      * 

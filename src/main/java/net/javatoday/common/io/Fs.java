@@ -48,7 +48,7 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  * <a href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System introduced in
  * JDK 7</a>. {@link java.nio.file.Path Path} users will find similar methods in the {@link MorePaths} class.
  * <p>
- * Bellow is table of common methods provided in this class and their Guava equivalents:
+ * Below is table of common methods provided in this class and their Guava equivalents:
  * 
  * <pre>
  * <table border="1" cellpadding="3" cellspacing="1">

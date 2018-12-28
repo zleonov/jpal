@@ -13,6 +13,7 @@ import com.google.common.collect.Maps;
  * 
  * @author Zhenya Leonov
  * @see Maps
+ * 
  */
 public class MoreMaps {
 

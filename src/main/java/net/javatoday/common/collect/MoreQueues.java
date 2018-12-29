@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2018 Zhenya Leonov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.javatoday.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -24,10 +39,12 @@ public class MoreQueues {
     }
 
     /**
-     * Creates an {@code ArrayDeque} containing the specified initial elements.
+     * Creates a mutable {@code ArrayDeque} containing the specified initial elements.
      * 
-     * @param elements initial elements
-     * @return an {@code ArrayDeque} containing the specified initial elements
+     * @param elements the specified initial elements
+     * @return a mutable {@code ArrayDeque} containing the specified initial elements
+     * @see Queues#newArrayDeque()
+     * @see Queues#newArrayDeque(Iterable)
      */
     @SafeVarargs
     public static <E> ArrayDeque<E> newArrayDeque(final E... elements) {
@@ -38,10 +55,12 @@ public class MoreQueues {
     }
 
     /**
-     * Creates an {@code ArrayDeque} containing the elements returned by the specified iterator.
+     * Creates a mutable {@code ArrayDeque} containing the specified initial elements.
      * 
-     * @param elements the iterator whose elements are to be placed into the deque
-     * @return an {@code ArrayDeque} containing the elements returned by the specified iterator
+     * @param elements the specified initial elements
+     * @return a mutable {@code ArrayDeque} containing the specified initial elements
+     * @see Queues#newArrayDeque()
+     * @see Queues#newArrayDeque(Iterable)
      */
     public static <E> ArrayDeque<E> newArrayDeque(final Iterator<? extends E> elements) {
         checkNotNull(elements, "elements == null");
@@ -51,10 +70,14 @@ public class MoreQueues {
     }
 
     /**
-     * Creates an empty {@code ArrayDeque} with an initial capacity sufficient to hold the specified number of elements.
+     * Creates an empty mutable {@code ArrayDeque} with an initial capacity sufficient to hold the specified number of
+     * elements.
      * 
      * @param numElements lower bound on initial capacity of the deque
-     * @return an empty {@code ArrayDeque} with an initial capacity sufficient to hold the specified number of elements
+     * @return an empty mutable {@code ArrayDeque} with an initial capacity sufficient to hold the specified number of
+     *         elements
+     * @see Queues#newArrayDeque()
+     * @see Queues#newArrayDeque(Iterable)
      */
     public static <E> ArrayDeque<E> newArrayDequeWithCapacity(final int numElements) {
         return new ArrayDeque<E>(numElements);
@@ -103,7 +126,6 @@ public class MoreQueues {
      *                                  queue
      */
     public static <E> boolean offerAll(Queue<? super E> queue, Iterable<E> elements) {
-        checkNotNull(queue, "queue == null");
         checkNotNull(elements, "elements == null");
         return offerAll(queue, elements.iterator());
     }

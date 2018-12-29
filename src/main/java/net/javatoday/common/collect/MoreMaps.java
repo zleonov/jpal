@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2018 Zhenya Leonov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.javatoday.common.collect;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -20,25 +35,29 @@ public class MoreMaps {
     }
 
     /**
-     * Creates an empty {@code LinkedHashMap} with the specified ordering mode.
+     * Creates an empty mutable {@code LinkedHashMap} with the specified ordering mode.
      * 
-     * @param accessOrder the ordering mode - {@code true} for access-order, {@code false} for insertion-order
-     * @return an empty {@code LinkedHashMap} with the specified ordering mode
-     * @see LinkedHashMap
+     * @param accessOrder the ordering mode: {@code true} for access-order, {@code false} for insertion-order
+     * @return an empty mutable {@code LinkedHashMap} with the specified ordering mode
+     * @see Maps#newLinkedHashMap()
+     * @see Maps#newLinkedHashMap(Map)
+     * @see Maps#newLinkedHashMapWithExpectedSize(int)
      */
     public static <K, V> Map<K, V> newLinkedHashMap(final boolean accessOrder) {
         return new LinkedHashMap<K, V>(16, .75F, accessOrder);
     }
 
     /**
-     * Creates a {@code LinkedHashMap} with the specified ordering mode, containing the same mappings as the specified map.
+     * Creates a mutable {@code LinkedHashMap} with the specified ordering mode, containing the same mappings as the
+     * specified map.
      * 
-     * @param accessOrder the ordering mode - {@code true} for access-order, {@code false} for insertion-order
      * @param m           the map whose mappings this map should contain
-     * @return a {@code LinkedHashMap} with the specified ordering mode, containing the same mappings as the specified map
+     * @param accessOrder the ordering mode: {@code true} for access-order, {@code false} for insertion-order
+     * @return a mutable {@code LinkedHashMap} with the specified ordering mode, containing the same mappings as the
+     *         specified map
      * @see LinkedHashMap
      */
-    public static <K, V> Map<K, V> newLinkedHashMap(final boolean accessOrder, final Map<? extends K, ? extends V> m) {
+    public static <K, V> Map<K, V> newLinkedHashMap(final Map<? extends K, ? extends V> m, final boolean accessOrder) {
         checkNotNull(m, "m == null");
         final Map<K, V> map = new LinkedHashMap<K, V>(Math.max((int) (m.size() / .75F) + 1, 16), .75F, accessOrder);
         map.putAll(m);
@@ -46,12 +65,12 @@ public class MoreMaps {
     }
 
     /**
-     * Creates an empty {@code LinkedHashMap} with the specified ordering mode and enough capacity to hold the specified
+     * Creates an empty mutable {@code LinkedHashMap} with the given ordering mode and enough capacity to hold the specified
      * number of entries without rehashing.
      * 
      * @param expectedSize the expected size
-     * @param accessOrder  the ordering mode - {@code true} for access-order, {@code false} for insertion-order
-     * @return an empty {@code LinkedHashMap} with the specified ordering mode and enough capacity to hold the specified
+     * @param accessOrder  the ordering mode: {@code true} for access-order, {@code false} for insertion-order
+     * @return an empty mutable {@code LinkedHashMap} with the given ordering mode and enough capacity to hold the specified
      *         number of entries without rehashing
      * @see LinkedHashMap
      */

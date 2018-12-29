@@ -1,9 +1,5 @@
 /*
-<<<<<<< HEAD
- * Copyright (C) 2019 Zhenya Leonov
-=======
  * Copyright (C) 2018 Zhenya Leonov
->>>>>>> branch 'master' of git@github.com:zleonov/jpal.git
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

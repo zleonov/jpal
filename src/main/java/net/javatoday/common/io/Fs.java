@@ -294,7 +294,7 @@ final public class Fs {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * <p>
      * <b>Note:</b> Users not working with legacy APIs should prefer {@link #hash(File, HashFunction)} which uses Guava's
-     * more robust {@link Hashing} facility.
+     * robust {@link Hashing} facility.
      *
      * @param file   the given file
      * @param digest the specified message digest object

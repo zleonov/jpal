@@ -57,7 +57,7 @@ final public class ByteStream {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * <p>
      * <b>Note:</b> Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
-     * Guava's more robust {@link Hashing} facility.
+     * Guava's robust {@link Hashing} facility.
      *
      * @param in     the given input stream
      * @param digest the specified message digest object

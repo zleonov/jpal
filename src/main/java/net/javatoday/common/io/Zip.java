@@ -48,7 +48,7 @@ import com.google.common.io.Files;
  * Static utility methods useful for working with {@link ZipFile}s and {@link ZipOutputStream}s.
  * <p>
  * This class is provided as a convenience to developers who are making casual use of the {@code java.util.zip} package.
- * Consider using a more robust library like <a href="https://commons.apache.org/proper/commons-compress/
+ * Consider using a robust library like <a href="https://commons.apache.org/proper/commons-compress/
  * target="_blank">Apache Commons Compress</a>.
  * 
  * @author Zhenya Leonov

@@ -167,8 +167,9 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      * 
      * @return a new unbounded {@code TreeQueue} that orders its elements according to their <i>natural ordering</i>
      */
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> TreeQueue<E> create() {
+    // @SuppressWarnings("rawtypes")
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> TreeQueue<E> create() {
         return orderedBy(Ordering.natural()).create();
     }
 
@@ -221,10 +222,9 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      * @return a new builder configured to build {@code TreeQueue} instances that are limited to the specified maximum
      *         number of elements
      */
-    @SuppressWarnings("rawtypes")
-    public static Builder<Comparable> maximumSize(final int maximumSize) {
-        checkState(maximumSize > 0, "maxElements < 1");
-        return new Builder<Comparable>(Ordering.natural()).maximumSize(maximumSize);
+    public static Builder<Comparable<?>> maximumSize(final int maximumSize) {
+        checkState(maximumSize > 0, "maximumSize < 1");
+        return new Builder<Comparable<?>>(Ordering.natural()).maximumSize(maximumSize);
     }
 
     /**

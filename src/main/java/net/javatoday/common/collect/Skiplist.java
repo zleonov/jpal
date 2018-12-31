@@ -168,8 +168,9 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * 
      * @return a new {@code Skiplist} that orders its elements according to their <i>natural ordering</i>
      */
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> Skiplist<E> create() {
+    // @SuppressWarnings("rawtypes")
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> Skiplist<E> create() {
         return new Skiplist<E>(Ordering.natural());
     }
 

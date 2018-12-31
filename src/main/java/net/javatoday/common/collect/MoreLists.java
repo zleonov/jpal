@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.RandomAccess;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Iterables;
@@ -182,6 +183,23 @@ public class MoreLists {
         }
 
         return -1;
+    }
+
+    /**
+     * Creates a mutable {@code CopyOnWriteArrayList} containing the specified initial elements.
+     * 
+     * @param elements the specified initial elements
+     * @return a mutable {@code CopyOnWriteArrayList} containing the specified initial elements
+     * @see CopyOnWriteArrayList#CopyOnWriteArrayList(Object[])
+     * @see Lists#newCopyOnWriteArrayList()
+     * @see Lists#newCopyOnWriteArrayList(Iterable)
+     */
+    public static <E> CopyOnWriteArrayList<E> newCopyOnWriteArrayList(final Iterator<? extends E> elements) {
+        checkNotNull(elements, "elements == null");
+
+        // Use an intermediate ArrayList to avoid the quadratic cost of adding elements to the COWAL directly
+        final CopyOnWriteArrayList<E> cowal = new CopyOnWriteArrayList<E>(Lists.newArrayList(elements));
+        return cowal;
     }
 
     /**

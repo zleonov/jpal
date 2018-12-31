@@ -104,12 +104,12 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
     }
 
     /**
-     * Creates a new mutable {@code LRUCache} containing the same mappings as and whose maximum size is equal to the size of
-     * the specified map.
+     * Creates a new mutable {@code LRUCache} whose maximum size is equal to and containing the same mappings as the
+     * specified map.
      * 
      * @param m the specified map
-     * @return a new mutable {@code LRUCache} containing the same mappings as and whose maximum size is equal to the size of
-     *         the specified map
+     * @return a new mutable {@code LRUCache} whose maximum size is equal to and containing the same mappings as the
+     *         specified map
      */
     public static <K, V> LRUCache<K, V> create(final Map<? extends K, ? extends V> m) {
         checkNotNull(m, "m == null");

@@ -110,8 +110,9 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
      * 
      * @return a new {@code SortedSetImpl} that orders its elements according to their <i>natural ordering</i>
      */
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> TreeSet<E> create() {
+    //@SuppressWarnings("rawtypes")
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> TreeSet<E> create() {
         return new TreeSet<E>(Ordering.natural());
     }
 

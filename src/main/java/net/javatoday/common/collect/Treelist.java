@@ -140,8 +140,9 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * 
      * @return a new {@code Treelist} that orders its elements according to their <i>natural ordering</i>
      */
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> Treelist<E> create() {
+    // @SuppressWarnings("rawtypes")
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> Treelist<E> create() {
         return new Treelist<E>(Ordering.natural());
     }
 

@@ -124,8 +124,9 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
      * 
      * @return a new {@code SkiplistSet} that orders its elements according to their <i>natural ordering</i>
      */
-    @SuppressWarnings("rawtypes")
-    public static <E extends Comparable> SkiplistSet<E> create() {
+    // @SuppressWarnings("rawtypes")
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    public static <E extends Comparable<? super E>> SkiplistSet<E> create() {
         return new SkiplistSet<E>(Ordering.natural());
     }
 

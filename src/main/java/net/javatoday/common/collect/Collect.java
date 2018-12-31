@@ -30,9 +30,9 @@ import com.google.common.collect.Collections2;
  * @see Collections
  * @see Collections2
  */
-final public class MoreCollections {
+final public class Collect {
 
-    private MoreCollections() {
+    private Collect() {
     }
 
     /**

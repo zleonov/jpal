@@ -60,11 +60,12 @@ import com.google.common.collect.Iterables;
  * The following table summarizes the <i>big-O</i> performance of this class compared to an {@link ArrayList} and a
  * {@link LinkedList} (where n is the size of this list and <i>m</i> is the size of the specified collection which is
  * iterable in linear time):
- * <p>
+ * 
+ * <pre>
  * <table border cellpadding="3" cellspacing="1" style="width:450px;">
  *   <tr>
- *     <th style="text-align:center;" rowspan="2">Method</th>
- *     <th style="text-align:center;" colspan="3">Running Time</th>
+ *     <th rowspan="2">Method</th>
+ *     <th colspan="3">Running Time</th>
  *   </tr>
  *   <tr>
  *     <td style="text-align:center;"><b>RankList</b><br>(<i>expected</i>)</td>
@@ -72,24 +73,16 @@ import com.google.common.collect.Iterables;
  *     <td style="text-align:center;"><b>LinkedList</b><br>(<i>worst-case</i>)</td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #addAll(Collection) addAll(Collection)}
- *     </td>
+ *     <td>{@link RankList#addAll(Collection) addAll(Collection)}</td>
  *     <td style="text-align:center;" bgcolor="FFCC99"><i>O(m log n)</i></td>
  *     <td style="text-align:center;" bgcolor="FFCCCC"><i>O(m)</i></td>
  *     <td style="text-align:center;" bgcolor="9999CC"><i>O(m)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #containsAll(Collection) containsAll(Collection)}<br/>
- *       {@link #removeAll(Collection) removeAll(Collection)}<br/>
- *       {@link #retainAll(Collection) retainAll(Collection)}
- *     </td>
+ *     <td>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}</td>
  *     <td style="text-align:center;" colspan="3"><i>O(m * n)</i></td>
  *   </tr>
- *     <td>
- *       {@link #add(Object) add(E)}
- *     </td>
+ *     <td>{@link #add(Object) add(E)}</td>
  *     <td style="text-align:center;" rowspan="9" bgcolor="FFCC99"><i>O(log n)</i></td>
  *     <td style="text-align:center;" rowspan="4" bgcolor="FFCCCC"><i>O(1)</i></td>
  *     <td style="text-align:center;" bgcolor="9999CC"><i>O(1)</i></td>
@@ -122,29 +115,21 @@ import com.google.common.collect.Iterables;
  *     <td>{@link ListIterator#remove()}</td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link ListIterator#set(Object) ListIterator.set(E)}<br/>
- *       {@link #clear()}
- *     </td>
+ *     <td>{@link ListIterator#set(Object) ListIterator.set(E)}<br/>{@link #clear()}</td>
  *     <td style="text-align:center;" colspan="3"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #contains(Object) contains(Object)}<br/>
- *       {@link #indexOf(Object) indexOf(Object)}<br/>
- *       {@link #lastIndexOf(Object)}<br/>
- *       {@link #remove(Object) remove(Object)}
- *     </td>
+ *     <td>{@link #contains(Object) contains(Object)}<br/>{@link #indexOf(Object) indexOf(Object)}<br/>{@link #lastIndexOf(Object)}<br/>{@link #remove(Object) remove(Object)}</td>
  *     <td style="text-align:center;" rowspan="4" colspan="3"><i>O(n)</i></td>
+ *   </tr>
  * </table>
- * <p>
- * The {@code subList} views exhibit identical time complexity, with the
- * exception of the {@code clear()} operation which runs in linear time
- * proportional to the size of the view.
+ * </pre>
+ * 
+ * The {@code subList} views exhibit identical time complexity, with the exception of the {@code clear()} operation
+ * which runs in linear time proportional to the size of the view.
  * 
  * @author Zhenya Leonov
- * @param <E>
- *            the type of elements maintained by this list
+ * @param <E> the type of elements maintained by this list
  */
 public final class RankList<E> extends AbstractList<E> implements List<E>, RandomAccess, Serializable, Cloneable {
 

@@ -183,6 +183,15 @@ final public class Iteration {
      * like a general purpose {@code Iterable} because it supports only a single call to {@link Iterable#iterator()}.
      * Invoking the {@code iterator()} method to obtain subsequent iterators will result in an
      * {@code IllegalStateException}.
+     * <p>
+     * <b>Note:</b> Jave 8+ users should treat this method as deprecated. You can now create an {@code Iterable} from an
+     * {@code Iterator} using Java's lambda facility, for example:
+     * 
+     * <pre>
+     * for (final String s : (Iterable&ltString&gt)() -> iterator) {
+     *    ...
+     * }
+     * </pre>
      * 
      * @param iterator the underlying iterator
      * @return an {@code Iterable} which returns the underlying iterator on the first call to {@link Iterable#iterator()}
@@ -204,71 +213,6 @@ final public class Iteration {
             @Override
             public String toString() {
                 return Iterators.toString(iterator);
-            }
-        };
-    }
-
-    /**
-     * Decorates the specified {@code Iterator} to behave like a {@code ListIterator} by maintaining a {@code List} of all
-     * elements returned from calls to {@code next()}.
-     * <p>
-     * The {@code remove()}, {@code set(E)}, and {@code add(E)} operations are not supported. Modifying the underlying
-     * {@code Iterator} while the returned {@code ListIterator} is in use yields unpredictable results.
-     * <p>
-     * <b>Note:</b> This method is provided as a convenience to the casual user. The only advantage it has over
-     * {@link MoreLists#newLinkedList(Iterator)}{@link List#listIterator() .listIterator()} is that it is lazy, and does not
-     * require the underlying iterator to be exhausted immediately, thus possibly avoiding an {@code OutOfMemoryError}.
-     * 
-     * @param iterator the underlying {@code Iterator}
-     * @return a {@code UnmodifiableListIterator} backed by {@code iterator}
-     */
-    public static <E> UnmodifiableListIterator<E> listIterator(final Iterator<E> iterator) {
-        checkNotNull(iterator, "iterator == null");
-
-        return new UnmodifiableListIterator<E>() {
-            private final List<E> list = Lists.newLinkedList();
-            private int index = -1;
-
-            @Override
-            public boolean hasNext() {
-                if (index == list.size() - 1)
-                    return iterator.hasNext();
-                else
-                    return true;
-            }
-
-            @Override
-            public boolean hasPrevious() {
-                return index >= 0;
-            }
-
-            @Override
-            public E next() {
-                E nextElement;
-                if (index == list.size() - 1) {
-                    nextElement = iterator.next();
-                    list.add(nextElement);
-                    index++;
-                } else
-                    nextElement = list.get(++index);
-                return nextElement;
-            }
-
-            @Override
-            public int nextIndex() {
-                return index + 1;
-            }
-
-            @Override
-            public E previous() {
-                if (index < 0)
-                    throw new NoSuchElementException();
-                return list.get(index--);
-            }
-
-            @Override
-            public int previousIndex() {
-                return index;
             }
         };
     }

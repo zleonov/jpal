@@ -231,7 +231,7 @@ final public class MorePaths {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * <p>
      * <b>Note:</b> Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction)} which uses Guava's
-     * more robust {@link Hashing} facility.
+     * robust {@link Hashing} facility.
      *
      * @param path   the given file
      * @param digest the specified message digest object

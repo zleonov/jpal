@@ -17,7 +17,6 @@ package net.javatoday.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,51 +35,6 @@ import com.google.common.collect.Queues;
 public class MoreQueues {
 
     private MoreQueues() {
-    }
-
-    /**
-     * Creates a mutable {@code ArrayDeque} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code ArrayDeque} containing the specified initial elements
-     * @see Queues#newArrayDeque()
-     * @see Queues#newArrayDeque(Iterable)
-     */
-    @SafeVarargs
-    public static <E> ArrayDeque<E> newArrayDeque(final E... elements) {
-        checkNotNull(elements, "elements == null");
-        final ArrayDeque<E> arrayDeque = new ArrayDeque<E>(elements.length + 1);
-        Collections.addAll(arrayDeque, elements);
-        return arrayDeque;
-    }
-
-    /**
-     * Creates a mutable {@code ArrayDeque} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code ArrayDeque} containing the specified initial elements
-     * @see Queues#newArrayDeque()
-     * @see Queues#newArrayDeque(Iterable)
-     */
-    public static <E> ArrayDeque<E> newArrayDeque(final Iterator<? extends E> elements) {
-        checkNotNull(elements, "elements == null");
-        final ArrayDeque<E> arrayDeque = new ArrayDeque<E>();
-        Iterators.addAll(arrayDeque, elements);
-        return arrayDeque;
-    }
-
-    /**
-     * Creates an empty mutable {@code ArrayDeque} with an initial capacity sufficient to hold the specified number of
-     * elements.
-     * 
-     * @param numElements lower bound on initial capacity of the deque
-     * @return an empty mutable {@code ArrayDeque} with an initial capacity sufficient to hold the specified number of
-     *         elements
-     * @see Queues#newArrayDeque()
-     * @see Queues#newArrayDeque(Iterable)
-     */
-    public static <E> ArrayDeque<E> newArrayDequeWithCapacity(final int numElements) {
-        return new ArrayDeque<E>(numElements);
     }
 
     /**

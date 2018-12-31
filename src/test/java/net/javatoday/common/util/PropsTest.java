@@ -21,7 +21,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 
-import net.javatoday.common.collect.MoreLists;
 import net.javatoday.common.io.Fs;
 
 class PropsTest {
@@ -87,7 +86,7 @@ class PropsTest {
         final List<String> actual = Fs.readLines(temp);
         final List<String> expected = Fs.readLines(utf8_properties);
 
-        assertTrue(Iterables.elementsEqual(MoreLists.subList(expected, 1), MoreLists.subList(actual, 1)));
+        assertTrue(Iterables.elementsEqual(expected.subList(1, expected.size() - 1), actual.subList(1, actual.size() - 1)));
 
         assertEquals(EXPECTED, Props.load(null, temp, Charsets.UTF_8));
 
@@ -104,7 +103,7 @@ class PropsTest {
         final List<String> actual = Fs.readLines(temp);
         final List<String> expected = Fs.readLines(latin1_properties);
 
-        assertTrue(Iterables.elementsEqual(MoreLists.subList(expected, 1), MoreLists.subList(actual, 1)));
+        assertTrue(Iterables.elementsEqual(expected.subList(1, expected.size() - 1), actual.subList(1, actual.size() - 1)));
 
         assertEquals(EXPECTED, Props.load(null, temp, Charsets.ISO_8859_1));
 

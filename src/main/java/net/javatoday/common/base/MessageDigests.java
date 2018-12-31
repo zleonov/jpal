@@ -25,7 +25,7 @@ import com.google.common.hash.Hashing;
 /**
  * Common {@code MessageDigest}s which are supported by all Java platform implementations.
  * <p>
- * <b>Note:</b> Users not working with legacy APIs should prefer Guava's more robust {@link Hashing} facility.
+ * <b>Note:</b> Users not working with legacy APIs should prefer Guava's robust {@link Hashing} facility.
  * 
  * @author Zhenya Leonov
  */

@@ -18,18 +18,13 @@ package net.javatoday.common.collect;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.RandomAccess;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 /**
@@ -185,97 +180,4 @@ public class MoreLists {
         return -1;
     }
 
-    /**
-     * Creates a mutable {@code CopyOnWriteArrayList} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code CopyOnWriteArrayList} containing the specified initial elements
-     * @see CopyOnWriteArrayList#CopyOnWriteArrayList(Object[])
-     * @see Lists#newCopyOnWriteArrayList()
-     * @see Lists#newCopyOnWriteArrayList(Iterable)
-     */
-    public static <E> CopyOnWriteArrayList<E> newCopyOnWriteArrayList(final Iterator<? extends E> elements) {
-        checkNotNull(elements, "elements == null");
-
-        // Use an intermediate ArrayList to avoid the quadratic cost of adding elements to the COWAL directly
-        final CopyOnWriteArrayList<E> cowal = new CopyOnWriteArrayList<E>(Lists.newArrayList(elements));
-        return cowal;
-    }
-
-    /**
-     * Creates a mutable {@code LinkedList} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code LinkedList} containing the specified initial elements
-     * @see Lists#newLinkedList()
-     * @see Lists#newLinkedList(Iterable)
-     */
-    @SafeVarargs
-    public static <E> LinkedList<E> newLinkedList(final E... elements) {
-        checkNotNull(elements, "elements == null");
-        final LinkedList<E> linkedList = Lists.newLinkedList();
-        Collections.addAll(linkedList, elements);
-        return linkedList;
-    }
-
-    /**
-     * Creates a mutable {@code LinkedList} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code LinkedList} containing the specified initial elements
-     * @see Lists#newLinkedList()
-     * @see Lists#newLinkedList(Iterable)
-     */
-    public static <E> LinkedList<E> newLinkedList(final Iterator<? extends E> elements) {
-        checkNotNull(elements, "elements == null");
-        final LinkedList<E> linkedList = Lists.newLinkedList();
-        Iterators.addAll(linkedList, elements);
-        return linkedList;
-    }
-
-    /**
-     * Creates a mutable {@code RankList} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code RankList} containing the specified initial elements
-     * @see RankList#create()
-     * @see RankList#create(Iterable)
-     */
-    @SafeVarargs
-    public static <E> RankList<E> newRankList(final E... elements) {
-        checkNotNull(elements, "elements == null");
-        final RankList<E> rankList = RankList.create();
-        Collections.addAll(rankList, elements);
-        return rankList;
-    }
-
-    /**
-     * Creates a mutable {@code RankList} containing the specified initial elements.
-     * 
-     * @param elements the specified initial elements
-     * @return a mutable {@code RankList} containing the specified initial elements
-     * @see RankList#create()
-     * @see RankList#create(Iterable)
-     */
-    public static <E> RankList<E> newRankList(final Iterator<? extends E> elements) {
-        checkNotNull(elements, "elements == null");
-        final RankList<E> rankList = RankList.create();
-        Iterators.addAll(rankList, elements);
-        return rankList;
-    }
-
-    /**
-     * Returns a view of the portion of the specified list between the {@code fromIndex} to the end of the list.
-     * <p>
-     * Equivalent to calling {@link List#subList(int, int) list.subList(fromIndex, list.size())}.
-     * 
-     * @param list      the specified list
-     * @param fromIndex the beginning index (inclusive)
-     * @return a view of the portion of the specified list between the {@code fromIndex} to the end of the list
-     */
-    public static <E> List<E> subList(final List<E> list, final int fromIndex) {
-        checkNotNull(list, "list == null");
-        checkElementIndex(fromIndex, list.size());
-        return list.subList(fromIndex, list.size());
-    }
 }

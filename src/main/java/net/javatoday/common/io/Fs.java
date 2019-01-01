@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,10 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.google.common.io.ByteSink;
+import com.google.common.io.ByteSource;
+import com.google.common.io.CharSink;
+import com.google.common.io.CharSource;
 import com.google.common.io.Closer;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
@@ -71,37 +75,37 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <th>Method</th><th>Guava</th>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND).write(CharSequence)}</td>
+ *     <td>{@link Fs#append(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND).write(CharSequence)}</td>
+ *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND).writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND).writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedInputStream(File)}</td><td>{@link Files#asByteSource(File) Files.asByteSource(File).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedInputStream(File)}</td><td>{@link Files#asByteSource(File) Files.asByteSource(File)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, false)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, false)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, true)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, APPEND).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, true)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, false)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, false)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, true)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, true)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, false, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, false, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND).openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#newLineNumberReader(File)}</td><td>N/A</td>
@@ -128,22 +132,22 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>N/A</td><td>{@link Files#readLines(File, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#toString(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charsets.UTF_8).read()}</td>
+ *     <td>{@link Fs#toString(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charsets.UTF_8)}{@link CharSource#read() .read()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#toString(File, Charset)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charset).read()}</td>
+ *     <td>{@link Fs#toString(File, Charset)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charset)}{@link CharSource#read() .read()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8).write(CharSequence)}</td>
+ *     <td>{@link Fs#write(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset).write(CharSequence)}</td>
+ *     <td>{@link Fs#write(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8).writeLines(Iterable)}</td>
+ *     <td>{@link Fs#write(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset).writeLines(Iterable)}</td>
+ *     <td>{@link Fs#write(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#deleteDirectoryContents(File)}</td><td>N/A</td>

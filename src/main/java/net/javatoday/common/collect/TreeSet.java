@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,39 +53,33 @@ import com.google.common.collect.Ordering;
  * This set is not <i>thread-safe</i>. If multiple threads modify this set concurrently it must be synchronized
  * externally.
  * <p>
- * This implementation uses a comparator (whether or not one is explicitly provided) to perform all element comparisons.
- * Two elements which are deemed equal by the comparator's {@code compare(E, E)} method are, from the standpoint of this
- * set, equal.
+ * This implementation uses a comparator ({@link Ordering#natural() whether or not one is explicitly provided}) to
+ * perform all element comparisons. Two elements which are deemed equal by the comparator's {@code compare(E, E)} method
+ * are, from the standpoint of this set, equal.
  * <p>
  * The underlying Red-Black Tree provides the following worst case running time (where <i>n</i> is the size of this set
  * and <i>m</i> is the size of the specified collection which is iterable in linear time):
- * <p>
+ * 
+ * <pre>
  * <table border="1" cellpadding="3" cellspacing="1" style="width:400px;">
- * <tr>
- * <th style="text-align:center;">Method</th>
- * <th style="text-align:center;">Running Time</th>
- * </tr>
- * <tr>
- * <td>{@link #addAll(Collection) addAll(Collection)}<br/>
- * {@link #containsAll(Collection) containsAll(Collection)}<br/>
- * {@link #retainAll(Collection) retainAll(Collection)}<br/>
- * {@link #removeAll(Collection) removeAll(Collection)}</td>
- * <td style="text-align:center;"><i>O(m log n)</i></td>
- * </tr>
- * <tr>
- * <td>{@link #add(Object) add(E)}<br/>
- * {@link #contains(Object)}<br/>
- * {@link #remove(Object)}</td>
- * <td style="text-align:center;"><i>O(log n)</i></td>
- * </tr>
- * <tr>
- * <td>{@link #clear() clear()}<br/>
- * {@link #isEmpty() isEmpty()}<br/>
- * {@link #size()}<br/>
- * {@link Iterator#remove()}</td>
- * <td style="text-align:center;"><i>O(1)</i></td>
- * </tr>
+ *   <tr>
+ *     <th style="text-align:center;">Method</th>
+ *     <th style="text-align:center;">Running Time</th>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br/>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}</td>
+ *     <td style="text-align:center;"><i>O(m log n)</i></td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link #add(Object) add(E)}<br/>{@link #contains(Object)}<br/>{@link #remove(Object)}</td>
+ *     <td style="text-align:center;"><i>O(log n)</i></td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link #clear() clear()}<br/>{@link #isEmpty() isEmpty()}<br/>{@link #size()}<br/>{@link Iterator#remove()}</td>
+ *     <td style="text-align:center;"><i>O(1)</i></td>
+ *   </tr>
  * </table>
+ * </pre>
  * 
  * @author Zhenya Leonov
  * @param <E> the type of elements maintained by this set
@@ -110,7 +104,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
      * 
      * @return a new {@code SortedSetImpl} that orders its elements according to their <i>natural ordering</i>
      */
-    //@SuppressWarnings("rawtypes")
+    // @SuppressWarnings("rawtypes")
     // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
     public static <E extends Comparable<? super E>> TreeSet<E> create() {
         return new TreeSet<E>(Ordering.natural());
@@ -318,31 +312,30 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         }
     }
 
-    // @formatter:off
-	/**
-	 * Introduction to Algorithms (CLR) Second Edition
-	 * 
-	 * <pre>
-	 * RB-INSERT(T, z)
-	 * y = nil[T]
-	 * x = root[T]
-	 * while x != nil[T]
-	 *    do y = x
-	 *       if key[z] < key[x]
-	 *          then x = left[x]
-	 *          else x = right[x]
-	 * p[z] = y
-	 * if y = nil[T]
-	 *    then root[T] = z
-	 *    else if key[z] < key[y]
-	 *            then left[y] = z
-	 *            else right[y] = z
-	 * left[z] = nil[T]
-	 * right[z] = nil[T]
-	 * color[z] = RED
-	 * RB-INSERT-FIXUP(T, z)
-	 */
-	 // @formatter:on
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * RB-INSERT(T, z)
+     * y = nil[T]
+     * x = root[T]
+     * while x != nil[T]
+     *    do y = x
+     *       if key[z] < key[x]
+     *          then x = left[x]
+     *          else x = right[x]
+     * p[z] = y
+     * if y = nil[T]
+     *    then root[T] = z
+     *    else if key[z] < key[y]
+     *            then left[y] = z
+     *            else right[y] = z
+     * left[z] = nil[T]
+     * right[z] = nil[T]
+     * color[z] = RED
+     * RB-INSERT-FIXUP(T, z)
+     * </pre>
+     */
     private boolean insert(final Node z) {
         modCount++;
         Node x = root;
@@ -371,6 +364,31 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         return true;
     }
 
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * RB-DELETE-FIXUP(T, z)
+     * if left[z] = nil[T] or right[z] = nil[T]
+     *    then y = z
+     *    else y = TREE-SUCCESSOR(z)
+     * if left[y] != nil[T]
+     *    then x = left[y]
+     *    else x = right[y]
+     * p[x] = p[y]
+     * if p[y] = nil[T]
+     *    then root[T] = x
+     *    else if y = left[p[y]]
+     *            then left[p[y]] = x
+     *            else right[p[y]] = x
+     * if y != z
+     *    then key[z] = key[y]
+     *         copy y's satellite data into z
+     * if color[y] = BLACK
+     *    then RB-DELETE-FIXUP(T, x)
+     * return y
+     * </pre>
+     */
     private void delete(Node z) {
         size--;
         modCount++;
@@ -412,21 +430,20 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         return null;
     }
 
-    // @formatter:off
-	/**
-	 * Introduction to Algorithms (CLR) Second Edition
-	 * 
-	 * <pre>
-	 * TREE-SUCCESSOR(x)
-	 * if right[x] != NIL
-	 *    then return TREE-MINIMUM(right[x])
-	 * y = p[x]
-	 * while y != NIL and x = right[y]
-	 *    do x = y
-	 *       y = p[y]
-	 * return y
-	 */
-    // @formatter:on	
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * TREE-SUCCESSOR(x)
+     * if right[x] != NIL
+     *    then return TREE-MINIMUM(right[x])
+     * y = p[x]
+     * while y != NIL and x = right[y]
+     *    do x = y
+     *       y = p[y]
+     * return y
+     * </pre>
+     */
     private Node successor(Node x) {
         if (x == nil)
             return nil;
@@ -444,26 +461,25 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         return y;
     }
 
-    // @formatter:off
-	/**
-	 * Introduction to Algorithms (CLR) Second Edition
-	 * 
-	 * <pre>
-	 * LEFT-ROTATE(T, x)
-	 * y = right[x]							Set y.
-	 * right[x] = left[y]					Turn y's left subtree into x's right subtree.
-	 * if left[y] != nil[T]
-	 *    then p[left[y]] = x
-	 * p[y] = p[x]							Link x's parent to y.
-	 * if p[x] = nil[T]
-	 *    then root[T] = y
-	 *    else if x = left[p[x]]
-	 *            then left[p[x]] = y
-	 *            else right[p[x]] = y
-	 * left[y] = x							Put x on y's left.
-	 * p[x] = y
-	 */
-    // @formatter:on	
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * LEFT-ROTATE(T, x)
+     * y = right[x]                         Set y.
+     * right[x] = left[y]                   Turn y's left subtree into x's right subtree.
+     * if left[y] != nil[T]
+     *    then p[left[y]] = x
+     * p[y] = p[x]                          Link x's parent to y.
+     * if p[x] = nil[T]
+     *    then root[T] = y
+     *    else if x = left[p[x]]
+     *            then left[p[x]] = y
+     *            else right[p[x]] = y
+     * left[y] = x                          Put x on y's left.
+     * p[x] = y
+     * </pre>
+     */
     private void leftRotate(final Node x) {
         if (x != nil) {
             Node n = x.right;
@@ -500,31 +516,30 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         }
     }
 
-    // @formatter:off
-	/**
-	 * Introduction to Algorithms (CLR) Second Edition
-	 * 
-	 * <pre>
-	 * RB-INSERT-FIXUP(T, z)
-	 * while color[p[z]] = RED
-	 *    do if p[z] = left[p[p[z]]]
-	 *          then y = right[p[p[z]]]
-	 *               if color[y] = RED
-	 *                  then color[p[z]] = BLACK					Case 1
-	 *                       color[y] = BLACK						Case 1 
-	 *                       color[p[p[z]]] = RED					Case 1
-	 *                       z = p[p[z]]							Case 1
-	 *                  else if z = right[p[z]]
-	 *                          then z = p[z]						Case 2
-	 *                               LEFT-ROTATE(T, z)				Case 2
-	 *                       color[p[z]] = BLACK					Case 3
-	 *                       color[p[p[z]]] = RED					Case 3
-	 *                       RIGHT-ROTATE(T, p[p[z]])				Case 3
-	 *          else (same as then clause
-	 *                        with right and left exchanged)
-	 * color[root[T]] = BLACK
-	 */
-    // @formatter:on	
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * RB-INSERT-FIXUP(T, z)
+     * while color[p[z]] = RED
+     *    do if p[z] = left[p[p[z]]]
+     *          then y = right[p[p[z]]]
+     *               if color[y] = RED
+     *                  then color[p[z]] = BLACK                    Case 1
+     *                       color[y] = BLACK                       Case 1 
+     *                       color[p[p[z]]] = RED                   Case 1
+     *                       z = p[p[z]]                            Case 1
+     *                  else if z = right[p[z]]
+     *                          then z = p[z]                       Case 2
+     *                               LEFT-ROTATE(T, z)              Case 2
+     *                       color[p[z]] = BLACK                    Case 3
+     *                       color[p[p[z]]] = RED                   Case 3
+     *                       RIGHT-ROTATE(T, p[p[z]])               Case 3
+     *          else (same as then clause
+     *                        with right and left exchanged)
+     * color[root[T]] = BLACK
+     * </pre>
+     */
     private void fixAfterInsertion(Node z) {
         z.color = RED;
         while (z.parent.color == RED) {
@@ -565,37 +580,36 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         root.color = BLACK;
     }
 
-    // @formatter:off
-	/**
-	 * Introduction to Algorithms (CLR) Second Edition
-	 * 
-	 * <pre>
-	 * RB-DELETE-FIXUP(T, x)
-	 * while x != root[T] and color[x] = BLACK
-	 *    do if x = left[p[x]]
-	 *          then w = right[p[x]]
-	 *               if color[w] = RED
-	 *                  then color[w] = BLACK								Case 1
-	 *                       color[p[x]] = RED								Case 1
-	 *                       LEFT-ROTATE(T, p[x])							Case 1
-	 *                       w = right[p[x]]								Case 1
-	 *               if color[left[w]] = BLACK and color[right[w]] = BLACK
-	 *                  then color[w] = RED									Case 2
-	 *                       x = p[x]										Case 2
-	 *                  else if color[right[w]] = BLACK
-	 *                          then color[left[w]] = BLACK					Case 3
-	 *                               color[w] = RED							Case 3
-	 *                               RIGHT-ROTATE(T,w)						Case 3
-	 *                               w = right[p[x]]						Case 3
-	 *                       color[w] = color[p[x]]							Case 4
-	 *                       color[p[x]] = BLACK							Case 4
-	 *                       color[right[w]] = BLACK						Case 4
-	 *                       LEFT-ROTATE(T, p[x])							Case 4
-	 *                       x = root[T]									Case 4
-	 *          else (same as then clause with right and left exchanged)
-	 * color[x] = BLACK
-	 */
-    // @formatter:on	
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * RB-DELETE-FIXUP(T, x)
+     * while x != root[T] and color[x] = BLACK
+     *    do if x = left[p[x]]
+     *          then w = right[p[x]]
+     *               if color[w] = RED
+     *                  then color[w] = BLACK                               Case 1
+     *                       color[p[x]] = RED                              Case 1
+     *                       LEFT-ROTATE(T, p[x])                           Case 1
+     *                       w = right[p[x]]                                Case 1
+     *               if color[left[w]] = BLACK and color[right[w]] = BLACK
+     *                  then color[w] = RED                                 Case 2
+     *                       x = p[x]                                       Case 2
+     *                  else if color[right[w]] = BLACK
+     *                          then color[left[w]] = BLACK                 Case 3
+     *                               color[w] = RED                         Case 3
+     *                               RIGHT-ROTATE(T,w)                      Case 3
+     *                               w = right[p[x]]                        Case 3
+     *                       color[w] = color[p[x]]                         Case 4
+     *                       color[p[x]] = BLACK                            Case 4
+     *                       color[right[w]] = BLACK                        Case 4
+     *                       LEFT-ROTATE(T, p[x])                           Case 4
+     *                       x = root[T]                                    Case 4
+     *          else (same as then clause with right and left exchanged)
+     * color[x] = BLACK
+     * </pre>
+     */
     private void fixAfterDeletion(Node x) {
         while (x != root && x.color == BLACK) {
             if (x == x.parent.left) {

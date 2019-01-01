@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,10 +63,10 @@ import com.google.common.collect.Ordering;
  * This sorted-list is not <i>thread-safe</i>. If multiple threads modify this sorted-list concurrently it must be
  * synchronized externally.
  * <p>
- * This implementation uses a comparator (whether or not one is explicitly provided) to perform all element comparisons.
- * Two elements which are deemed equal by the comparator's {@code compare(E, E)} method are, from the standpoint of this
- * list, equal. Further, no guarantee is made as to the final order of <i>equal</i> elements. Ties may be broken
- * arbitrarily.
+ * This implementation uses a comparator ({@link Ordering#natural() whether or not one is explicitly provided}) to
+ * perform all element comparisons. Two elements which are deemed equal by the comparator's {@code compare(E, E)} method
+ * are, from the standpoint of this list, equal. Further, no guarantee is made as to the final order of <i>equal</i>
+ * elements. Ties may be broken arbitrarily.
  * <p>
  * Invented by <a href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
  * structure for maintaining items in sorted order. Strictly speaking it is impossible to make any hard guarantees
@@ -75,7 +75,8 @@ import com.google.common.collect.Ordering;
  * <p>
  * The following table summarizes the performance of this class compared to a {@link Treelist} (where n is the size of
  * this sorted-list and <i>m</i> is the size of the specified collection which is iterable in linear time):
- * <p>
+ * 
+ * <pre>
  * <table border="1" cellpadding="3" cellspacing="1" style="width:400px;">
  *   <tr>
  *     <th style="text-align:center;" rowspan="2">Method</th>
@@ -86,58 +87,35 @@ import com.google.common.collect.Ordering;
  *     <td style="text-align:center;"><b>Treelist</b><br>(<i>amortized</i>)</td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #addAll(Collection) addAll(Collection)}<br/>
- *       {@link #containsAll(Collection) containsAll(Collection)}<br/>
- *       {@link #retainAll(Collection) retainAll(Collection)}<br/>
- *       {@link #removeAll(Collection) removeAll(Collection)}
- *     </td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br/>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td style="text-align:center;" colspan="2"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #indexOf(Object)}<br/>
- *       {@link #lastIndexOf(Object)}<br/>
- *       {@link #get(int)}<br/>
- *       {@link #remove(int)}<br/>
- *       {@link #listIterator(int)}
- *     </td>
+ *     <td>{@link #indexOf(Object)}<br/>{@link #lastIndexOf(Object)}<br/>{@link #get(int)}<br/>{@link #remove(int)}<br/>{@link #listIterator(int)}</td>
  *     <td style="text-align:center;" bgcolor="FFCC99"><i>O(log n)</i></td>
  *     <td style="text-align:center;" bgcolor="FFCCCC"><i>O(n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #add(Object) add(E)}<br/>
- *       {@link #contains(Object)}<br/>
- *       {@link #remove(Object)}
- *     </td>
+ *     <td>{@link #add(Object) add(E)}<br/>{@link #contains(Object)}<br/>{@link #remove(Object)}</td>
  *     <td style="text-align:center;" colspan="2"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #clear() clear()}<br/>
- *       {@link #isEmpty() isEmpty()}<br/>
- *       {@link #size()}<br/>
- *     </td>
+ *     <td>{@link #clear() clear()}<br/>{@link #isEmpty() isEmpty()}<br/>{@link #size()}<br/></td>
  *     <td style="text-align:center;" colspan="2"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link Iterator#remove()}<br/>
- *       {@link ListIterator#remove()}
- *     </td>
+ *     <td>{@link Iterator#remove()}<br/>{@link ListIterator#remove()}</td>
  *     <td style="text-align:center;" bgcolor="FFCC99"><i>O(log n)</i></td>
  *     <td style="text-align:center;" bgcolor="FFCCCC"><i>O(1)</i></td>
  *   </tr>
  * </table>
- * <p>
- * The {@code subList} views exhibit identical time complexity, with the
- * exception of the {@code clear()} operation which runs in linear time
- * proportional to the size of the view.
+ * </pre>
+ * 
+ * The {@code subList} views exhibit identical time complexity, with the exception of the {@code clear()} operation
+ * which runs in linear time proportional to the size of the view.
  * 
  * @author Zhenya Leonov
- * @param <E>
- *            the type of elements maintained by this list
+ * @param <E> the type of elements maintained by this list
  * @see Treelist
  */
 public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>, Serializable, Cloneable {

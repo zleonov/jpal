@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,65 +58,44 @@ import com.google.common.collect.Ordering;
  * This sorted-list is not <i>thread-safe</i>. If multiple threads modify this sorted-list concurrently it must be
  * synchronized externally.
  * <p>
- * This implementation uses a comparator (whether or not one is explicitly provided) to perform all element comparisons.
- * Two elements which are deemed equal by the comparator's {@code compare(E, E)} method are, from the standpoint of this
- * list, equal. Further, no guarantee is made as to the final order of <i>equal</i> elements. Ties may be broken
- * arbitrarily.
+ * This implementation uses a comparator ({@link Ordering#natural() whether or not one is explicitly provided}) to
+ * perform all element comparisons. Two elements which are deemed equal by the comparator's {@code compare(E, E)} method
+ * are, from the standpoint of this list, equal. Further, no guarantee is made as to the final order of <i>equal</i>
+ * elements. Ties may be broken arbitrarily.
  * <p>
  * The underlying Red-Black Tree provides the following amortized running time (where <i>n</i> is the size of this
  * sorted-list and <i>m</i> is the size of the specified collection which is iterable in linear time):
- * <p>
+ * 
+ * <pre>
  * <table border="1" cellpadding="3" cellspacing="1" style="width:400px;">
  *   <tr>
  *     <th style="text-align:center;">Method</th>
  *     <th style="text-align:center;">Running Time</th>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #addAll(Collection) addAll(Collection)}<br/>
- *       {@link #containsAll(Collection) containsAll(Collection)}<br/>
- *       {@link #retainAll(Collection) retainAll(Collection)}<br/>
- *       {@link #removeAll(Collection) removeAll(Collection)}
- *     </td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br/>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td style="text-align:center;"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #indexOf(Object)}<br/>
- *       {@link #lastIndexOf(Object)}<br/>
- *       {@link #get(int)}<br/>
- *       {@link #remove(int)}<br/>
- *       {@link #listIterator(int)}
- *     </td>
+ *     <td>{@link #indexOf(Object)}<br/>{@link #lastIndexOf(Object)}<br/>{@link #get(int)}<br/>{@link #remove(int)}<br/>{@link #listIterator(int)}</td>
  *     <td style="text-align:center;"><i>O(n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #add(Object) add(E)}<br/>
- *       {@link #contains(Object)}<br/>
- *       {@link #remove(Object)}
- *     </td>
+ *     <td>{@link #add(Object) add(E)}<br/>{@link #contains(Object)}<br/>{@link #remove(Object)}</td>
  *     <td style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #clear() clear()}<br/>
- *       {@link #isEmpty() isEmpty()}<br/>
- *       {@link #size()}<br/>
- *       {@link Iterator#remove()}<br/>
- *       {@link ListIterator#remove()}
- *     </td>
+ *     <td>{@link #clear() clear()}<br/>{@link #isEmpty() isEmpty()}<br/>{@link #size()}<br/>{@link Iterator#remove()}<br/>{@link ListIterator#remove()}</td>
  *     <td style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  * </table>
- * <p>
- * The {@code subList} views exhibit identical time complexity, with the
- * exception of the {@code clear()} operation which runs in linear time
- * proportional to the size of the view.
+ * </pre>
+ * 
+ * The {@code subList} views exhibit identical time complexity, with the exception of the {@code clear()} operation
+ * which runs in linear time proportional to the size of the view.
  * 
  * @author Zhenya Leonov
- * @param <E>
- *            the type of elements maintained by this list
+ * @param <E> the type of elements maintained by this list
  * @see Skiplist
  */
 public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>, Cloneable, Serializable {
@@ -699,8 +678,6 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             throw new NotSerializableException();
         }
 
-        // Red-Black-Tree
-
         @Override
         Node search(final E e) {
             final int compareFrom = comparator.compare(e, from.element);
@@ -858,6 +835,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * right[z] = nil[T]
      * color[z] = RED
      * RB-INSERT-FIXUP(T, z)
+     * </pre>
      */
     private void insert(Node z) {
         size++;
@@ -908,6 +886,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * if color[y] = BLACK
      *    then RB-DELETE-FIXUP(T, x)
      * return y
+     * </pre>
      */
     private void delete(Node z) {
         size--;
@@ -950,6 +929,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      *    do x = y
      *       y = p[y]
      * return y
+     * </pre>
      */
     private Node successor(Node x) {
         if (x == nil)
@@ -1002,6 +982,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      *            else right[p[x]] = y
      * left[y] = x                          Put x on y's left.
      * p[x] = y
+     * </pre>
      */
     private void leftRotate(final Node x) {
         if (x != nil) {
@@ -1061,6 +1042,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      *          else (same as then clause
      *                        with right and left exchanged)
      * color[root[T]] = BLACK
+     * </pre>
      */
     private void fixAfterInsertion(Node z) {
         z.color = RED;
@@ -1130,6 +1112,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      *                       x = root[T]                                    Case 4
      *          else (same as then clause with right and left exchanged)
      * color[x] = BLACK
+     * </pre>
      */
     private void fixAfterDeletion(Node x) {
         while (x != root && x.color == BLACK) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.SortedSet;
-import java.util.NavigableSet;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
@@ -62,40 +62,28 @@ import com.google.common.collect.Ordering;
  * <p>
  * The underlying array-based skip list provides the following expected case running time (where <i>n</i> is the size of
  * this set and <i>m</i> is the size of the specified collection which is iterable in linear time):
- * <p>
+ * 
+ * <pre>
  * <table border="1" cellpadding="3" cellspacing="1" style="width:400px;">
  *   <tr>
  *     <th style="text-align:center;">Method</th>
  *     <th style="text-align:center;">Running Time</th>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #addAll(Collection) addAll(Collection)}<br/>
- *       {@link #containsAll(Collection) containsAll(Collection)}<br/>
- *       {@link #retainAll(Collection) retainAll(Collection)}<br/>
- *       {@link #removeAll(Collection) removeAll(Collection)}
- *     </td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br/>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td style="text-align:center;"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #add(Object) add(E)}<br/>
- *       {@link #contains(Object)}<br/>
- *       {@link #remove(Object)}<br/>
- *       {@link Iterator#remove()}
- *     </td>
+ *     <td>{@link #add(Object) add(E)}<br/>{@link #contains(Object)}<br/>{@link #remove(Object)}<br/>{@link Iterator#remove()}</td>
  *     <td style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #clear() clear()}<br/>
- *       {@link #isEmpty() isEmpty()}<br/>
- *       {@link #size()}
- *     </td>
+ *     <td>{@link #clear() clear()}<br/>{@link #isEmpty() isEmpty()}<br/>{@link #size()}</td>
  *     <td style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  * </table>
- *
+ * </pre>
+ * 
  * @author Zhenya Leonov
  * @param <E> the type of elements maintained by this list
  * @see Skiplist

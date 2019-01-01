@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,10 @@ import java.security.MessageDigest;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.google.common.io.ByteSink;
+import com.google.common.io.ByteSource;
+import com.google.common.io.CharSink;
+import com.google.common.io.CharSource;
 import com.google.common.io.Closer;
 import com.google.common.io.MoreFiles;
 
@@ -60,37 +64,37 @@ import net.javatoday.common.base.MessageDigests;
  *     <th>Method</th><th>Guava</th><th>Java</th>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#append(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND).write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link MorePaths#append(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#append(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND).write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link MorePaths#append(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#append(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND).writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, CREATE, APPEND)}</td>
+ *     <td>{@link MorePaths#append(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#append(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND).writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, Charset, OpenOption...) Files.write(Path, Iterable, Charset, CREATE, APPEND)}</td>
+ *     <td>{@link MorePaths#append(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, Charset, OpenOption...) Files.write(Path, Iterable, Charset, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#newBufferedInputStream(Path)}</td><td>{@link MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path).openBufferedStream()}</td><td>N/A</td>
+ *     <td>{@link MorePaths#newBufferedInputStream(Path)}</td><td>{@link MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, false)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path).openBufferedStream()}</td><td>N/A</td>
+ *     <td>{@link MorePaths#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, false)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, true)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, CREATE, APPEND).openBufferedStream()}</td><td>N/A</td>
+ *     <td>{@link MorePaths#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, true)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, CREATE, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8).openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path)}</td>
+ *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND).openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path, CREATE, APPEND)}</td>
+ *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset).openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset)}</td>
+ *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND).openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset, CREATE, APPEND)}</td>
+ *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link MorePaths#newLineNumberReader(Path)}</td><td>N/A</td><td>N/A</td>
@@ -111,28 +115,28 @@ import net.javatoday.common.base.MessageDigests;
  *     <td>{@link MorePaths#newPrintWriter(Path, boolean, Charset)}</td><td>N/A</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, StandardCharsets.UTF_8).readLines()}</td><td>{@link Files#readAllLines(Path)}</td>
+ *     <td>N/A</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, StandardCharsets.UTF_8)}{@link CharSource#readLines() .readLines()}</td><td>{@link Files#readAllLines(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset).readLines()}</td><td>{@link Files#readAllLines(Path, Charset)}</td>
+ *     <td>N/A</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#readLines() .readLines()}</td><td>{@link Files#readAllLines(Path, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#toString(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, StandardCharsets.UTF_8).read()}</td><td>N/A</td>
+ *     <td>{@link MorePaths#toString(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, StandardCharsets.UTF_8)}{@link CharSource#read() .read()}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#toString(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset).read()}</td><td>N/A</td>
+ *     <td>{@link MorePaths#toString(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#read() .read()}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#write(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8).write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link MorePaths#write(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#write(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset).write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link MorePaths#write(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#write(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8).writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable)}</td>
+ *     <td>{@link MorePaths#write(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link MorePaths#write(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset).writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, Charset)}</td>
+ *     <td>{@link MorePaths#write(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, Charset)}</td>
  *   </tr>
  * </table>
  * </pre>

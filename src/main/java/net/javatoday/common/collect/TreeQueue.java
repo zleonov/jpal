@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Zhenya Leonov
+ * Copyright (C) 2019 Zhenya Leonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,10 @@ import com.google.common.collect.Ordering;
  * remove or insert {@code null} elements is prohibited. Querying for {@code null} elements is allowed. Inserting
  * non-comparable elements will result in a {@code ClassCastException}. This queue uses the same general ordering rules
  * as a {@link PriorityQueue PriorityQueue}. The first element (the head) of this queue is considered to be the
- * <i>least</i> element with respect to the specified ordering. A comparator is used (whether or not one is explicitly
- * provided) to perform all element comparisons. Two elements which are deemed equal by the comparator's
- * {@code compare(E, E)} method have equal priority from the standpoint of this queue. Elements with equal priority are
- * sorted according to their insertion order.
+ * <i>least</i> element with respect to the specified ordering. A comparator is used ({@link Ordering#natural() whether
+ * or not one is explicitly provided}) to perform all element comparisons. Two elements which are deemed equal by the
+ * comparator's {@code compare(E, E)} method have equal priority from the standpoint of this queue. Elements with equal
+ * priority are sorted according to their insertion order.
  * <p>
  * Besides the regular {@link #peek() peek()}, {@link #poll() poll()}, {@link #remove() remove()} operations specified
  * in the {@code Queue} interface, this implementation provides additional {@link #peekLast() peekLast()},
@@ -74,7 +74,8 @@ import com.google.common.collect.Ordering;
  * The underlying Red-Black Tree provides the following running time compared to a {@link PriorityQueue PriorityQueue}
  * (where <i>n</i> is the size of this queue and <i>m</i> is the size of the specified collection which is iterable in
  * linear time):
- * <p>
+ * 
+ * <pre>
  * <table border="1" cellpadding="3" cellspacing="1" style="width:400px;">
  *   <tr>
  *     <th style="text-align:center;" rowspan="2">Method</th>
@@ -85,65 +86,40 @@ import com.google.common.collect.Ordering;
  *     <td style="text-align:center;"><b>PriorityQueue</b><br>(<i>worst-case</i>)</td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #addAll(Collection) addAll(Collection)}<br>
- *       {@link #containsAll(Collection) containsAll(Collection)}</br>
- *       {@link #retainAll(Collection) retainAll(Collection)}</br>
- *       {@link #removeAll(Collection) removeAll(Collection)}
- *     </td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br>{@link #containsAll(Collection) containsAll(Collection)}</br>{@link #retainAll(Collection) retainAll(Collection)}</br>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td colspan="2" style="text-align:center;"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #add(Object) add(E)}</br>
- *       {@link #offer(Object) offer(E)}</br>
- *       {@link #remove(Object)}
- *     </td>
+ *     <td>{@link #add(Object) add(E)}</br>{@link #offer(Object) offer(E)}</br>{@link #remove(Object)}</td>
  *     <td colspan="2" style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #contains(Object)}
- *     </td>
+ *     <td>{@link #contains(Object)}</td>
  *     <td bgcolor="FFCC99" style="text-align:center;"><i>O(log n)</i></td>
  *     <td bgcolor="FFCCCC" rowspan="2" style="text-align:center;"><i>O(n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #clear()}
- *     </td>
+ *     <td>{@link #clear()}</td>
  *     <td bgcolor="FFCC99" rowspan="2" style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #poll()}</br>
- *       {@link #remove() remove()}</br>
- *     </td>
+ *     <td>{@link #poll()}</br>{@link #remove() remove()}</br></td>
  *     <td bgcolor="FFCCCC" style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #element() element()}</br>
- *       {@link #isEmpty() isEmpty()}</br>
- *       {@link #peek()}</br>
- *       {@link #size()}
- *     </td>
+ *     <td>{@link #element() element()}</br>{@link #isEmpty() isEmpty()}</br>{@link #peek()}</br>{@link #size()}</td>
  *     <td colspan="2" style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>
- *       {@link #peekLast() peekLast()}</br>
- *       {@link #pollLast() pollLast()}</br>
- *       {@link #removeLast() removeLast()}
- *      </td>
- *      <td style="text-align:center;"><i>O(1)</i></td>
- *      <td style="text-align:center;">&nbsp</td>
+ *     <td>{@link #peekLast() peekLast()}</br>{@link #pollLast() pollLast()}</br>{@link #removeLast() removeLast()}</td>
+ *     <td style="text-align:center;"><i>O(1)</i></td>
+ *     <td style="text-align:center;">&nbsp</td>
  *   </tr>
  * </table>
+ * </pre>
  * 
  * @author Zhenya Leonov
- * @param <E>
- *            the type of elements held in this queue
+ * @param <E> the type of elements held in this queue
  */
 final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollection<E>, BoundedQueue<E>, Cloneable, Serializable {
 
@@ -397,7 +373,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
     public int size() {
         return size;
     }
-    
+
     @Override
     public int remainingCapacity() {
         return capacity - size();
@@ -523,7 +499,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         return clone;
     }
 
-    private void writeObject(java.io.ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final java.io.ObjectOutputStream oos) throws java.io.IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -531,7 +507,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
         ois.defaultReadObject();
         nil = new Node();
         root = nil;
@@ -569,7 +545,6 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         }
     }
 
-    // @formatter:off
     /**
      * Introduction to Algorithms (CLR) Second Edition
      * 
@@ -592,8 +567,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      * right[z] = nil[T]
      * color[z] = RED
      * RB-INSERT-FIXUP(T, z)
+     * </pre>
      */
-     // @formatter:on
     private boolean insert(final Node z) {
         modCount++;
         Node x = root;
@@ -622,6 +597,31 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         return true;
     }
 
+    /**
+     * Introduction to Algorithms (CLR) Second Edition
+     * 
+     * <pre>
+     * RB-DELETE-FIXUP(T, z)
+     * if left[z] = nil[T] or right[z] = nil[T]
+     *    then y = z
+     *    else y = TREE-SUCCESSOR(z)
+     * if left[y] != nil[T]
+     *    then x = left[y]
+     *    else x = right[y]
+     * p[x] = p[y]
+     * if p[y] = nil[T]
+     *    then root[T] = x
+     *    else if y = left[p[y]]
+     *            then left[p[y]] = x
+     *            else right[p[y]] = x
+     * if y != z
+     *    then key[z] = key[y]
+     *         copy y's satellite data into z
+     * if color[y] = BLACK
+     *    then RB-DELETE-FIXUP(T, x)
+     * return y
+     * </pre>
+     */
     private void delete(Node z) {
         size--;
         modCount++;
@@ -663,7 +663,6 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         return null;
     }
 
-    // @formatter:off
     /**
      * Introduction to Algorithms (CLR) Second Edition
      * 
@@ -676,8 +675,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      *    do x = y
      *       y = p[y]
      * return y
+     * </pre>
      */
-    // @formatter:on    
     private Node successor(Node x) {
         if (x == nil)
             return nil;
@@ -712,7 +711,6 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         return y;
     }
 
-    // @formatter:off
     /**
      * Introduction to Algorithms (CLR) Second Edition
      * 
@@ -730,8 +728,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      *            else right[p[x]] = y
      * left[y] = x                          Put x on y's left.
      * p[x] = y
+     * </pre>
      */
-    // @formatter:on    
     private void leftRotate(final Node x) {
         if (x != nil) {
             Node n = x.right;
@@ -768,7 +766,6 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         }
     }
 
-    // @formatter:off
     /**
      * Introduction to Algorithms (CLR) Second Edition
      * 
@@ -791,8 +788,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      *          else (same as then clause
      *                        with right and left exchanged)
      * color[root[T]] = BLACK
+     * </pre>
      */
-    // @formatter:on    
     private void fixAfterInsertion(Node z) {
         z.color = RED;
         while (z.parent.color == RED) {
@@ -833,7 +830,6 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         root.color = BLACK;
     }
 
-    // @formatter:off
     /**
      * Introduction to Algorithms (CLR) Second Edition
      * 
@@ -862,8 +858,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      *                       x = root[T]                                    Case 4
      *          else (same as then clause with right and left exchanged)
      * color[x] = BLACK
+     * </pre>
      */
-    // @formatter:on    
     private void fixAfterDeletion(Node x) {
         while (x != root && x.color == BLACK) {
             if (x == x.parent.left) {
@@ -918,5 +914,5 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         }
         x.color = BLACK;
     }
-    
+
 }

@@ -175,13 +175,13 @@ final public class Fs {
      * <p>
      * If the file does not exist it will be created.
      *
-     * @param content the character sequence to append
-     * @param to      the file to append to
+     * @param chars the character sequence to append
+     * @param to    the file to append to
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File append(final CharSequence content, final File to) throws IOException {
-        return append(content, to, Charsets.UTF_8);
+    public static File append(final CharSequence chars, final File to) throws IOException {
+        return append(chars, to, Charsets.UTF_8);
     }
 
     /**
@@ -189,20 +189,20 @@ final public class Fs {
      * <p>
      * If the file does not exist it will be created.
      * 
-     * @param content the character sequence to append
+     * @param chars   the character sequence to append
      * @param to      the file to append to
      * @param charset the character set to use when writing to the file
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File append(final CharSequence content, final File to, final Charset charset) throws IOException {
-        checkNotNull(content, "content == null");
+    public static File append(final CharSequence chars, final File to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
         checkNotNull(to, "to == null");
         checkNotNull(charset, "charset == null");
 
         final Closer closer = Closer.create();
         try {
-            CharStream.write(content, closer.register(new FileOutputStream(to, true)), charset);
+            CharStream.write(chars, closer.register(new FileOutputStream(to, true)), charset);
             return to;
         } catch (final Throwable e) {
             throw closer.rethrow(e);
@@ -700,36 +700,38 @@ final public class Fs {
     /**
      * Writes a character sequence to the given file using the UTF-8 charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
+     * written.
      *
-     * @param content the character sequence to append
-     * @param to      the file to write to
+     * @param chars the character sequence to append
+     * @param to    the file to write to
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File write(final CharSequence content, final File to) throws IOException {
-        return write(content, to, Charsets.UTF_8);
+    public static File write(final CharSequence chars, final File to) throws IOException {
+        return write(chars, to, Charsets.UTF_8);
     }
 
     /**
      * Writes a character sequence to the given file using the specified charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
+     * written.
      * 
-     * @param content the character sequence to append
+     * @param chars   the character sequence to append
      * @param to      the file to write to
      * @param charset the character set to use when writing to the file
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File write(final CharSequence content, final File to, final Charset charset) throws IOException {
-        checkNotNull(content, "content == null");
+    public static File write(final CharSequence chars, final File to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
         checkNotNull(to, "to == null");
         checkNotNull(charset, "charset == null");
 
         final Closer closer = Closer.create();
         try {
-            CharStream.write(content, closer.register(new FileOutputStream(to, false)), charset);
+            CharStream.write(chars, closer.register(new FileOutputStream(to, false)), charset);
             return to;
         } catch (final Throwable e) {
             throw closer.rethrow(e);
@@ -742,7 +744,7 @@ final public class Fs {
      * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the UTF-8 charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines is written.
      *
      * @param lines the lines of text to write
      * @param to    the file write to
@@ -757,7 +759,7 @@ final public class Fs {
      * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the specified charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines is written.
      * 
      * @param lines   the lines of text to write
      * @param to      the file write to

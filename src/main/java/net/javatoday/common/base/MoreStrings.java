@@ -202,7 +202,7 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence or {@code null}
      * @return {@code true} if the specified character sequence is {@code null}, empty, or contains only white space
      *         characters; {@code false} otherwise
      * @see CharMatcher#whitespace()
@@ -210,15 +210,15 @@ final public class MoreStrings {
      * @see Strings#nullToEmpty(String)
      * @see Objects#toString()
      */
-    public static boolean isNullOrWhitespace(final CharSequence content) {
-        return content == null || isWhitespace(content);
+    public static boolean isNullOrWhitespace(final CharSequence chars) {
+        return chars == null || isWhitespace(chars);
     }
 
     /**
      * Returns {@code true} if the specified character sequence is empty or contains only white space characters according
      * to {@link CharMatcher#whitespace()}.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence
      * @return {@code true} if the specified character sequence is empty or contains only white space characters;
      *         {@code false} otherwise
      * @see CharMatcher#whitespace()
@@ -226,9 +226,9 @@ final public class MoreStrings {
      * @see Strings#nullToEmpty(String)
      * @see Objects#toString()
      */
-    public static boolean isWhitespace(final CharSequence content) {
-        checkNotNull(content, "content == null");
-        return CharMatcher.whitespace().matchesAllOf(content);
+    public static boolean isWhitespace(final CharSequence chars) {
+        checkNotNull(chars, "chars == null");
+        return CharMatcher.whitespace().matchesAllOf(chars);
     }
 
     /**
@@ -312,12 +312,12 @@ final public class MoreStrings {
      * One example where this method is useful is when you need to pass a UTF-8 encoded string to a consumer that only
      * supports one to three bytes per character.
      * 
-     * @param content the give character sequence
+     * @param chars the given character sequence
      * @return the given character sequence with the set of characters from U+0000 to U+FFFF (outside the <i>Basic
      *         Multilingual Plane (BMP)</i> characters) replaced with the U+FFFD (� ) character
      */
-    public static String replaceSupplementaryCharacters(final CharSequence content) {
-        return replaceSupplementaryCharacters(content, '\uFFFD');
+    public static String replaceSupplementaryCharacters(final CharSequence chars) {
+        return replaceSupplementaryCharacters(chars, '\uFFFD');
     }
 
     /**
@@ -327,14 +327,14 @@ final public class MoreStrings {
      * This method is useful when you need to pass a UTF-8 encoded string to a consumer that only supports one to three
      * bytes per character.
      * 
-     * @param content     the give character sequence
+     * @param chars       the given character sequence
      * @param replacement the character to use when replacing characters outside the <i>Basic Multilingual Plane (BMP)</i>
      * @return the given character sequence with the set of characters from U+0000 to U+FFFF (outside the <i>Basic
      *         Multilingual Plane (BMP)</i> characters) replaced with the specified character
      */
-    public static String replaceSupplementaryCharacters(final CharSequence content, final char replacement) {
-        checkNotNull(content, "content == null");
-        return SUPPLEMENTARY_CHARACTERS.matcher(content).replaceAll(String.valueOf(replacement));
+    public static String replaceSupplementaryCharacters(final CharSequence chars, final char replacement) {
+        checkNotNull(chars, "chars == null");
+        return SUPPLEMENTARY_CHARACTERS.matcher(chars).replaceAll(String.valueOf(replacement));
     }
 
     /**
@@ -354,11 +354,11 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with trailing and leading whitespace omitted
      */
-    public static String trim(final CharSequence content) {
-        return content == null ? null : CharMatcher.whitespace().trimFrom(content);
+    public static String trim(final CharSequence chars) {
+        return chars == null ? null : CharMatcher.whitespace().trimFrom(chars);
     }
 
     /**
@@ -367,11 +367,11 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with trailing whitespace omitted
      */
-    public static String trimEnd(final CharSequence content) {
-        return content == null ? null : CharMatcher.whitespace().trimTrailingFrom(content);
+    public static String trimEnd(final CharSequence chars) {
+        return chars == null ? null : CharMatcher.whitespace().trimTrailingFrom(chars);
     }
 
     /**
@@ -381,14 +381,14 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with leading and trailing blank lines omitted
      */
-    public static String trimLines(final CharSequence content) {
-        if (content == null)
+    public static String trimLines(final CharSequence chars) {
+        if (chars == null)
             return null;
 
-        return NEWLINE_WHITESPACE.matcher(WHITESPACE_NEWLINE.matcher(content).replaceAll("")).replaceAll("");
+        return NEWLINE_WHITESPACE.matcher(WHITESPACE_NEWLINE.matcher(chars).replaceAll("")).replaceAll("");
     }
 
     /**
@@ -397,11 +397,11 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with leading whitespace omitted or {@code null}
      */
-    public static String trimStart(final CharSequence content) {
-        return content == null ? null : CharMatcher.whitespace().trimLeadingFrom(content);
+    public static String trimStart(final CharSequence chars) {
+        return chars == null ? null : CharMatcher.whitespace().trimLeadingFrom(chars);
     }
 
 //    /**
@@ -532,13 +532,13 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      * 
-     * @param content   the given character sequence or {@code null}
+     * @param chars     the given character sequence or {@code null}
      * @param maxLength the specified maximum length
      * @return the given character sequence truncated to the specified maximum length
      * @throws IllegalArgumentException if {@code maxLength} < 1
      */
-    public static String truncate(final CharSequence content, final int maxLength) {
-        return truncate(content, maxLength, null);
+    public static String truncate(final CharSequence chars, final int maxLength) {
+        return truncate(chars, maxLength, null);
     }
 
     /**
@@ -550,7 +550,7 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      * 
-     * @param content   the given character sequence or {@code null}
+     * @param chars     the given character sequence or {@code null}
      * @param maxLength the specified maximum length
      * @param suffix    the string to append to the truncated sequence or {@code null} for no suffix
      * @return the given character sequence truncated to the specified maximum length
@@ -558,18 +558,18 @@ final public class MoreStrings {
      * @throws IllegalArgumentException if {@code suffix} is not {@code null} and its length is not less than
      *                                  {@code maxLength}
      */
-    public static String truncate(final CharSequence content, final int maxLength, final String suffix) {
+    public static String truncate(final CharSequence chars, final int maxLength, final String suffix) {
         checkArgument(maxLength > 0, "maxLength < 1");
 
-        if (content == null)
+        if (chars == null)
             return null;
 
-        if (content.length() <= maxLength)
-            return content.toString();
+        if (chars.length() <= maxLength)
+            return chars.toString();
 
         checkArgument(suffix == null || maxLength > suffix.length(), "maxLength <= suffix.length()");
 
-        final StringBuilder sb = new StringBuilder(maxLength).append(content, 0, suffix == null ? maxLength : maxLength - suffix.length());
+        final StringBuilder sb = new StringBuilder(maxLength).append(chars, 0, suffix == null ? maxLength : maxLength - suffix.length());
 
         if (suffix != null)
             sb.append(suffix);
@@ -583,14 +583,14 @@ final public class MoreStrings {
      * <p>
      * This method is {@code null} safe.
      *
-     * @param content the specified character sequence
+     * @param chars the specified character sequence or {@code null}
      * @return {@code null} if the given character sequence is {@code null}, empty, or contains only whitespace characters
      *         according to {@link CharMatcher#whitespace()}
      */
-    public static <T extends CharSequence> T whitespaceToNull(final T content) {
-        if (isNullOrWhitespace(content))
+    public static <T extends CharSequence> T whitespaceToNull(final T chars) {
+        if (isNullOrWhitespace(chars))
             return null;
-        return content;
+        return chars;
     }
 
     private static String replace(final String str, final String substr, final String replacement, final boolean ignoreCase) {

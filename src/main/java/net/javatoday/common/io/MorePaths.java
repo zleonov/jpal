@@ -158,13 +158,13 @@ final public class MorePaths {
      * <p>
      * If the file does not exist it will be created.
      *
-     * @param content the character sequence to append
+     * @param chars the character sequence to append
      * @param to      the file to append to
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static Path append(final CharSequence content, final Path to) throws IOException {
-        return append(content, to, StandardCharsets.UTF_8);
+    public static Path append(final CharSequence chars, final Path to) throws IOException {
+        return append(chars, to, StandardCharsets.UTF_8);
     }
 
     /**
@@ -172,18 +172,18 @@ final public class MorePaths {
      * <p>
      * If the file does not exist it will be created.
      *
-     * @param content the character sequence to append
+     * @param chars the character sequence to append
      * @param to      the file to append to
      * @param charset the character set to use when writing to the file
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static Path append(final CharSequence content, final Path to, final Charset charset) throws IOException {
-        checkNotNull(content, "content == null");
+    public static Path append(final CharSequence chars, final Path to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
         checkNotNull(to, "to == null");
         checkNotNull(charset, "charset == null");
         try (final OutputStream out = Files.newOutputStream(to, CREATE, APPEND)) {
-            CharStream.write(content, out, charset);
+            CharStream.write(chars, out, charset);
         }
         return to;
     }
@@ -447,34 +447,34 @@ final public class MorePaths {
     /**
      * Writes a character sequence to the given file using the UTF-8 charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are written.
      *
-     * @param content the character sequence to append
+     * @param chars the character sequence to append
      * @param to      the file to write to
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static Path write(final CharSequence content, final Path to) throws IOException {
-        return write(content, to, StandardCharsets.UTF_8);
+    public static Path write(final CharSequence chars, final Path to) throws IOException {
+        return write(chars, to, StandardCharsets.UTF_8);
     }
 
     /**
      * Writes a character sequence to the given file using the specified charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are written.
      * 
-     * @param content the character sequence to append
+     * @param chars the character sequence to append
      * @param to      the file to write to
      * @param charset the character set to use when writing to the file
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static Path write(final CharSequence content, final Path to, final Charset charset) throws IOException {
-        checkNotNull(content, "content == null");
+    public static Path write(final CharSequence chars, final Path to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
         checkNotNull(to, "to == null");
         checkNotNull(charset, "charset == null");
         try (final OutputStream out = Files.newOutputStream(to, CREATE, TRUNCATE_EXISTING, WRITE)) {
-            CharStream.write(content, out, charset);
+            CharStream.write(chars, out, charset);
         }
         return to;
     }
@@ -483,7 +483,7 @@ final public class MorePaths {
      * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the UTF-8 charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
      *
      * @param lines the lines of text to write
      * @param to    the file write to
@@ -498,7 +498,7 @@ final public class MorePaths {
      * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the specified charset.
      * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new content is written.
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
      * 
      * @param lines   the lines of text to write
      * @param to      the file write to

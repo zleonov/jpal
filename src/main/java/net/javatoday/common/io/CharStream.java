@@ -273,13 +273,13 @@ final public class CharStream {
      * <p>
      * Does not close the stream.
      * 
-     * @param content the character sequence to write
-     * @param out     the given {@code OutputStream}
+     * @param chars the character sequence to write
+     * @param out   the given {@code OutputStream}
      * @return the given {@code OutputStream}
      * @throws IOException if an I/O error occurs
      */
-    public static OutputStream write(final CharSequence content, final OutputStream out) throws IOException {
-        return write(content, out, Charsets.UTF_8);
+    public static OutputStream write(final CharSequence chars, final OutputStream out) throws IOException {
+        return write(chars, out, Charsets.UTF_8);
     }
 
     /**
@@ -287,14 +287,14 @@ final public class CharStream {
      * <p>
      * Does not close the stream.
      * 
-     * @param content the character sequence to write
+     * @param chars   the character sequence to write
      * @param out     the given {@code OutputStream}
-     * @param charset the character set to use when writing the content
+     * @param charset the character set to use when writing the chars
      * @return the given {@code OutputStream}
      * @throws IOException if an I/O error occurs
      */
-    public static OutputStream write(final CharSequence content, final OutputStream out, final Charset charset) throws IOException {
-        new OutputStreamWriter(out, charset).append(content).flush();
+    public static OutputStream write(final CharSequence chars, final OutputStream out, final Charset charset) throws IOException {
+        new OutputStreamWriter(out, charset).append(chars).flush();
         return out;
     }
 

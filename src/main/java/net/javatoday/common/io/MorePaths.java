@@ -54,7 +54,7 @@ import net.javatoday.common.base.MessageDigests;
 /**
  * Static utility methods for working with {@link Path}s.
  * <p>
- * This class is the {@link java.nio.file.Path} counterpart to the {@link MorePathsTest} class.
+ * This class is the {@link java.nio.file.Path} counterpart to the {@link Fs} class.
  * <p>
  * Below is table of common methods provided in this class and their Guava and Java 7+ equivalents:
  * 
@@ -440,7 +440,7 @@ final public class MorePaths {
         checkNotNull(charset, "charset == null");
 
         try (final InputStream in = Files.newInputStream(path)) {
-            return CharStream.toString(in, charset);
+            return CharStream.toString(in, charset, Files.size(path));
         }
     }
 

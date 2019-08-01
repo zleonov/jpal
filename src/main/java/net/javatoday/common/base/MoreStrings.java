@@ -265,7 +265,7 @@ final public class MoreStrings {
      * {@code java.util.regex} facility.
      * <p>
      * Java 9+ users should prefer {@link String#replace(CharSequence, CharSequence)} which now has a faster implementation
-     * and no longer uses the {@code java.util.regex}. See
+     * and no longer uses {@code java.util.regex}. See
      * <a href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more information.
      * 
      * @param str         the specified string
@@ -289,7 +289,7 @@ final public class MoreStrings {
      * {@code java.util.regex} facility.
      * <p>
      * Java 9+ users should prefer {@link String#replace(CharSequence, CharSequence)} which now has a faster implementation
-     * and no longer uses the {@code java.util.regex}. See
+     * and no longer uses {@code java.util.regex}. See
      * <a href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more information.
      * 
      * @param str         the specified string

@@ -27,10 +27,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Charsets;
@@ -46,7 +46,7 @@ import com.google.common.io.CharStreams;
  */
 final public class CharStream {
 
-    private static final int CHAR_BUFF_SIZE = 2048;
+    private final static int DEFAULT_BUFFER_SIZE = 8192;
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private CharStream() {
@@ -256,16 +256,31 @@ final public class CharStream {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
-        final Reader reader = new InputStreamReader(in, charset);
+        return toString(in, charset, DEFAULT_BUFFER_SIZE);
+    }
 
-        final StringBuilder sb = new StringBuilder();
+    static String toString(final InputStream in, final Charset charset, long size) throws IOException {
 
-        final char[] buffer = new char[CHAR_BUFF_SIZE];
-        int n = 0;
-        while ((n = reader.read(buffer)) != -1)
-            sb.append(buffer, 0, n);
+        // size is a suggestion but it is not guaranteed to be accurate so we don't throw an OOME if it's too large
+        byte[] bytes = new byte[size > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size];
+        int total = 0;
+        int n;
 
-        return sb.toString();
+        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
+        do {
+            n = in.read(bytes, total, (int) size - total);
+            total += n;
+
+            if ((n = in.read()) != -1) {
+                bytes = Arrays.copyOf(bytes, (size *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size);
+                bytes[total++] = (byte) n;
+            }
+        } while (n != -1);
+
+        if (size != total)
+            bytes = Arrays.copyOf(bytes, total);
+
+        return new String(bytes, charset);
     }
 
     /**

@@ -19,9 +19,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +33,10 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
@@ -96,77 +101,73 @@ class FsTest {
         assertEquals(expected, actual);
     }
 
-//    @Test
-//    void testToStringBenchmarkVsGuava() throws URISyntaxException, IOException {
-//        final File fin = getResourceAsFile("War and Peace.txt");
-//
-//        //final CharSource guava = Files.asCharSource(fin, Charsets.UTF_8);
-//        final Stopwatch watch = Stopwatch.createUnstarted();
-//
-//        watch.start();
-//        Files.asCharSource(fin, Charsets.UTF_8).toString();
-//        watch.stop();
-//        final long guavaTime = watch.elapsed(TimeUnit.MILLISECONDS);
-//
-//        watch.reset();
-//
-//        watch.start();
-//        Fs.toString(fin, Charsets.UTF_8);
-//        watch.stop();
-//        final long myTime = watch.elapsed(TimeUnit.MILLISECONDS);
-//
-//        System.out.println("myTime: " + myTime);
-//        System.out.println("guavaTime: " + guavaTime);
-//
-//        System.out.println(percentageDifference(guavaTime, myTime));
-//
-//    }
-//    
-//    @Test
-//    void testWriteLinesBenchmarkVsGuava() throws URISyntaxException, IOException {
-//        final File fin = getResourceAsFile("War and Peace.txt");
-//
-//        final int numLines = 66055 * 100;
-////
-////        final List<String> readLines = Files.readLines(fin, Charsets.UTF_8);
-//
-////        
-////        Lists.chara
-//        
-//        final String content = Files.asCharSource(fin, Charsets.UTF_8).read();
-//        final List<String> characters = Lists.newArrayList();
-//        
-//        for(final Character c: Lists.charactersOf(content))
-//            characters.add(c.toString());
-//        
-//        Collections.shuffle(characters);
-//        
-//        final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
-//         
-//        final File tmp = createTempFile(new File("d:\\"));
-//        final File tmp2 = createTempFile(new File("d:\\"));
-//
-//        final CharSink guava = Files.asCharSink(tmp, Charsets.UTF_8);
-//        final Stopwatch watch = Stopwatch.createUnstarted();
-//
-//        watch.start();
-//        guava.writeLines(lines);
-//        watch.stop();
-//        final long guavaTime = watch.elapsed(TimeUnit.MILLISECONDS);
-//
-//        watch.reset();
-//
-//        watch.start();
-//        Fs.write(lines, tmp2);
-//        watch.stop();
-//        final long myTime = watch.elapsed(TimeUnit.MILLISECONDS);
-//
-//        System.out.println("myTime: " + myTime);
-//        System.out.println("guavaTime: " + guavaTime);
-//
-//        System.out.println(percentageDifference(guavaTime, myTime));
-//
-//    }
+    @Test
+    void testToStringBenchmarkVsGuavaAndJava() throws URISyntaxException, IOException {
+        final File fin = getResourceAsFile("War and Peace.txt");
+
+        final File tmp = createTempFile(new File("d:\\"));
+        Files.asCharSink(tmp, Charsets.UTF_8).write(Strings.repeat(Files.asCharSource(fin, Charsets.UTF_8).read(), 200));
+
+        final Stopwatch watch = Stopwatch.createUnstarted();
+
+        watch.start();
+        Files.asCharSource(tmp, Charsets.UTF_8).read();
+        watch.stop();
+        final long guava = watch.elapsed(TimeUnit.MILLISECONDS);
+
+        watch.reset();
+
+        watch.start();
+        Fs.toString(tmp, Charsets.UTF_8);
+        watch.stop();
+        final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
+
+        System.out.println("Fs.toString(File) vs Files.asCharSource(File, Charsets.UTF_8).read():");
+        System.out.println("jpal : " + jpal);
+        System.out.println("guava: " + guava);
+        System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
+        System.out.println();
+    }
+
+    @Test
+    void testWriteLinesBenchmarkVsGuava() throws URISyntaxException, IOException {
+        final File fin = getResourceAsFile("War and Peace.txt");
+
+        final int numLines = 66055 * 100;
+
+        final String content = Files.asCharSource(fin, Charsets.UTF_8).read();
+        final List<String> characters = Lists.newArrayList();
+
+        for (final Character c : Lists.charactersOf(content))
+            characters.add(c.toString());
+
+        Collections.shuffle(characters);
+
+        final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
+
+        final File tmp = createTempFile(new File("d:\\"));
+        final File tmp2 = createTempFile(new File("d:\\"));
+
+        final Stopwatch watch = Stopwatch.createUnstarted();
+
+        watch.start();
+        Files.asCharSink(tmp, Charsets.UTF_8).writeLines(lines);
+        watch.stop();
+        final long guava = watch.elapsed(TimeUnit.MILLISECONDS);
+
+        watch.reset();
+
+        watch.start();
+        Fs.write(lines, tmp2);
+        watch.stop();
+        final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
+
+        System.out.println("Fs.write(Iterable, File) vs Files.asCharSink(File, Charsets.UTF_8).writeLines(lines):");
+        System.out.println("jpal : " + jpal);
+        System.out.println("guava: " + guava);
+        System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
+        System.out.println();
+    }
 
     public float percentageDifference(final long t1, final long t2) {
         return Math.abs(t1 - t2) / ((t1 + t2) / 2f);

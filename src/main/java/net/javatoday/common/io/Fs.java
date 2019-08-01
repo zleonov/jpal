@@ -53,6 +53,7 @@ import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
 import net.javatoday.common.base.MessageDigests;
+import net.javatoday.common.base.MoreStrings;
 import net.javatoday.common.io.FileWalker.VisitResult;
 
 /**
@@ -344,7 +345,7 @@ final public class Fs {
      * @return the {@code HashCode} of the given file using the specified hash function
      * @throws IOException if an I/O error occurs
      */
-    public static HashCode hash(final File file, HashFunction func) throws IOException {
+    public static HashCode hash(final File file, final HashFunction func) throws IOException {
         checkNotNull(file, "file == null");
         checkNotNull(func, "func == null");
         final Closer closer = Closer.create();
@@ -365,7 +366,7 @@ final public class Fs {
      * @param to   the destination file
      * @throws IOException if an I/O error occurs
      */
-    public static void move(File from, File to) throws IOException {
+    public static void move(final File from, final File to) throws IOException {
         checkNotNull(to, "to == null");
         checkNotNull(from, "from == null");
 
@@ -571,9 +572,10 @@ final public class Fs {
      * @param base  the base path
      * @param child the path to relativize against {@code base}
      * @return the relative path between {@code base} and {@code child}
+     * @throws IOException if an I/O error occurs
      */
-    public static String relativize(final File base, final File child) {
-        return base.toURI().relativize(child.toURI()).getPath();
+    public static String relativize(final File base, final File child) throws IOException {
+        return base.getCanonicalFile().toURI().relativize(child.getCanonicalFile().toURI()).getPath();
     }
 
     /**
@@ -584,7 +586,7 @@ final public class Fs {
      */
     public static String separatorsToUnix(final String path) {
         checkNotNull(path, "path == null");
-        return path.replace("\\", "/");
+        return MoreStrings.replace(path, "\\", "/");
     }
 
     /**
@@ -612,7 +614,7 @@ final public class Fs {
 
         final Closer closer = Closer.create();
         try {
-            return CharStream.toString(closer.register(new FileInputStream(file)), charset);
+            return CharStream.toString(closer.register(new FileInputStream(file)), charset, (int) file.length());
         } catch (final Throwable e) {
             throw closer.rethrow(e);
         } finally {

@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.List;
@@ -23,10 +24,10 @@ import org.junit.jupiter.api.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.io.CharSink;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
@@ -54,121 +55,113 @@ class MorePathsTest {
             f.delete();
     }
 
-//    @Test
-//    void testToStringBenchmarkVsGuava() throws URISyntaxException, IOException {
-//        final File fin = getResourceAsFile("War and Peace.txt");
-//
-//        //final CharSource guava = Files.asCharSource(fin, Charsets.UTF_8);
-//        final Stopwatch watch = Stopwatch.createUnstarted();
-//
-//        watch.start();
-//        Files.asCharSource(fin, Charsets.UTF_8).toString();
-//        watch.stop();
-//        final long guavaTime = watch.elapsed(TimeUnit.MILLISECONDS);
-//
-//        watch.reset();
-//
-//        watch.start();
-//        MorePaths.toString(fin, Charsets.UTF_8);
-//        watch.stop();
-//        final long myTime = watch.elapsed(TimeUnit.MILLISECONDS);
-//
-//        System.out.println("myTime: " + myTime);
-//        System.out.println("guavaTime: " + guavaTime);
-//
-//        System.out.println(percentageDifference(guavaTime, myTime));
-//
-//    }
-//    
+    @Test
+    void testToStringBenchmarkVsGuava() throws URISyntaxException, IOException {
+        final File fin = getResourceAsFile("War and Peace.txt");
+
+        final File tmp = createTempFile(new File("d:\\"));
+        Files.asCharSink(tmp, Charsets.UTF_8).write(Strings.repeat(Files.asCharSource(fin, Charsets.UTF_8).read(), 200));
+
+        final Path path = tmp.toPath();
+
+        final Stopwatch watch = Stopwatch.createUnstarted();
+
+        watch.start();
+        MoreFiles.asCharSource(path, Charsets.UTF_8).read();
+        watch.stop();
+        final long guava = watch.elapsed(TimeUnit.MILLISECONDS);
+
+        watch.reset();
+
+        watch.start();
+        MorePaths.toString(path);
+        watch.stop();
+        final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
+
+        System.out.println("MorePaths.toString(Path) vs MoreFiles.asCharSource(Path, Charsets.UTF_8).read():");
+        System.out.println("jpal : " + jpal);
+        System.out.println("guava: " + guava);
+        System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
+        System.out.println();
+
+    }
+
     @Test
     void testWriteLinesBenchmarkVsGuava() throws URISyntaxException, IOException {
         final File fin = getResourceAsFile("War and Peace.txt");
-
         final int numLines = 66055 * 100;
-//
-//        final List<String> readLines = Files.readLines(fin, Charsets.UTF_8);
 
-//        
-//        Lists.chara
-        
         final String content = Files.asCharSource(fin, Charsets.UTF_8).read();
         final List<String> characters = Lists.newArrayList();
-        
-        for(final Character c: Lists.charactersOf(content))
-            characters.add(c.toString());
-        
-        Collections.shuffle(characters);
-        
-        final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
-         
-        final File tmp = createTempFile(new File("d:\\"));
-        final File tmp2 = createTempFile(new File("d:\\"));
 
-        final CharSink guava = Files.asCharSink(tmp, Charsets.UTF_8);
+        for (final Character c : Lists.charactersOf(content))
+            characters.add(c.toString());
+
+        Collections.shuffle(characters);
+
+        final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
+
+        final Path tmp1 = createTempFile(new File("d:\\")).toPath();
+        final Path tmp2 = createTempFile(new File("d:\\")).toPath();
+
         final Stopwatch watch = Stopwatch.createUnstarted();
 
         watch.start();
-        guava.writeLines(lines);
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
         watch.stop();
-        final long guavaTime = watch.elapsed(TimeUnit.MILLISECONDS);
+        final long guava = watch.elapsed(TimeUnit.MILLISECONDS);
 
         watch.reset();
 
         watch.start();
-        MorePaths.write(lines, tmp2.toPath());
+        MorePaths.write(lines, tmp2);
         watch.stop();
-        final long myTime = watch.elapsed(TimeUnit.MILLISECONDS);
+        final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("myTime: " + myTime);
-        System.out.println("guavaTime: " + guavaTime);
-
-        System.out.println(percentageDifference(guavaTime, myTime));
-
+        System.out.println("MorePaths.write(Iterable, Path) vs MoreFiles.asCharSink(Path, Charsets.UTF_8).writeLines(lines):");
+        System.out.println("jpal : " + jpal);
+        System.out.println("guava: " + guava);
+        System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
+        System.out.println();
     }
-    
+
     @Test
     void testWriteLinesBenchmarkVsJava() throws URISyntaxException, IOException {
         final File fin = getResourceAsFile("War and Peace.txt");
-
         final int numLines = 66055 * 100;
-//
-//        final List<String> readLines = Files.readLines(fin, Charsets.UTF_8);
 
-//        
-//        Lists.chara
-        
         final String content = Files.asCharSource(fin, Charsets.UTF_8).read();
         final List<String> characters = Lists.newArrayList();
-        
-        for(final Character c: Lists.charactersOf(content))
+
+        for (final Character c : Lists.charactersOf(content))
             characters.add(c.toString());
-        
+
         Collections.shuffle(characters);
-        
+
         final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
-         
-        final File tmp = createTempFile(new File("d:\\"));
-        final File tmp2 = createTempFile(new File("d:\\"));
+
+        final Path tmp1 = createTempFile(new File("d:\\")).toPath();
+        final Path tmp2 = createTempFile(new File("d:\\")).toPath();
 
         final Stopwatch watch = Stopwatch.createUnstarted();
 
         watch.start();
-        java.nio.file.Files.write(tmp.toPath(), lines);
+        java.nio.file.Files.write(tmp1, lines);
         watch.stop();
-        final long guavaTime = watch.elapsed(TimeUnit.MILLISECONDS);
+        final long java = watch.elapsed(TimeUnit.MILLISECONDS);
 
         watch.reset();
 
         watch.start();
-        MorePaths.write(lines, tmp2.toPath());
+        MorePaths.write(lines, tmp2);
         watch.stop();
-        final long myTime = watch.elapsed(TimeUnit.MILLISECONDS);
+        final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("myTime: " + myTime);
-        System.out.println("javaTime: " + guavaTime);
-
-        System.out.println(percentageDifference(guavaTime, myTime));
-
+        System.out.println("MorePaths.write(Iterable, Path) vs java.nio.file.Files.write(Path, Iterable):");
+        System.out.println("jpal : " + jpal);
+        System.out.println("guava: " + java);
+        System.out.println("Percentage Difference: " + percentageDifference(java, jpal) * 100 + "%");
+        System.out.println();
     }
 
     public float percentageDifference(final long t1, final long t2) {

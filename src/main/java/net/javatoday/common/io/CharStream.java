@@ -268,8 +268,7 @@ final public class CharStream {
 
         // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
         do {
-            n = in.read(bytes, total, (int) size - total);
-            total += n;
+            total += (n = in.read(bytes, total, (int) size - total));
 
             if ((n = in.read()) != -1) {
                 bytes = Arrays.copyOf(bytes, (size *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size);

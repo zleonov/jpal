@@ -49,10 +49,10 @@ public final class Dates {
     }
 
     /**
-     * Returns a date/time formatter which uses the {@link DateFormat#DEFAULT DEFAULT} date and time formatting styles for
+     * Returns a date/time formatter which uses the {@link DateFormat#DEFAULT DEFAULT} date and time formatting styles in
      * the default locale.
      * 
-     * @return a date/time formatter which uses the {@link DateFormat#DEFAULT DEFAULT} date and time formatting styles for
+     * @return a date/time formatter which uses the {@link DateFormat#DEFAULT DEFAULT} date and time formatting styles in
      *         the default locale
      */
     public static DateFormat getDefaultDateTimeInstance() {

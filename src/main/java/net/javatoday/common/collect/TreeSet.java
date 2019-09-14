@@ -100,9 +100,9 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     /**
-     * Creates a new {@code SortedSetImpl} that orders its elements according to their <i>natural ordering</i>.
+     * Creates a new {@code TreeSet} that orders its elements according to their <i>natural ordering</i>.
      * 
-     * @return a new {@code SortedSetImpl} that orders its elements according to their <i>natural ordering</i>
+     * @return a new {@code TreeSet} that orders its elements according to their <i>natural ordering</i>
      */
     // @SuppressWarnings("rawtypes")
     // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
@@ -111,10 +111,10 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     /**
-     * Creates a new {@code SortedSetImpl} that uses the specified comparator to order its elements.
+     * Creates a new {@code TreeSet} that uses the specified comparator to order its elements.
      * 
      * @param comparator the specified comparator
-     * @return a new {@code SortedSetImpl} that uses the specified comparator to order its elements
+     * @return a new {@code TreeSet} that uses the specified comparator to order its elements
      * 
      */
     public static <E> TreeSet<E> create(final Comparator<? super E> comparator) {
@@ -123,13 +123,13 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     /**
-     * Creates a new {@code SortedSetImpl} containing the specified initial elements. If {@code elements} is an instance of
+     * Creates a new {@code TreeSet} containing the specified initial elements. If {@code elements} is an instance of
      * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this set will be
      * ordered according to the same ordering. Otherwise, this set will be ordered according to the <i>natural ordering</i>
      * of its elements.
      * 
      * @param elements the initial elements to be placed into the set
-     * @return a new {@code SortedSetImpl} containing the specified initial elements
+     * @return a new {@code TreeSet} containing the specified initial elements
      * @throws ClassCastException   if any of the initial elements cannot be compared to one another according to this set's
      *                              ordering
      * @throws NullPointerException if any of the initial elements or {@code elements} itself is {@code null}
@@ -243,7 +243,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     /**
-     * Returns a shallow copy of this {@code SortedSetImpl}. The elements themselves are not cloned.
+     * Returns a shallow copy of this {@code TreeSet}. The elements themselves are not cloned.
      * 
      * @return a shallow copy of this queue
      */

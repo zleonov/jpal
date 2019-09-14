@@ -3,15 +3,17 @@ package net.javatoday.common.io;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -28,13 +30,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.io.FileWriteMode;
-import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 
 class MorePathsTest {
 
-    private final static List<File> TEMP_FILES = Lists.newLinkedList();
+    private final static List<Path> TEMP_PATHS = new LinkedList<>();
 
     @BeforeAll
     static void setUpBeforeClass() throws Exception {
@@ -43,6 +43,10 @@ class MorePathsTest {
 
     @AfterAll
     static void tearDownAfterClass() throws Exception {
+
+
+        for (final Path p : TEMP_PATHS)
+            java.nio.file.Files.delete(p);
     }
 
     @BeforeEach
@@ -51,18 +55,16 @@ class MorePathsTest {
 
     @AfterEach
     void tearDown() throws Exception {
-        for (final File f : TEMP_FILES)
-            f.delete();
     }
 
     @Test
     void testToStringBenchmarkVsGuava() throws URISyntaxException, IOException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
 
-        final File tmp = createTempFile(new File("d:\\"));
-        Files.asCharSink(tmp, Charsets.UTF_8).write(Strings.repeat(Files.asCharSource(fin, Charsets.UTF_8).read(), 200));
+        final Path tmp = createTempPath(Paths.get("d:"));
+        MoreFiles.asCharSink(tmp, Charsets.UTF_8).write(Strings.repeat(MoreFiles.asCharSource(fin, Charsets.UTF_8).read(), 200));
 
-        final Path path = tmp.toPath();
+        final Path path = tmp;
 
         final Stopwatch watch = Stopwatch.createUnstarted();
 
@@ -88,10 +90,10 @@ class MorePathsTest {
 
     @Test
     void testWriteLinesBenchmarkVsGuava() throws URISyntaxException, IOException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final int numLines = 66055 * 100;
 
-        final String content = Files.asCharSource(fin, Charsets.UTF_8).read();
+        final String content = MoreFiles.asCharSource(fin, Charsets.UTF_8).read();
         final List<String> characters = Lists.newArrayList();
 
         for (final Character c : Lists.charactersOf(content))
@@ -101,8 +103,8 @@ class MorePathsTest {
 
         final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
 
-        final Path tmp1 = createTempFile(new File("d:\\")).toPath();
-        final Path tmp2 = createTempFile(new File("d:\\")).toPath();
+        final Path tmp1 = createTempPath(Paths.get("d:"));
+        final Path tmp2 = createTempPath(Paths.get("d:"));
 
         final Stopwatch watch = Stopwatch.createUnstarted();
 
@@ -127,10 +129,10 @@ class MorePathsTest {
 
     @Test
     void testWriteLinesBenchmarkVsJava() throws URISyntaxException, IOException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final int numLines = 66055 * 100;
 
-        final String content = Files.asCharSource(fin, Charsets.UTF_8).read();
+        final String content = MoreFiles.asCharSource(fin, Charsets.UTF_8).read();
         final List<String> characters = Lists.newArrayList();
 
         for (final Character c : Lists.charactersOf(content))
@@ -140,8 +142,8 @@ class MorePathsTest {
 
         final Iterable<String> lines = Iterables.limit(Iterables.cycle(characters), numLines);
 
-        final Path tmp1 = createTempFile(new File("d:\\")).toPath();
-        final Path tmp2 = createTempFile(new File("d:\\")).toPath();
+        final Path tmp1 = createTempPath(Paths.get("d:"));
+        final Path tmp2 = createTempPath(Paths.get("d:"));
 
         final Stopwatch watch = Stopwatch.createUnstarted();
 
@@ -170,56 +172,56 @@ class MorePathsTest {
 
     @Test
     void testAppendCharSequenceFileExistsVsGuava() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        Files.asCharSink(tmp1, Charsets.UTF_8, FileWriteMode.APPEND).write(content);
-        MorePaths.append(content, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).write(content);
+        MorePaths.append(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testAppendCharSequenceFileExistsVsJava7() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        java.nio.file.Files.write(tmp1.toPath(), content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(content, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        MorePaths.append(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testAppendCharSequenceFileNotExistsVsGuava() throws IOException, URISyntaxException {
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        Files.asCharSink(tmp1, Charsets.UTF_8, FileWriteMode.APPEND).write(content);
-        MorePaths.append(content, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).write(content);
+        MorePaths.append(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testAppendCharSequenceFileNotExistsVsJava7() throws IOException, URISyntaxException {
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        java.nio.file.Files.write(tmp1.toPath(), content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(content, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        MorePaths.append(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
@@ -227,13 +229,13 @@ class MorePathsTest {
         final String content = "The quick brown fox jumps over the lazy dog";
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            java.nio.file.Files.write(tmp1.toPath(), content.getBytes(charset), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            MorePaths.append(content, tmp2.toPath(), charset);
+            java.nio.file.Files.write(tmp1, content.getBytes(charset), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            MorePaths.append(content, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
@@ -242,68 +244,68 @@ class MorePathsTest {
         final String content = "The quick brown fox jumps over the lazy dog";
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            Files.asCharSink(tmp1, charset, FileWriteMode.APPEND).write(content);
-            MorePaths.append(content, tmp2.toPath(), charset);
+            MoreFiles.asCharSink(tmp1, charset, StandardOpenOption.APPEND).write(content);
+            MorePaths.append(content, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
     @Test
     void testAppendLinesFileExistsVsGuava() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        Files.asCharSink(tmp1, Charsets.UTF_8, FileWriteMode.APPEND).writeLines(lines);
-        MorePaths.append(lines, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).writeLines(lines);
+        MorePaths.append(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testAppendLinesFileExistsVsJava7() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        java.nio.file.Files.write(tmp1.toPath(), lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(lines, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        MorePaths.append(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testAppendLinesFileNotExistsVsGuava() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        Files.asCharSink(tmp1, Charsets.UTF_8, FileWriteMode.APPEND).writeLines(lines);
-        MorePaths.append(lines, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).writeLines(lines);
+        MorePaths.append(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testAppendLinesFileNotExistsVsJava7() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        java.nio.file.Files.write(tmp1.toPath(), lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(lines, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        MorePaths.append(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
@@ -311,13 +313,13 @@ class MorePathsTest {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            java.nio.file.Files.write(tmp1.toPath(), lines, charset, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            MorePaths.append(lines, tmp2.toPath(), charset);
+            java.nio.file.Files.write(tmp1, lines, charset, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            MorePaths.append(lines, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
@@ -326,68 +328,68 @@ class MorePathsTest {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            Files.asCharSink(tmp1, charset, FileWriteMode.APPEND).writeLines(lines);
-            MorePaths.append(lines, tmp2.toPath(), charset);
+            MoreFiles.asCharSink(tmp1, charset, StandardOpenOption.APPEND).writeLines(lines);
+            MorePaths.append(lines, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
     @Test
     void testWriteCharSequenceFileExistsVsGuava() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        Files.asCharSink(tmp1, Charsets.UTF_8).write(content);
-        MorePaths.write(content, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8).write(content);
+        MorePaths.write(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testWriteCharSequenceFileExistsVsJava7() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        java.nio.file.Files.write(tmp1.toPath(), content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(content, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        MorePaths.write(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testWriteCharSequenceFileNotExistsVsGuava() throws IOException, URISyntaxException {
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        Files.asCharSink(tmp1, Charsets.UTF_8).write(content);
-        MorePaths.write(content, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8).write(content);
+        MorePaths.write(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testWriteCharSequenceFileNotExistsVsJava7() throws IOException, URISyntaxException {
         final String content = "The quick brown fox jumps over the lazy dog";
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        java.nio.file.Files.write(tmp1.toPath(), content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(content, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        MorePaths.write(content, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
@@ -395,13 +397,13 @@ class MorePathsTest {
         final String content = "The quick brown fox jumps over the lazy dog";
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            java.nio.file.Files.write(tmp1.toPath(), content.getBytes(charset), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            MorePaths.write(content, tmp2.toPath(), charset);
+            java.nio.file.Files.write(tmp1, content.getBytes(charset), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            MorePaths.write(content, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
@@ -410,68 +412,68 @@ class MorePathsTest {
         final String content = "The quick brown fox jumps over the lazy dog";
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            Files.asCharSink(tmp1, charset).write(content);
-            MorePaths.write(content, tmp2.toPath(), charset);
+            MoreFiles.asCharSink(tmp1, charset).write(content);
+            MorePaths.write(content, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
     @Test
     void testWriteLinesFileExistsVsGuava() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        Files.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
-        MorePaths.write(lines, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
+        MorePaths.write(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testWriteLinesFileExistsVsJava7() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFileAndCopy(fin);
-        final File tmp2 = createTempFileAndCopy(fin);
+        final Path tmp1 = createTempPathAndCopy(fin);
+        final Path tmp2 = createTempPathAndCopy(fin);
 
-        java.nio.file.Files.write(tmp1.toPath(), lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(lines, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        MorePaths.write(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testWriteLinesFileNotExistsVsGuava() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        Files.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
-        MorePaths.write(lines, tmp2.toPath());
+        MoreFiles.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
+        MorePaths.write(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
     void testWriteLinesFileNotExistsVsJava7() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
-        final File tmp1 = createTempFile();
-        final File tmp2 = createTempFile();
+        final Path tmp1 = createTempPath();
+        final Path tmp2 = createTempPath();
 
-        java.nio.file.Files.write(tmp1.toPath(), lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(lines, tmp2.toPath());
+        java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        MorePaths.write(lines, tmp2);
 
-        assertTrue(Files.equal(tmp1, tmp2));
+        assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
 
     @Test
@@ -479,13 +481,13 @@ class MorePathsTest {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            java.nio.file.Files.write(tmp1.toPath(), lines, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            MorePaths.write(lines, tmp2.toPath(), charset);
+            java.nio.file.Files.write(tmp1, lines, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            MorePaths.write(lines, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
@@ -494,61 +496,58 @@ class MorePathsTest {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final File tmp1 = createTempFile();
-            final File tmp2 = createTempFile();
+            final Path tmp1 = createTempPath();
+            final Path tmp2 = createTempPath();
 
-            Files.asCharSink(tmp1, charset).writeLines(lines);
-            MorePaths.write(lines, tmp2.toPath(), charset);
+            MoreFiles.asCharSink(tmp1, charset).writeLines(lines);
+            MorePaths.write(lines, tmp2, charset);
 
-            assertTrue(Files.equal(tmp1, tmp2));
+            assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
     }
 
     @Test
     void testToStringVsGuava() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final String expected = MoreFiles.asCharSource(fin.toPath(), charset).read();
-            final String actual = MorePaths.toString(fin.toPath(), charset);
+            final String expected = MoreFiles.asCharSource(fin, charset).read();
+            final String actual = MorePaths.toString(fin, charset);
             assertEquals(expected, actual);
         }
     }
 
     @Test
     void testToStringVsJava7() throws IOException, URISyntaxException {
-        final File fin = getResourceAsFile("War and Peace.txt");
+        final Path fin = getResourceAsFile("War and Peace.txt");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
-            final String expected = new String(java.nio.file.Files.readAllBytes(fin.toPath()), charset);
-            final String actual = MorePaths.toString(fin.toPath(), charset);
+            final String expected = new String(java.nio.file.Files.readAllBytes(fin), charset);
+            final String actual = MorePaths.toString(fin, charset);
             assertEquals(expected, actual);
         }
     }
 
-    private static File getResourceAsFile(final String name) throws URISyntaxException {
+    private static Path getResourceAsFile(final String name) throws URISyntaxException {
         final URI uri = MorePaths.class.getResource(name).toURI();
         Preconditions.checkArgument(uri != null, "cannot find %s", name);
-        return new File(uri);
+        return Paths.get(uri);
     }
 
-    private static File createTempFileAndCopy(final File from) throws IOException {
-        final File tmp = createTempFile();
-        Files.copy(from, tmp);
+    private static Path createTempPathAndCopy(final Path from) throws IOException {
+        final Path tmp = createTempPath();
+        java.nio.file.Files.copy(from, tmp, StandardCopyOption.REPLACE_EXISTING);
         return tmp;
     }
 
-    private static File createTempFile() throws IOException {
-        return createTempFile(TEMP_DIR);
+    private static Path createTempPath() throws IOException {
+        return createTempPath(Paths.get("d:\\"));
     }
 
-    private static final File TEMP_DIR = new File(System.getProperty("java.io.tmpdir"));
-
-    private static File createTempFile(final File tempDir) throws IOException {
-        final File f = File.createTempFile("tmp", null, tempDir);
-        f.deleteOnExit();
-        TEMP_FILES.add(f);
-        return f;
+    private static Path createTempPath(final Path directory) throws IOException {
+        final Path p = java.nio.file.Files.createTempFile(directory, "tmp", null);
+        TEMP_PATHS.add(p);
+        return p;
     }
 
 }

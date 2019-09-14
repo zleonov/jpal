@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
  * @author Zhenya Leonov
  */
 
-// Buffers are inherently not thread-safe (even accessing a buffer using absolute positioning  from multiple threads is
+// Buffers are inherently not thread-safe (even accessing a buffer using absolute positioning from multiple threads is
 // not guaranteed to return correct results) so we must use synchronization.
 public final class ByteBufferInputStream extends InputStream {
 

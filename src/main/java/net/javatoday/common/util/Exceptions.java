@@ -17,6 +17,8 @@ package net.javatoday.common.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
+
 import com.google.common.base.Throwables;
 
 /**
@@ -58,20 +60,19 @@ public final class Exceptions {
      * @return the specified throwable
      */
     public static RuntimeException throwUnchecked(final Throwable t) {
-        checkNotNull(t, "t == null");
-
-        Exceptions.<RuntimeException>_throw_(t);
-
-        // Must throw an exception satisfy the Java compiler error: This method must return a result of type RuntimeException
-        throw new AssertionError();
+       throw Exceptions.<RuntimeException>_throw_(t);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Exception> void _throw_(final Throwable t) throws T {
+    private static <T extends Throwable> RuntimeException _throw_(final Throwable t) throws T {
         checkNotNull(t, "t == null");
 
         // This is a no-op because of type erasure
         throw (T) t;
+    }
+    
+    public static void main(String[] args) {
+        throw throwUnchecked(new IOException());
     }
 
 }

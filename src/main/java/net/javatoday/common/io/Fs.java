@@ -17,6 +17,10 @@ package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static net.javatoday.common.io.FileWalker.VisitResult.CONTINUE;
 import static net.javatoday.common.io.FileWalker.VisitResult.SKIP_SIBLINGS;
 import static net.javatoday.common.io.FileWalker.VisitResult.TERMINATE;
@@ -30,12 +34,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.util.List;
 
@@ -51,115 +61,306 @@ import com.google.common.io.CharSource;
 import com.google.common.io.Closer;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 
 import net.javatoday.common.base.MessageDigests;
 import net.javatoday.common.base.MoreStrings;
 import net.javatoday.common.io.FileWalker.VisitResult;
 
 /**
- * Static utility methods for working with {@link File}s.
+ * Static utility methods for working with {@link File}s and {@link Path}s.
  * <p>
  * <b>Warning:</b> The {@code java.io.File} facility suffers from race conditions and provides no platform-independent
  * way to detect symbolic links, as such there is no way to ensure a symbolic link to a directory is not followed when
  * traversing a file tree. In the presence of symbolic links, you may encounter files outside the starting directory, or
  * even end up in an infinite loop.
  * <p>
- * While this class is not deprecated, Java 7+ users are highly encouraged to use the
- * <a href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System introduced in
- * JDK 7</a>. {@link java.nio.file.Path Path} users will find similar methods in the {@link MorePaths} class.
+ * While {@code java.io.File} operations are not deprecated, Java 7+ users are highly encouraged to use {@code java.nio.file.Path} operations introduced in JDK 7 as part of the 
+ * <a href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System</a>.
  * <p>
- * Below is table of common methods provided in this class and their Guava equivalents:
+ * The following table describes common methods provided in this class and their Guava and Java equivalents:
  * 
  * <pre>
  * <table border="1" cellpadding="3" cellspacing="1">
  *   <tr>
- *     <th>Method</th><th>Guava</th>
+ *     <th>Method</th>
+ *     <th>Guava</th>
+ *     <th>Java 8</th>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#append(CharSequence, File)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#append(CharSequence, Path)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(CharSequence, File, Charset)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(CharSequence, Path, Charset)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
+ *   </tr>     
+ *   <tr>
+ *     <td>{@link Fs#append(Iterable, File)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedInputStream(File)}</td><td>{@link Files#asByteSource(File) Files.asByteSource(File)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#append(Iterable, Path)}</td>     
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, false)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#append(Iterable, File, Charset)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, true)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#append(Iterable, Path, Charset)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link java.nio.file.Files#write(Path, Iterable, Charset, OpenOption...) Files.write(Path, Iterable, Charset, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, false)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedInputStream(File)}</td>
+ *     <td>{@link Files#asByteSource(File) Files.asByteSource(File)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, true)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedInputStream(Path)}</td>
+ *     <td>{@link java.nio.file.MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, false, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, false)}</td>
+ *     <td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, false)}</td>
+ *     <td>{@link java.nio.file.MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newLineNumberReader(File)}</td><td>N/A</td>
+ *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, true)}</td>
+ *     <td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newLineNumberReader(File, Charset)}</td><td>N/A</td>
+ *      <td>{@link Fs#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, true)}</td>
+ *     <td>{@link java.nio.file.MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, CREATE, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newPrintStream(File, boolean)}</td><td>N/A</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, false)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newPrintStream(File, boolean, Charset)}</td><td>N/A</td>
+ *     <td>N/A</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link java.nio.file.Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newPrintWriter(File, boolean)}</td><td>N/A</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean) newBufferedWriter(File, true)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newPrintWriter(File, boolean, Charset)}</td><td>N/A</td>
+ *     <td>N/A</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8, CREATE, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link java.nio.file.Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#readLines(File)}</td><td>{@link Files#readLines(File, Charset) Files.readLines(File, Charsets.UTF_8)}</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, false, Charset)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link Files#readLines(File, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset)}</td>
+ *   </tr>     
+ *   <tr>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, true, Charset)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#toString(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charsets.UTF_8)}{@link CharSource#read() .read()}</td>
+ *     <td>N/A</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset, CREATE, APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#toString(File, Charset)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charset)}{@link CharSource#read() .read()}</td>
+ *     <td>{@link Fs#newLineNumberReader(File)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#newLineNumberReader(Path)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#newLineNumberReader(File, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#newLineNumberReader(Path, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#newPrintStream(File, boolean)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#deleteDirectoryContents(File)}</td><td>N/A</td>
+ *     <td>{@link Fs#newPrintStream(Path, boolean)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#deleteRecursively(File)}</td><td>N/A</td>
+ *     <td>{@link Fs#newPrintStream(File, boolean, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#newPrintStream(Path, boolean, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#newPrintWriter(File, boolean)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#newPrintWriter(Path, boolean)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#newPrintWriter(Path, boolean, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#newPrintWriter(Path, boolean, Charset)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#readLines(File)}</td>
+ *     <td>{@link Files#readLines(File, Charset) Files.readLines(File, Charsets.UTF_8)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#readLines(Path)}</td>     
+ *     <td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, StandardCharsets.UTF_8)}{@link CharSource#readLines() .readLines()}</td>
+ *     <td>{@link java.nio.file.Files#readAllLines(Path)}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#readLines(File, Charset)}</td>
+ *     <td>{@link Files#readLines(File, Charset)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#readLines(Path, Charset)}</td>
+ *     <td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#readLines() .readLines()}</td>
+ *     <td>{@link java.nio.file.Files#readAllLines(Path, Charset)}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#toString(File)}</td>
+ *     <td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charsets.UTF_8)}{@link CharSource#read() .read()}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#toString(Path)}</td>
+ *     <td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, StandardCharsets.UTF_8)}{@link CharSource#read() .read()}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#toString(File, Charset)}</td>
+ *     <td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charset)}{@link CharSource#read() .read()}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#toString(Path, Charset)}</td>
+ *     <td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#read() .read()}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(CharSequence, File)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(CharSequence, Path)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(CharSequence, File, Charset)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(CharSequence, Path, Charset)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(Iterable, File)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charsets.UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(Iterable, Path)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, StandardCharsets.UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable)}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(Iterable, File, Charset)}</td>
+ *     <td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(Iterable, Path, Charset)}</td>
+ *     <td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, Charset)}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#deleteDirectoryContents(File)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>N/A</td>
+ *     <td>{@link MoreFiles#deleteDirectoryContents(Path, RecursiveDeleteOption...) MoreFiles.deleteDirectoryContents(Path, RecursiveDeleteOption...)}</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#deleteRecursively(File)}</td>
+ *     <td>N/A</td>
+ *     <td>N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>N/A</td>
+ *     <td>{@link MoreFiles#deleteRecursively(Path, RecursiveDeleteOption...) MoreFiles.deleteRecursively(Path, RecursiveDeleteOption...)}</td>
+ *     <td>N/A</td>
  *   </tr>
  * </table>
  * </pre>
  * 
- * @see MorePaths
  * @see com.google.common.io.Files
  * @see com.google.common.io.MoreFiles
  * @see java.nio.file.Files
@@ -213,6 +414,41 @@ final public class Fs {
     }
 
     /**
+     * Appends a character sequence to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param chars the character sequence to append
+     * @param to    the file to append to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final CharSequence chars, final Path to) throws IOException {
+        return append(chars, to, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Appends a character sequence to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param chars   the character sequence to append
+     * @param to      the file to append to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final CharSequence chars, final Path to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            CharStream.write(chars, out, charset);
+        }
+        return to;
+    }
+
+    /**
      * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the UTF-8 charset.
      * <p>
@@ -256,11 +492,50 @@ final public class Fs {
     }
 
     /**
+     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param lines the lines of text to append
+     * @param to    the file to append to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final Iterable<? extends CharSequence> lines, final Path to) throws IOException {
+        append(lines, to, StandardCharsets.UTF_8);
+        return to;
+    }
+
+    /**
+     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param lines   the lines of text to append
+     * @param to      the file to append to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final Iterable<? extends CharSequence> lines, final Path to, final Charset charset) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            CharStream.write(lines, out, charset);
+        }
+        return to;
+    }
+
+    /**
      * Deletes all the files within a directory. Does not delete the directory itself.
      * 
      * @param dir the directory to delete the contents of
      * @throws IllegalArgumentException if the argument is not a directory
      * @throws IOException              if an I/O error occurs
+     * @see MoreFiles#deleteDirectoryContents(Path, com.google.common.io.RecursiveDeleteOption...)
      */
     public static void deleteDirectoryContents(final File dir) throws IOException {
         checkNotNull(dir, "dir == null");
@@ -279,6 +554,7 @@ final public class Fs {
      *
      * @param file the file to delete
      * @throws IOException if an I/O error occurs
+     * @see MoreFiles#deleteRecursively(Path, com.google.common.io.RecursiveDeleteOption...)
      */
     public static void deleteRecursively(final File file) throws IOException {
         checkNotNull(file, "file == null");
@@ -320,12 +596,45 @@ final public class Fs {
     }
 
     /**
+     * Computes and returns the digest value of the given file using the specified message digest object.
+     * <p>
+     * Invoke {@link MessageDigests#toString(byte[])} to get a lower case hexadecimal string representation of the digest
+     * value which conveniently matches the output of Unix-like commands such as {@code md5sum}.
+     * <p>
+     * The {@code MessageDigest} is reset when this method returns successfully.
+     * <p>
+     * <b>Note:</b> Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction)} which uses Guava's
+     * robust {@link Hashing} facility.
+     *
+     * @param path   the given file
+     * @param digest the specified message digest object
+     * @return the result of {@link MessageDigest#digest()} for all the bytes in the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] digest(final Path path, final MessageDigest digest) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(digest, "digest == null");
+        final Closer closer = Closer.create();
+        try {
+            return ByteStream.digest(closer.register(java.nio.file.Files.newInputStream(path)), digest);
+        } catch (final Throwable e) {
+            throw closer.rethrow(e);
+        } finally {
+            closer.close();
+        }
+    }
+
+    /**
      * Returns the last name in the path's name sequence.
      * <p>
      * This method handles both Windows and Unix path separator characters.
      * 
      * @param path the specified path
      * @return the last name in the path's name sequence
+     * @see Files#getNameWithoutExtension(String)
+     * @see Files#getFileExtension(String)
+     * @see MoreFiles#getNameWithoutExtension(Path)
+     * @see MoreFiles#getFileExtension(Path)
      */
     public static String getName(final String path) {
         checkNotNull(path, "path == null");
@@ -359,12 +668,38 @@ final public class Fs {
     }
 
     /**
+     * Computes and returns the {@code HashCode} of the given file using the specified hash function.
+     * <p>
+     * Invoke {@link HashCode#asBytes()} to get the hash code value as a byte array or {@link HashCode#toString()} for a
+     * lower case hexadecimal string representation which conveniently matches the output of Unix-like commands such as
+     * {@code md5sum}.
+     * 
+     * @param path the specified file
+     * @param func the given hash function
+     * @return the {@code HashCode} of the given file using the specified hash function
+     * @throws IOException if an I/O error occurs
+     */
+    public static HashCode hash(final Path path, HashFunction func) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(func, "func == null");
+        final Closer closer = Closer.create();
+        try {
+            return ByteStream.hash(closer.register(java.nio.file.Files.newInputStream(path)), func);
+        } catch (final Throwable e) {
+            throw closer.rethrow(e);
+        } finally {
+            closer.close();
+        }
+    }
+
+    /**
      * Moves the file from one path to another. This method can rename a file or move it to a different directory, like the
      * Unix {@code mv} command.
      *
      * @param from the source file
      * @param to   the destination file
      * @throws IOException if an I/O error occurs
+     * @see Files#move(File, File)
      */
     public static void move(final File from, final File to) throws IOException {
         checkNotNull(to, "to == null");
@@ -392,6 +727,18 @@ final public class Fs {
     }
 
     /**
+     * Returns a {@code BufferedInputStream} to the specified file.
+     *
+     * @param path the specified file
+     * @return a {@code BufferedInputStream} to the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedInputStream newBufferedInputStream(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedInputStream(java.nio.file.Files.newInputStream(path));
+    }
+
+    /**
      * Returns a {@code BufferedOutputStream} to the specified file.
      *
      * @param file   the specified file
@@ -402,6 +749,19 @@ final public class Fs {
     public static BufferedOutputStream newBufferedOutputStream(final File file, final boolean append) throws IOException {
         checkNotNull(file, "file == null");
         return new BufferedOutputStream(new FileOutputStream(file, append));
+    }
+
+    /**
+     * Returns a {@code BufferedOutputStream} to the specified file.
+     *
+     * @param path   the specified file
+     * @param append whether to truncate or append to the specified file
+     * @return a {@code BufferedOutputStream} to the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedOutputStream newBufferedOutputStream(final Path path, final boolean append) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedOutputStream(java.nio.file.Files.newOutputStream(path, append ? new StandardOpenOption[] { CREATE, APPEND } : new StandardOpenOption[] {}));
     }
 
     /**
@@ -445,6 +805,18 @@ final public class Fs {
     }
 
     /**
+     * Returns a {@code ByteArrayInputStream} containing all the bytes read from the specified file.
+     *
+     * @param path the specified file
+     * @return a {@code ByteArrayInputStream} containing all the bytes read from the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static ByteArrayInputStream newByteArrayInputStream(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        return new ByteArrayInputStream(java.nio.file.Files.readAllBytes(path));
+    }
+
+    /**
      * Returns a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset.
      * <p>
      * Does not close the reader.
@@ -471,6 +843,35 @@ final public class Fs {
         checkNotNull(file, "file == null");
         checkNotNull(file, "charset == null");
         return new LineNumberReader(new InputStreamReader(new FileInputStream(file), charset));
+    }
+
+    /**
+     * Returns a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param path the given file
+     * @return a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static LineNumberReader newLineNumberReader(final Path path) throws IOException {
+        return newLineNumberReader(path, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Returns a new {@code LineNumberReader} which reads from the given file using the specified charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param path    the given file
+     * @param charset the character set to use when reading from the input stream
+     * @return a new {@code LineNumberReader} which reads from the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static LineNumberReader newLineNumberReader(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(path, "charset == null");
+        return new LineNumberReader(new InputStreamReader(java.nio.file.Files.newInputStream(path), charset));
     }
 
     /**
@@ -511,6 +912,43 @@ final public class Fs {
     }
 
     /**
+     * Returns a new {@code PrintStream} which writes to the given file using the UTF-8 charset, without automatic line
+     * flushing.
+     * <p>
+     * <b>Warning:</b> A {@code PrintStream} never throws I/O exceptions. Users may check whether errors have occurred by
+     * calling the {@link PrintStream#checkError()} method.
+     *
+     * @param path   the specified file
+     * @param append whether to truncate or append to the specified file
+     * @return a new {@code PrintStream} which writes to the given file using the UTF-8 charset, without automatic line
+     *         flushing
+     * @throws IOException if an I/O error occurs
+     */
+    public static PrintStream newPrintStream(final Path path, final boolean append) throws IOException {
+        return newPrintStream(path, append, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Returns a new {@code PrintStream} which writes to the given file using the UTF-8 charset, without automatic line
+     * flushing.
+     * <p>
+     * <b>Warning:</b> A {@code PrintStream} never throws I/O exceptions. Users may check whether errors have occurred by
+     * calling the {@link PrintStream#checkError()} method.
+     *
+     * @param path    the specified file
+     * @param append  whether to truncate or append to the specified file
+     * @param charset the character set to use when writing to the given file
+     * @return a new {@code PrintStream} which writes to the given file using the UTF-8 charset, without automatic line
+     *         flushing
+     * @throws IOException if an I/O error occurs
+     */
+    public static PrintStream newPrintStream(final Path path, final boolean append, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+        return CharStream.newPrintStream(newBufferedOutputStream(path, append), false, charset);
+    }
+
+    /**
      * Returns a {@code PrintWriter} to the given file using the UTF-8 charset, without automatic line flushing.
      * <p>
      * <b>Warning:</b> A {@code PrintWriter} never throws I/O exceptions. Users may check whether errors have occurred by
@@ -544,6 +982,37 @@ final public class Fs {
     }
 
     /**
+     * Returns a {@code PrintWriter} to the given file using the UTF-8 charset, without automatic line flushing.
+     * <p>
+     * <b>Warning:</b> A {@code PrintWriter} never throws I/O exceptions. Users may check whether errors have occurred by
+     * calling the {@link PrintWriter#checkError()} method.
+     *
+     * @param path   the given file
+     * @param append whether to truncate or append to the specified file
+     * @return a {@code PrintWriter} to the given file using the UTF-8 charset, without automatic line flushing
+     * @throws IOException if an I/O error occurs
+     */
+    public static PrintWriter newPrintWriter(final Path path, final boolean append) throws IOException {
+        return newPrintWriter(path, append, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Returns a {@code PrintWriter} to the given file using the specified charset, without automatic line flushing.
+     * <p>
+     * <b>Warning:</b> A {@code PrintWriter} never throws I/O exceptions. Users may check whether errors have occurred by
+     * calling the {@link PrintWriter#checkError()} method.
+     *
+     * @param path    the given file
+     * @param append  whether to truncate or append to the specified file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code PrintWriter} to the given file using the specified charset, without automatic line flushing
+     * @throws IOException if an I/O error occurs
+     */
+    public static PrintWriter newPrintWriter(final Path path, final boolean append, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+        return new PrintWriter(java.nio.file.Files.newBufferedWriter(path, append ? new StandardOpenOption[] { CREATE, APPEND } : new StandardOpenOption[] {}));
+    }/**
      * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
      * line-termination characters.
      * <p>
@@ -567,15 +1036,75 @@ final public class Fs {
     }
 
     /**
+     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * line-termination characters.
+     * <p>
+     * Note: Use {@link Files#readLines(File, Charset)} to specify a different charset.
+     * 
+     * @param file    the specified file *
+     * @param charset the character set to use when reading the file
+     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static List<String> readLines(final File file, final Charset charset) throws IOException {
+        checkNotNull(file, "file == null");
+        checkNotNull(charset, "charset == null");
+
+        final Closer closer = Closer.create();
+        try {
+            return CharStream.readLines(closer.register(new FileInputStream(file)), charset);
+        } catch (final Throwable e) {
+            throw closer.rethrow(e);
+        } finally {
+            closer.close();
+        }
+    }
+
+    /**
      * Returns the relative path between {@code base} and {@code child}.
      * 
      * @param base  the base path
      * @param child the path to relativize against {@code base}
      * @return the relative path between {@code base} and {@code child}
      * @throws IOException if an I/O error occurs
+     * @see java.nio.file.Path#relativize(Path)
      */
     public static String relativize(final File base, final File child) throws IOException {
         return base.getCanonicalFile().toURI().relativize(child.getCanonicalFile().toURI()).getPath();
+    }
+
+    /**
+     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * line-termination characters.
+     * 
+     * @param path the specified file
+     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static List<String> readLines(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return CharStream.readLines(in, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
+     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * line-termination characters.
+     * 
+     * @param path    the specified file
+     * @param charset the character set to use when reading the file
+     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static List<String> readLines(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return CharStream.readLines(in, charset);
+        }
     }
 
     /**
@@ -619,6 +1148,34 @@ final public class Fs {
             throw closer.rethrow(e);
         } finally {
             closer.close();
+        }
+    }
+
+    /**
+     * Returns the contents of the specified file as a string in the UTF-8 charset.
+     * 
+     * @param file the specified file
+     * @return the contents of the specified file as a string in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static String toString(final Path path) throws IOException {
+        return toString(path, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Returns the contents of the given file as a string in the specified charset.
+     * 
+     * @param file    the given file
+     * @param charset the specified charset
+     * @return the contents of the given file as a string in the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static String toString(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return CharStream.toString(in, charset, java.nio.file.Files.size(path));
         }
     }
 
@@ -743,6 +1300,43 @@ final public class Fs {
     }
 
     /**
+     * Writes a character sequence to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
+     * written.
+     *
+     * @param chars the character sequence to append
+     * @param to    the file to write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final CharSequence chars, final Path to) throws IOException {
+        return write(chars, to, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Writes a character sequence to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
+     * written.
+     * 
+     * @param chars   the character sequence to append
+     * @param to      the file to write to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final CharSequence chars, final Path to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, TRUNCATE_EXISTING, WRITE)) {
+            CharStream.write(chars, out, charset);
+        }
+        return to;
+    }
+
+    /**
      * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the UTF-8 charset.
      * <p>
@@ -783,6 +1377,43 @@ final public class Fs {
         } finally {
             closer.close();
         }
+    }
+
+    /**
+     * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
+     *
+     * @param lines the lines of text to write
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final Iterable<? extends CharSequence> lines, final Path to) throws IOException {
+        return write(lines, to, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the specified charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
+     * 
+     * @param lines   the lines of text to write
+     * @param to      the file write to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final Iterable<? extends CharSequence> lines, final Path to, final Charset charset) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
+            CharStream.write(lines, out, charset);
+        }
+        return to;
     }
 
     private static VisitResult walkFileTree(final File start, int depth, final int maxDepth, final FileWalker<?> walker) throws IOException {

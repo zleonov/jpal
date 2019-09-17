@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.Objects;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.io.Closer;
 
 import net.javatoday.common.io.Fs;
@@ -34,10 +35,13 @@ import net.javatoday.common.io.Fs;
  * Static utility methods that operate on or return {@link Object}s.
  * 
  * @author Zhenya Leonov
+ * @see java.util.Objects java.util.Objects
+ * @see com.google.common.base.Objects com.google.common.base.Objects
+ * @see com.google.common.base.MoreObjects com.google.common.base.MoreObjects
  */
-public final class ObjectHelper {
+public final class Obj {
 
-    private ObjectHelper() {
+    private Obj() {
     }
 
     /**

@@ -118,7 +118,7 @@ class FsTest {
         watch.reset();
 
         watch.start();
-        Fs.toString(tmp, Charsets.UTF_8);
+        Fs.read(tmp, Charsets.UTF_8);
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
@@ -515,7 +515,7 @@ class FsTest {
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
             final String expected = Files.asCharSource(fin, charset).read();
-            final String actual = Fs.toString(fin, charset);
+            final String actual = Fs.read(fin, charset);
             assertEquals(expected, actual);
         }
     }
@@ -526,7 +526,7 @@ class FsTest {
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
             final String expected = new String(java.nio.file.Files.readAllBytes(fin.toPath()), charset);
-            final String actual = Fs.toString(fin, charset);
+            final String actual = Fs.read(fin, charset);
             assertEquals(expected, actual);
         }
     }

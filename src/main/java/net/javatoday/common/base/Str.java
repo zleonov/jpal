@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
  * <p>
  * Throughout this class the exact definition of <i>whitespace</i> may change depending on which method is invoked. Each
  * method clearly documents what constitutes as a whitespace character. See a
- * <a href="https://spreadsheets.google.com/pub?key=pd8dAQyHbdewRsnE5x5GzKQ" substr="_blank"> comparison of several
+ * <a href="https://goo.gl/Y6SLWx" substr="_blank"> comparison of several
  * definitions of whitespace</a>.
  *
  * @see Strings
@@ -47,13 +47,13 @@ import com.google.common.collect.Lists;
  * 
  * @author Zhenya Leonov
  */
-final public class MoreStrings {
+final public class Str {
 
     private static final Pattern NEWLINE_WHITESPACE = Pattern.compile("[\n|\r]\\s*$");
     private static final Pattern SUPPLEMENTARY_CHARACTERS = Pattern.compile("[^\\u0000-\\uFFFF]");
     private static final Pattern WHITESPACE_NEWLINE = Pattern.compile("^\\s*[\n|\r]");
 
-    private MoreStrings() {
+    private Str() {
     }
 
     /**
@@ -85,7 +85,7 @@ final public class MoreStrings {
     /**
      * Returns {@code true} if {@code str} contains {@code substr}, ignoring case differences; else {@code false}.
      * <p>
-     * Note: This method uses the rules of the default locale.
+     * <b>Note:</b> This method uses the rules of the default locale.
      *
      * @param str    the specified string
      * @param substr the string to search for
@@ -148,7 +148,7 @@ final public class MoreStrings {
     /**
      * Returns the index within {@code str} of the first occurrence of {@code substr}, ignoring case differences.
      * <p>
-     * Note: This method uses the rules of the default locale.
+     * <b>Note:</b> This method uses the rules of the default locale.
      *
      * @param str    the specified string
      * @param substr the string to search for
@@ -163,7 +163,7 @@ final public class MoreStrings {
      * Returns the index within {@code str} of the first occurrence of {@code substr}, starting at the specified index and
      * ignoring case differences.
      * <p>
-     * Note: This method uses the rules of the default locale.
+     * <b>Note:</b> This method uses the rules of the default locale.
      *
      * @param str       the specified string
      * @param substr    the string to search for

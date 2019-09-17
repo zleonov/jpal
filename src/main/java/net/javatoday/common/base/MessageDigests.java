@@ -111,13 +111,13 @@ public final class MessageDigests {
      * <p>
      * The {@code MessageDigest} is reset after this method returns.
      * 
-     * @param md the specified {@code MessageDigest}
+     * @param digest the specified {@code MessageDigest}
      * @return a lowercase hexadecimal string representation of {@link MessageDigest#digest()}
      */
-    public static String toString(final MessageDigest md) {
-        checkNotNull(md, "md == null");
+    public static String toString(final MessageDigest digest) {
+        checkNotNull(digest, "digest == null");
 
-        return toString(md.digest());
+        return toString(digest.digest());
     }
 
     private static MessageDigest getInstance(final String algorithm) {

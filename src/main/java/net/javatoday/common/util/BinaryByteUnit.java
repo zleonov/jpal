@@ -28,7 +28,7 @@ import com.google.common.math.DoubleMath;
 /**
  * Defines the commonly used binary prefixes specified by
  * <a href="https://en.wikipedia.org/wiki/JEDEC_memory_standards#JEDEC_Standard_100B.01" target="_blank">JEDEC Standard
- * 100B.01</a> to represent the <i>power of 2</i> byte sizes of the filesystem and memory.
+ * 100B.01</a> to represent the <i>power of 2</i> byte sizes of the file system and memory.
  * <p>
  * This {@code Enum} is a poor attempt to deal with the surprisingly
  * <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Quantities_of_bytes_and_bits"

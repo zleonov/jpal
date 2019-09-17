@@ -15,20 +15,19 @@
  */
 package net.javatoday.common.io;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import com.google.common.io.ByteSource;
-import com.google.common.io.Closer;
 
 /**
  * A {@link ByteSource readable source of bytes} from one or more {@link MappedByteBuffer}s backed by a file. Files
@@ -43,39 +42,26 @@ final public class MappedFileByteSource extends ByteSource {
     private final ByteBuffer[] buffers;
     private final long capacity;
 
-    private MappedFileByteSource(final File file) throws IOException {
-        capacity = file.length();
+    /**
+     * Creates a new {@code MappedFileByteSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
+     * file.
+     * 
+     * @param path the specified file
+     * @return a new {@code MappedFileByteSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
+     *         file
+     * @throws IOException if an I/O error occurs
+     */
+    public MappedFileByteSource(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        capacity = Files.size(path);
 
-        final Closer closer = Closer.create();
-
-        try {
-            final RandomAccessFile raf = closer.register(new RandomAccessFile(file, "r"));
-            final FileChannel channel = closer.register(raf.getChannel());
+        try (final FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             buffers = new ByteBuffer[(int) ((capacity + PAGE_SIZE - 1) / PAGE_SIZE)];
 
             for (int i = 0; i < buffers.length; i++)
                 buffers[i] = channel.map(MapMode.READ_ONLY, i * PAGE_SIZE, Math.min(PAGE_SIZE, capacity - i * PAGE_SIZE));
-        } catch (final Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
         }
-    }
-
-    /**
-     * Creates a new {@code MappedFileByteSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
-     * file.
-     * 
-     * @param file the specified file
-     * @return a new {@code MappedFileByteSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
-     *         file
-     * @throws IOException if an I/O error occurs
-     */
-    public static MappedFileByteSource create(final File file) throws IOException {
-        checkNotNull(file, "file == null");
-        checkArgument(file.isFile(), "%s is not a normal file or does not exist", file.getPath());
-        return new MappedFileByteSource(file);
     }
 
     /**
@@ -95,6 +81,7 @@ final public class MappedFileByteSource extends ByteSource {
 //  * @return a new {@code ByteBufferInputStream} which reads from the byte buffer
 //  * @throws IOException if an I/O error occurs
 //  */
+// Do we benefit from buffering here? Or should we simply delegate to openStream()
     @Override
     public BufferedInputStream openBufferedStream() throws IOException {
         return (BufferedInputStream) super.openBufferedStream();

@@ -71,7 +71,7 @@ public class MoreLists {
      * Returns the index of the first occurrence in the specified list of an element which satisfies the given predicate,
      * starting the search at {@code fromIndex}, or -1 if there is no such element.
      * <p>
-     * Note: If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
+     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
      * inputs to avoid a {@code NullPointerException}.
      * 
      * @param list      the specified list
@@ -134,7 +134,7 @@ public class MoreLists {
      * Returns the index of the last occurrence in the specified list of an element which satisfies the given predicate, or
      * -1 if there is no such element.
      * <p>
-     * Note: If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
+     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
      * inputs as well to avoid a {@code NullPointerException}.
      * 
      * @param list      the specified list
@@ -151,7 +151,7 @@ public class MoreLists {
      * Returns the index of the last occurrence in the specified list of an element which satisfies the given predicate,
      * searching backward starting at {@code fromIndex}, or -1 if there is no such element.
      * <p>
-     * Note: If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
+     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
      * inputs as well to avoid a {@code NullPointerException}.
      * 
      * @param list      the specified list

@@ -57,15 +57,16 @@ final public class ByteBufferByteSource extends ByteSource {
      */
     @Override
     public ByteBufferInputStream openStream() throws IOException {
-        return ByteBufferInputStream.create(buff);
+        return new ByteBufferInputStream(buff);
     }
 
-//    /**
-//     * This method simply delegates to {@link #openStream()}.
-//     * 
-//     * @return a new {@code ByteBufferInputStream} which reads from the byte buffer
-//     * @throws IOException if an I/O error occurs
-//     */
+//  /**
+//  * This method simply delegates to {@link #openStream()}.
+//  * 
+//  * @return a new {@code ByteBufferInputStream} which reads from the byte buffer
+//  * @throws IOException if an I/O error occurs
+//  */
+// Do we benefit from buffering here? Or should we simply delegate to openStream()
     @Override
     public BufferedInputStream openBufferedStream() throws IOException {
         return (BufferedInputStream) super.openBufferedStream();

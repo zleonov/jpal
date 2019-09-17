@@ -17,10 +17,10 @@ package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -40,7 +40,7 @@ import net.javatoday.common.base.MessageDigests;
  */
 final public class ByteStream {
 
-    private static final int BYTE_BUFF_SIZE = 4096;
+    private final static int DEFAULT_BUFFER_SIZE = 8192;
 
     private ByteStream() {
     }
@@ -55,9 +55,9 @@ final public class ByteStream {
      * value which conveniently matches the output of Unix-like commands such as {@code md5sum}.
      * <p>
      * The {@code MessageDigest} is reset when this method returns successfully.
-     * <p>
-     * <b>Note:</b> Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
-     * Guava's robust {@link Hashing} facility.
+     * 
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
+     *             Guava's robust {@link Hashing} facility.
      *
      * @param in     the given input stream
      * @param digest the specified message digest object
@@ -68,7 +68,7 @@ final public class ByteStream {
         checkNotNull(in, "in == null");
         checkNotNull(digest, "digest == null");
 
-        final byte[] buff = new byte[BYTE_BUFF_SIZE];
+        final byte[] buff = new byte[DEFAULT_BUFFER_SIZE];
 
         for (int r = in.read(buff); r != -1; r = in.read(buff))
             digest.update(buff, 0, r);
@@ -93,7 +93,7 @@ final public class ByteStream {
         checkNotNull(in, "in == null");
         checkNotNull(func, "func == null");
 
-        final byte[] buff = new byte[BYTE_BUFF_SIZE];
+        final byte[] buff = new byte[DEFAULT_BUFFER_SIZE];
         final Hasher hasher = func.newHasher();
 
         for (int r = in.read(buff); r != -1; r = in.read(buff))
@@ -103,20 +103,41 @@ final public class ByteStream {
     }
 
     /**
-     * Returns a {@code ByteArrayInputStream} containing all the bytes read from the specified input stream.
+     * Returns a byte array containing all the bytes read from the specified input stream.
      * <p>
      * Does not close the stream.
      * <p>
-     * <b>Note</b>: The returned {@code ByteArrayInputStream} is <i>not</i> lazy. The underlying input stream must be non
-     * blocking and finite.
+     * <b>Note</b>: The underlying input stream must be non-blocking and finite.
      * 
      * @param in the specified input stream
-     * @return a {@code ByteArrayInputStream} containing all the bytes read from the specified input stream
+     * @return a byte array containing all the bytes read from the input stream
      * @throws IOException if an I/O error occurs
      */
-    public static ByteArrayInputStream newByteArrayInputStream(final InputStream in) throws IOException {
+    public static byte[] readBytes(final InputStream in) throws IOException {
         checkNotNull(in, "in == null");
-        return in instanceof ByteArrayInputStream ? (ByteArrayInputStream) in : new ByteArrayInputStream(ByteStreams.toByteArray(in));
+        return readBytes(in, DEFAULT_BUFFER_SIZE);
+    }
+
+    static byte[] readBytes(final InputStream in, long size) throws IOException {
+
+        // size is a suggestion but it is not guaranteed to be accurate so we don't throw an OOME if it's too large
+        byte[] bytes = new byte[size > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size];
+        int total = 0;
+        int n;
+
+        do {
+            total += (n = in.read(bytes, total, (int) size - total));
+
+            if ((n = in.read()) != -1) {
+                bytes = Arrays.copyOf(bytes, (size *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size);
+                bytes[total++] = (byte) n;
+            }
+        } while (n != -1);
+
+        if (size != total)
+            bytes = Arrays.copyOf(bytes, total);
+
+        return bytes;
     }
 
 }

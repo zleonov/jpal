@@ -20,7 +20,7 @@ import java.util.function.BiFunction;
 /**
  * Determines an output value for two arguments.
  * <p>
- * Note: Java 8+ users consider switching to {@link BiFunction}.
+ * <b>Note:</b> Java 8+ users consider switching to {@link BiFunction}.
  *
  * @param <T> the type of the first argument
  * @param <U> the type of the second argument

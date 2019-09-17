@@ -32,7 +32,7 @@ import com.google.common.base.Objects;
  * <p>
  * <b>Note:</b> While this class is not deprecated, unless mutability is absolutely required, users are encouraged to
  * use Guava's {@link com.google.common.base.Optional Optional} class or Java 8+ {@link java.util.Optional Optional}
- * class or {@link AtomicReference} in a concurrent scenario.
+ * class. {@link AtomicReference} is an alternative which can be used in a concurrent scenario.
  * 
  * @param <T> the type of value
  * @author Zhenya Leonov
@@ -40,7 +40,6 @@ import com.google.common.base.Objects;
 final public class Holder<T> {
 
     private T value = null;
-    // private boolean hasValue = false;
 
     private Holder() {
     }

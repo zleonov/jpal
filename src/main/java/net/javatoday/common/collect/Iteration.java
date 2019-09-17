@@ -155,7 +155,7 @@ final public class Iteration {
     /**
      * Returns an immutable empty {@code ListIterator}.
      * <p>
-     * Note: Java 7+ users should prefer {@link Collections#emptyListIterator()}.
+     * <b>Note:</b> Java 7+ users should prefer {@link Collections#emptyListIterator()}.
      * 
      * @return an immutable empty {@code ListIterator}
      */

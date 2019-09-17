@@ -25,17 +25,13 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 
 /**
@@ -46,8 +42,8 @@ import com.google.common.io.CharStreams;
  */
 final public class CharStream {
 
-    private final static int DEFAULT_BUFFER_SIZE = 8192;
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    // private final static int DEFAULT_BUFFER_SIZE = 8192;
+    private final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private CharStream() {
     }
@@ -76,105 +72,29 @@ final public class CharStream {
     }
 
     /**
-     * Returns a new {@code PrintStream} which prints to the given output stream using the UTF-8 charset.
-     * <p>
-     * <b>Note:</b> The returned {@code PrintStream} is not buffered. For performance reasons consider supplying a
-     * {@code BufferedOutputStream}.
-     * <p>
-     * <b>Warning:</b> A {@code PrintStream} never throws I/O exceptions. Users may check whether errors have occurred by
-     * calling the {@link PrintStream#checkError()} method.
+     * Returning a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
+     * UTF-8 charset.
      * 
-     * @param out       the output stream to which values and objects will be printed
-     * @param autoFlush if {@code true}, the output buffer will be flushed whenever a byte array is written, one of the
-     *                  println methods is invoked, or a newline character or byte ('\n') is written
-     * @return a new {@code PrintStream} which prints to the given output stream using the UTF-8 charset
+     * @param out the given output stream
+     * @return a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
+     *         UTF-8 charset
      */
-    public static PrintStream newPrintStream(final OutputStream out, final boolean autoFlush) {
-        return newPrintStream(out, autoFlush, Charsets.UTF_8);
+    public static BufferedWriter newWriter(final OutputStream out) {
+        return newWriter(out, StandardCharsets.UTF_8);
     }
 
     /**
-     * Returns a new {@code PrintStream} which prints to the given output stream using the specified charset.
-     * <p>
-     * <b>Note:</b> The returned {@code PrintStream} is not buffered. For performance reasons consider supplying a
-     * {@code BufferedOutputStream}.
-     * <p>
-     * <b>Warning:</b> A {@code PrintStream} never throws I/O exceptions. Users may check whether errors have occurred by
-     * calling the {@link PrintStream#checkError()} method.
+     * Returning a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
+     * specified charset.
      * 
-     * @param out       the output stream to which values and objects will be printed
-     * @param autoFlush if {@code true}, the output buffer will be flushed whenever a byte array is written, one of the
-     *                  println methods is invoked, or a newline character or byte ('\n') is written
-     * @param charset   the charset to use when writing to the output stream
-     * @return a new {@code PrintStream} which prints to the given output stream using the specified charset
+     * @param out     the given output stream
+     * @param charset the character set to use when writing to the output stream
+     * @return a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
+     *         specified charset
      */
-    public static PrintStream newPrintStream(final OutputStream out, final boolean autoFlush, final Charset charset) {
-        checkNotNull(out, "out == null");
-        checkNotNull(charset, "charset == null");
-        try {
-            return new PrintStream(out, autoFlush, charset.toString());
-        } catch (final UnsupportedEncodingException e) {
-            throw new AssertionError();
-        }
-    }
+    public static BufferedWriter newWriter(final OutputStream out, final Charset charset) {
+        return new BufferedWriter(new OutputStreamWriter(out, charset));
 
-    /**
-     * Returns a new {@code PrintWriter} which writes to the given output stream using the UTF-8 charset.
-     * <p>
-     * <b>Note:</b> For performance reasons the underlying {@code OutputStreamWriter} created by this method is buffered.
-     * This is because supplying a buffered output stream would not increase efficiency since the {@code OutputStreamWriter}
-     * uses a {@code CharsetEncoder} and cannot avoid frequent converter invocations.
-     * <p>
-     * <b>Warning:</b> A {@code PrintWriter} never throws I/O exceptions. Users may check whether errors have occurred by
-     * calling the {@link PrintWriter#checkError()} method.
-     * 
-     * @param out       the given output stream
-     * @param autoFlush if {@code true}, the {@code println}, {@code printf}, or {@code format} methods will flush the
-     *                  output buffer
-     * @return a new {@code PrintWriter} which writes to the given output stream using the UTF-8 charset
-     */
-    public static PrintWriter newPrintWriter(final OutputStream out, final boolean autoFlush) {
-        return newPrintWriter(out, autoFlush, Charsets.UTF_8);
-    }
-
-    /**
-     * Returns a new {@code PrintWriter} which writes to the given output stream using the specified charset.
-     * <p>
-     * <b>Note:</b> For performance reasons the underlying {@code OutputStreamWriter} created by this method is buffered.
-     * This is because supplying a buffered output stream would not increase efficiency since the {@code OutputStreamWriter}
-     * uses a {@code CharsetEncoder} and cannot avoid frequent converter invocations.
-     * <p>
-     * <b>Warning:</b> A {@code PrintWriter} never throws I/O exceptions. Users may check whether errors have occurred by
-     * calling the {@link PrintWriter#checkError()} method.
-     * 
-     * @param out       the given output stream
-     * @param autoFlush if {@code true}, the {@code println}, {@code printf}, or {@code format} methods will flush the
-     *                  output buffer
-     * @param charset   the charset to use
-     * @return a new {@code PrintWriter} which writes to the given output stream using the specified charset
-     */
-    public static PrintWriter newPrintWriter(final OutputStream out, final boolean autoFlush, final Charset charset) {
-        checkNotNull(out, "out == null");
-        checkNotNull(charset, "charset == null");
-        return new PrintWriter(new BufferedWriter(new OutputStreamWriter(out, charset)), autoFlush);
-    }
-
-    /**
-     * Returns a {@code PrintStream} that simply discards printed characters.
-     * 
-     * @return a {@code PrintStream} that simply discards printed characters
-     */
-    public static PrintStream nullPrintStream() {
-        return newPrintStream(ByteStreams.nullOutputStream(), false);
-    }
-
-    /**
-     * Returns a {@code PrintWriter} that simply discards written characters.
-     * 
-     * @return a {@code PrintWriter} that simply discards written characters
-     */
-    public static PrintWriter nullPrintWriter() {
-        return newPrintWriter(ByteStreams.nullOutputStream(), false);
     }
 
     /**
@@ -235,8 +155,8 @@ final public class CharStream {
      * @return a string of all the characters read from the given input stream using the UTF-8 charset
      * @throws IOException if an I/O error occurs
      */
-    public static String toString(final InputStream in) throws IOException {
-        return toString(in, Charsets.UTF_8);
+    public static String read(final InputStream in) throws IOException {
+        return read(in, Charsets.UTF_8);
     }
 
     /**
@@ -252,34 +172,12 @@ final public class CharStream {
      * @return a string of all the characters read from the given input stream using the specified charset
      * @throws IOException if an I/O error occurs
      */
-    public static String toString(final InputStream in, final Charset charset) throws IOException {
+    public static String read(final InputStream in, final Charset charset) throws IOException {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
-        return toString(in, charset, DEFAULT_BUFFER_SIZE);
-    }
-
-    static String toString(final InputStream in, final Charset charset, long size) throws IOException {
-
-        // size is a suggestion but it is not guaranteed to be accurate so we don't throw an OOME if it's too large
-        byte[] bytes = new byte[size > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size];
-        int total = 0;
-        int n;
-
         // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
-        do {
-            total += (n = in.read(bytes, total, (int) size - total));
-
-            if ((n = in.read()) != -1) {
-                bytes = Arrays.copyOf(bytes, (size *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size);
-                bytes[total++] = (byte) n;
-            }
-        } while (n != -1);
-
-        if (size != total)
-            bytes = Arrays.copyOf(bytes, total);
-
-        return new String(bytes, charset);
+        return new String(ByteStream.readBytes(in), charset);
     }
 
     /**

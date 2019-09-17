@@ -49,17 +49,6 @@ final public class MappedFileInputStream extends InputStream {
         this.capacity = capacity;
     }
 
-    private MappedFileInputStream(final ByteBuffer buff) {
-        pageSize = Integer.MAX_VALUE;
-        buffers = new ByteBuffer[] { buff };
-        capacity = buff.capacity();
-    }
-
-    static MappedFileInputStream createForTesting(final ByteBuffer buff) {
-        checkNotNull(buff, "buff == null");
-        return new MappedFileInputStream(buff);
-    }
-
     /**
      * Returns the number of remaining bytes that can be read (or skipped over) from this input stream.
      * <p>

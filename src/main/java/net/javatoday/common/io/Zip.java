@@ -352,7 +352,7 @@ final public class Zip {
         final Closer closer = Closer.create();
 
         try {
-            return CharStream.toString(closer.register(zip.getInputStream(ze)), charset);
+            return CharStream.read(closer.register(zip.getInputStream(ze)), charset);
         } catch (final Throwable t) {
             throw closer.rethrow(t);
         } finally {
@@ -378,7 +378,7 @@ final public class Zip {
         final Closer closer = Closer.create();
 
         try {
-            return CharStream.toString(closer.register(zip.getInputStream(ze)));
+            return CharStream.read(closer.register(zip.getInputStream(ze)));
         } catch (final Throwable t) {
             throw closer.rethrow(t);
         } finally {

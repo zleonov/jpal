@@ -27,7 +27,7 @@ import com.google.common.math.DoubleMath;
 
 /**
  * Defines the commonly used <a href=https://en.wikipedia.org/wiki/International_System_of_Units target=_blank>SI
- * prefixes</a> to represent the byte sizes of the filesystem and memory.
+ * prefixes</a> to represent the byte sizes of the file system and memory.
  * <p>
  * This {@code Enum} is a poor attempt to deal with the surprisingly
  * <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Quantities_of_bytes_and_bits"

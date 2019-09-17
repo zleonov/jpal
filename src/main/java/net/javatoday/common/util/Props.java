@@ -219,7 +219,7 @@ public final class Props {
             if (charset == Charsets.ISO_8859_1)
                 properties.store(closer.register(new FileOutputStream(file)), comments);
             else
-                properties.store(closer.register(Fs.newBufferedWriter(file, false, charset)), comments);
+                properties.store(closer.register(Fs.newWriter(file, false, charset)), comments);
         } catch (final Throwable e) {
             closer.rethrow(e);
         } finally {

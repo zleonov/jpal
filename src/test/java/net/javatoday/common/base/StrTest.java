@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
-class MoreStringsTest {
+class StrTest {
 
     private final static List<File> TEMP_FILES = Lists.newLinkedList();
 
@@ -40,7 +40,7 @@ class MoreStringsTest {
         final String target = "brown";
         final String replacement = "blue";
 
-        assertEquals(str.replace(target, replacement), MoreStrings.replace(str, target, replacement));
+        assertEquals(str.replace(target, replacement), Str.replace(str, target, replacement));
     }
 
     @Test
@@ -49,7 +49,7 @@ class MoreStringsTest {
         final String target = "fox";
         final String replacement = "cat";
 
-        assertEquals(str.replace(target, replacement), MoreStrings.replace(str, target, replacement));
+        assertEquals(str.replace(target, replacement), Str.replace(str, target, replacement));
     }
 
     @Test
@@ -58,7 +58,7 @@ class MoreStringsTest {
         final String target = "The";
         final String replacement = "A";
 
-        assertEquals(str.replace(target, replacement), MoreStrings.replace(str, target, replacement));
+        assertEquals(str.replace(target, replacement), Str.replace(str, target, replacement));
     }
 
     @Test
@@ -67,7 +67,7 @@ class MoreStringsTest {
         final String target = "brown";
         final String replacement = "green";
 
-        assertEquals(str.replace(target, replacement), MoreStrings.replace(str, target, replacement));
+        assertEquals(str.replace(target, replacement), Str.replace(str, target, replacement));
     }
 
     @Test
@@ -76,7 +76,7 @@ class MoreStringsTest {
         final String target = "brown";
         final String replacement = "blue";
 
-        assertEquals("The quick blue fox", MoreStrings.replaceIgnoreCase(str, target.toUpperCase(), replacement));
+        assertEquals("The quick blue fox", Str.replaceIgnoreCase(str, target.toUpperCase(), replacement));
     }
 
     @Test
@@ -85,7 +85,7 @@ class MoreStringsTest {
         final String target = "fox";
         final String replacement = "cat";
 
-        assertEquals("The quick brown cat", MoreStrings.replaceIgnoreCase(str, target.toUpperCase(), replacement));
+        assertEquals("The quick brown cat", Str.replaceIgnoreCase(str, target.toUpperCase(), replacement));
     }
 
     @Test
@@ -94,7 +94,7 @@ class MoreStringsTest {
         final String target = "The";
         final String replacement = "A";
 
-        assertEquals("A quick brown fox", MoreStrings.replaceIgnoreCase(str, target.toUpperCase(), replacement));
+        assertEquals("A quick brown fox", Str.replaceIgnoreCase(str, target.toUpperCase(), replacement));
     }
 
     @Test
@@ -103,7 +103,7 @@ class MoreStringsTest {
         final String target = "brown";
         final String replacement = "green";
 
-        assertEquals("The quick green fox jumped over the green log", MoreStrings.replaceIgnoreCase(str, target.toUpperCase(), replacement));
+        assertEquals("The quick green fox jumped over the green log", Str.replaceIgnoreCase(str, target.toUpperCase(), replacement));
     }
 
     @Test
@@ -112,7 +112,7 @@ class MoreStringsTest {
         final String target = "blue";
         final String replacement = "green";
 
-        assertEquals(str.replace(target, replacement), MoreStrings.replace(str, target, replacement));
+        assertEquals(str.replace(target, replacement), Str.replace(str, target, replacement));
     }
 
     @Test
@@ -121,14 +121,14 @@ class MoreStringsTest {
         final String target = "blue";
         final String replacement = "green";
 
-        assertEquals(str, MoreStrings.replaceIgnoreCase(str, target.toUpperCase(), replacement));
+        assertEquals(str, Str.replaceIgnoreCase(str, target.toUpperCase(), replacement));
     }
     
     @Test
     void testEscapeEOLCharacters() {
         final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog";
         final String expected = "The quick brown fox\\njumped over\\rthe lazy\\r\\ndog";
-        assertEquals(MoreStrings.escapeEOLCharacters(str), expected);
+        assertEquals(Str.escapeEOLCharacters(str), expected);
     }
 
 }

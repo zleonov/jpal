@@ -26,12 +26,12 @@ import java.util.concurrent.ConcurrentMap;
 import com.google.common.math.DoubleMath;
 
 /**
- * Defines the commonly used <a href=https://en.wikipedia.org/wiki/International_System_of_Units target=_blank>SI
- * prefixes</a> to represent the byte sizes of the file system and memory.
+ * Defines the commonly used <a target="_blank" href="https://en.wikipedia.org/wiki/International_System_of_Units">SI prefixes</a> to
+ * represent the byte sizes of the file system and memory.
  * <p>
  * This {@code Enum} is a poor attempt to deal with the surprisingly
- * <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Quantities_of_bytes_and_bits"
- * target="_blank" >difficult issue</a> of representing the size of digital quantities.
+ * <a target="_blank" href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Quantities_of_bytes_and_bits"
+ * >difficult issue</a> of representing the size of digital quantities.
  * <p>
  * For example:
  * 
@@ -191,12 +191,11 @@ public enum DecimalByteUnit {
     }
 
     /**
-     * Returns the <a href=https://en.wikipedia.org/wiki/International_System_of_Units target=_blank>SI prefix</a> of this
+     * Returns the <a target="_blank" href="https://en.wikipedia.org/wiki/International_System_of_Units">SI prefix</a> of this
      * {@code DecimalByteUnit}.
      * 
      * @return the prefix of this {@code DecimalByteUnit} as defined by the
-     *         <a href="https://en.wikipedia.org/wiki/JEDEC_memory_standards#JEDEC_Standard_100B.01" target="_blank">JEDEC
-     *         Standard 100B.01</a> specification
+     *         <a target="_blank" href="https://en.wikipedia.org/wiki/International_System_of_Units">SI prefix</a> specification
      */
     @Override
     public String toString() {
@@ -257,11 +256,6 @@ public enum DecimalByteUnit {
                 value *= base;
 
         return format.format(value) + values()[index > length - 1 ? length - 1 : index];
-    }
-
-    public static void main(String[] args) {
-        System.out.println(DecimalByteUnit.MEGABYTES.convert(2.5, DecimalByteUnit.BYTES));
-        System.out.println(format(10000000, DecimalByteUnit.TERABYTES));
     }
 
 }

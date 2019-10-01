@@ -24,7 +24,7 @@ import java.nio.file.FileVisitor;
  * methods.
  * <p>
  * This interface is modeled after the
- * <a href= "http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileVisitor.html" target="_blank">FileVisitor</a>
+ * <a target="_blank" href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileVisitor.html">FileVisitor</a>
  * interface available in Java 7.
  * <p>
  * <b>Warning:</b> The {@code java.io.File class} provides no platform-independent way to detect symbolic links, as such
@@ -32,7 +32,7 @@ import java.nio.file.FileVisitor;
  * of symbolic links, you may encounter files outside the starting directory, or even end up in an infinite loop.
  * <p>
  * <b>Note:</b> While this class is not deprecated, Java 7+ users are highly encouraged to switch to {@link FileVisitor}
- * in the <a href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System
+ * in the <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System
  * introduced in JDK 7</a>.
  * 
  * @author Zhenya Leonov

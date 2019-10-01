@@ -34,7 +34,7 @@ final public class Swing {
 
     /**
      * Causes the specified {@code Runnable} be executed synchronously on the
-     * <a href= "http://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html" ><i>AWT Event Dispatching
+     * <a target="_blank" href="http://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html" ><i>AWT Event Dispatching
      * Thread</i></a>. If the current thread is the AWT Event Dispatching Thread the {@link Runnable#run()} method is
      * invoked immediately. This method blocks until the specified runnable is finished executing.
      * 

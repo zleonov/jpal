@@ -29,6 +29,11 @@ import com.google.common.collect.Lists;
 
 /**
  * More static utility methods which operate on or return {@link List}s.
+ * <p>
+ * <b>Note:</b> Methods in this class accept {@link java.util.function.Predicate java.util.function.Predicate}s which
+ * are interchangeable with their their Guava counterparts {@link com.google.common.base.Predicate
+ * com.google.common.base.Predicate}s, see {@link com.google.common.base.Predicate com.google.common.base.Predicate} for
+ * more information.
  * 
  * @author Zhenya Leonov
  * @see Lists
@@ -71,8 +76,8 @@ public class MoreLists {
      * Returns the index of the first occurrence in the specified list of an element which satisfies the given predicate,
      * starting the search at {@code fromIndex}, or -1 if there is no such element.
      * <p>
-     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
-     * inputs to avoid a {@code NullPointerException}.
+     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle
+     * {@code null} inputs to avoid a {@code NullPointerException}.
      * 
      * @param list      the specified list
      * @param predicate the given predicate
@@ -134,8 +139,8 @@ public class MoreLists {
      * Returns the index of the last occurrence in the specified list of an element which satisfies the given predicate, or
      * -1 if there is no such element.
      * <p>
-     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
-     * inputs as well to avoid a {@code NullPointerException}.
+     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle
+     * {@code null} inputs as well to avoid a {@code NullPointerException}.
      * 
      * @param list      the specified list
      * @param predicate the given predicate
@@ -151,8 +156,8 @@ public class MoreLists {
      * Returns the index of the last occurrence in the specified list of an element which satisfies the given predicate,
      * searching backward starting at {@code fromIndex}, or -1 if there is no such element.
      * <p>
-     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle {@code null}
-     * inputs as well to avoid a {@code NullPointerException}.
+     * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle
+     * {@code null} inputs as well to avoid a {@code NullPointerException}.
      * 
      * @param list      the specified list
      * @param predicate the given predicate

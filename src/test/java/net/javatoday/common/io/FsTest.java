@@ -74,7 +74,7 @@ class FsTest {
         final ArrayList<File> expected = Lists.newArrayList();
 
         final File start = new File(".");
-        final int maxDepth = 1000;
+        final int maxDepth = 3;
 
         Fs.walkFileTree(start, maxDepth, new SimpleFileWalker<Void>() {
 
@@ -86,7 +86,7 @@ class FsTest {
             }
         });
 
-        java.nio.file.Files.walkFileTree(start.toPath(), EnumSet.noneOf(FileVisitOption.class), maxDepth, new SimpleFileVisitor<Path>() {
+        java.nio.file.Files.walkFileTree(start.toPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS), maxDepth, new SimpleFileVisitor<Path>() {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -122,7 +122,7 @@ class FsTest {
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("Fs.toString(File) vs Files.asCharSource(File, Charsets.UTF_8).read():");
+        System.out.println("Fs.read(File) vs Files.asCharSource(File, Charsets.UTF_8).read():");
         System.out.println("jpal : " + jpal);
         System.out.println("guava: " + guava);
         System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
@@ -535,7 +535,7 @@ class FsTest {
     void testDigestVsGuava() throws IOException, URISyntaxException {
         final File fin = getResourceAsFile("War and Peace.txt");
 
-        final byte[] bytes = Fs.digest(fin, MessageDigests.md5());
+        final byte[] bytes = Fs.getDigest(fin, MessageDigests.md5());
         final HashCode hashCode = Files.asByteSource(fin).hash(Hashing.md5());
         assertArrayEquals(hashCode.asBytes(), bytes);
         assertEquals(hashCode.toString(), MessageDigests.toString(bytes));

@@ -16,22 +16,23 @@
 package net.javatoday.common.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static java.nio.file.StandardOpenOption.WRITE;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Closer;
-
-import net.javatoday.common.io.Fs;
 
 /**
  * Static utility methods for working with {@link Properties}.
@@ -50,12 +51,12 @@ public final class Props {
      * {@link Properties#load(Reader)}. Characters not in Latin1, and certain special characters, are represented in keys
      * and elements using Unicode escapes as defined in section 3.3 of <i>The Java Language Specification</i>.
      * 
-     * @param file the given file
+     * @param path the given file
      * @return a new Java {@code Properties} object loaded from the specified file
      * @throws IOException if an I/O error occurs
      */
-    public static Properties load(final File file) throws IOException {
-        return load(null, file, Charsets.ISO_8859_1);
+    public static Properties load(final Path path) throws IOException {
+        return load(null, path, Charsets.ISO_8859_1);
     }
 
     /**
@@ -66,12 +67,12 @@ public final class Props {
      * and elements using Unicode escapes as defined in section 3.3 of <i>The Java Language Specification</i>.
      * 
      * @param defaults the default properties or {@code null} for no defaults
-     * @param file     the given file
+     * @param path     the given file
      * @return a new Java {@code Properties} object loaded from the specified file
      * @throws IOException if an I/O error occurs
      */
-    public static Properties load(final Properties defaults, final File file) throws IOException {
-        return load(defaults, file, Charsets.ISO_8859_1);
+    public static Properties load(final Properties defaults, final Path path) throws IOException {
+        return load(defaults, path, Charsets.ISO_8859_1);
     }
 
     /**
@@ -81,24 +82,19 @@ public final class Props {
      * <i>The Java Language Specification</i>.
      * 
      * @param defaults the default properties or {@code null} for no defaults
-     * @param file     the given file
+     * @param path     the given file
      * @param charset  the charset to use
      * @return a new Java {@code Properties} object loaded from the given file using the specified charset
      * @throws IOException if an I/O error occurs
      */
-    public static Properties load(final Properties defaults, final File file, final Charset charset) throws IOException {
-        checkNotNull(file, "file == null");
+    public static Properties load(final Properties defaults, final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
         checkNotNull(charset, "charset == null");
 
         final Properties props = defaults == null ? new Properties() : new Properties(defaults);
 
-        final Closer closer = Closer.create();
-        try {
-            props.load(closer.register(new InputStreamReader(new FileInputStream(file), charset)));
-        } catch (final Throwable t) {
-            closer.rethrow(t);
-        } finally {
-            closer.close();
+        try (final Reader in = new InputStreamReader(Files.newInputStream(path, READ), charset)) {
+            props.load(in);
         }
 
         return props;
@@ -121,12 +117,12 @@ public final class Props {
      * 
      * Furthermore, the document must satisfy the properties DTD described above.
      * 
-     * @param file the specified XML file
+     * @param path the specified XML file
      * @return a new Java {@code Properties} object loaded from the specified XML file
      * @throws IOException if an I/O error occurs
      */
-    public static Properties loadFromXML(final File file) throws IOException {
-        return loadFromXML(null, file);
+    public static Properties loadFromXML(final Path path) throws IOException {
+        return loadFromXML(null, path);
     }
 
     /**
@@ -147,22 +143,17 @@ public final class Props {
      * Furthermore, the document must satisfy the properties DTD described above.
      * 
      * @param defaults the default properties or {@code null} for no defaults
-     * @param file     the specified XML file
+     * @param path     the specified XML file
      * @return a new Java {@code Properties} object loaded from the specified XML file
      * @throws IOException if an I/O error occurs
      */
-    public static Properties loadFromXML(final Properties defaults, final File file) throws IOException {
-        checkNotNull(file, "file == null");
+    public static Properties loadFromXML(final Properties defaults, final Path path) throws IOException {
+        checkNotNull(path, "path == null");
 
         final Properties props = defaults == null ? new Properties() : new Properties(defaults);
 
-        final Closer closer = Closer.create();
-        try {
-            props.loadFromXML(closer.register(new FileInputStream(file)));
-        } catch (final Throwable t) {
-            closer.rethrow(t);
-        } finally {
-            closer.close();
+        try (final InputStream in = Files.newInputStream(path, READ)) {
+            props.loadFromXML(in);
         }
 
         return props;
@@ -185,12 +176,12 @@ public final class Props {
      * 
      * @param properties the specified {@code Properties}
      * @param comments   a description of the property list or {@code null} if no comments are desired
-     * @param file       the given file
+     * @param path       the given file
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File save(final Properties properties, final String comments, final File file) throws IOException {
-        return save(properties, comments, file, Charsets.ISO_8859_1);
+    public static Path save(final Properties properties, final String comments, final Path path) throws IOException {
+        return save(properties, comments, path, Charsets.ISO_8859_1);
     }
 
     /**
@@ -199,33 +190,31 @@ public final class Props {
      * <p>
      * Default properties (if any) are <i>not</i> written out by this method.
      * <p>
-     * If the charset is ISO 8859-1 this method behaves identically to {@link #save(Properties, String, File)}, otherwise
+     * If the charset is ISO 8859-1 this method behaves identically to {@link #save(Properties, String, Path)}, otherwise
      * the {@code Properties} will be saved in the specified charset (without escaping Unicode characters).
      * 
      * @param properties the specified {@code Properties}
      * @param comments   a description of the property list or {@code null} if no comments are desired
-     * @param file       the given file
+     * @param path       the given file
      * @param charset    the charset to use
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File save(final Properties properties, final String comments, final File file, final Charset charset) throws IOException {
+    public static Path save(final Properties properties, final String comments, final Path path, final Charset charset) throws IOException {
         checkNotNull(properties, "properties == null");
-        checkNotNull(file, "file == null");
+        checkNotNull(path, "path == null");
         checkNotNull(charset, "charset == null");
 
-        final Closer closer = Closer.create();
-        try {
-            if (charset == Charsets.ISO_8859_1)
-                properties.store(closer.register(new FileOutputStream(file)), comments);
-            else
-                properties.store(closer.register(Fs.newWriter(file, false, charset)), comments);
-        } catch (final Throwable e) {
-            closer.rethrow(e);
-        } finally {
-            closer.close();
-        }
-        return file;
+        if (charset == Charsets.ISO_8859_1)
+            try (final OutputStream out = Files.newOutputStream(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
+                properties.store(out, comments);
+            }
+        else
+            try (final Writer writer = Files.newBufferedWriter(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
+                properties.store(writer, comments);
+            }
+
+        return path;
     }
 
     /**
@@ -242,25 +231,21 @@ public final class Props {
      * 
      * @param properties the specified {@code Properties}
      * @param comment    a description of the property list or {@code null} if no comment is desired
-     * @param file       the given file
+     * @param path       the given file
      * @param charset    the charset to use
      * @return the given file
      * @throws IOException if an I/O error occurs
      */
-    public static File saveAsXML(final Properties properties, final String comment, final File file, final Charset charset) throws IOException {
+    public static Path saveAsXML(final Properties properties, final String comment, final Path path, final Charset charset) throws IOException {
         checkNotNull(properties, "properties == null");
-        checkNotNull(file, "file == null");
+        checkNotNull(path, "path == null");
         checkNotNull(charset, "charset == null");
 
-        final Closer closer = Closer.create();
-        try {
-            properties.storeToXML(closer.register(new FileOutputStream(file)), comment, charset.toString());
-        } catch (final Throwable e) {
-            closer.rethrow(e);
-        } finally {
-            closer.close();
+        try (final OutputStream out = Files.newOutputStream(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
+            properties.storeToXML(out, comment, charset.toString());
         }
-        return file;
+
+        return path;
     }
 
 }

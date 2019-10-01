@@ -29,7 +29,7 @@ import com.google.common.primitives.Longs;
  * Static utility methods for working with {@link Integer}s, {@link Long}s, {@link Float}s, and {@link Double}s.
  * 
  * @author Zhenya Leonov
- * @see <a href="https://github.com/google/guava/wiki/PrimitivesExplained" target="_blank">PrimitivesExplained</a>
+ * @see <a target="_blank" href="https://github.com/google/guava/wiki/PrimitivesExplained">PrimitivesExplained</a>
  */
 public final class Numbers {
 

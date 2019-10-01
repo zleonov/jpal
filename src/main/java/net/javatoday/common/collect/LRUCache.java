@@ -28,7 +28,7 @@ import java.util.function.Function;
  * iteration order is the order in which its entries were last accessed, from least-recently to most-recently.
  * <p>
  * This map can be treated as a simple
- * <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)">LRU</a> cache. Invoking
+ * <a target="_blank" href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)">LRU</a> cache. Invoking
  * the {@link Map#put(Object, Object)}, {@link Map#putIfAbsent(Object, Object)}, {@link Map#get(Object)},
  * {@link Map#getOrDefault(Object, Object)}, {@link Map#compute(Object, BiFunction)} ,
  * {@link Map#computeIfAbsent(Object, Function)}, {@link Map#computeIfPresent(Object, BiFunction)}, or
@@ -41,8 +41,8 @@ import java.util.function.Function;
  * backing map.
  * <p>
  * <b>Note:</b> This class is provided as a convenience to developers who are making casual use of caching idioms.
- * Production projects should consider making use of Guava's robust
- * <a href="https://github.com/google/guava/wiki/CachesExplained">Caching facility<a>.
+ * Production projects should consider using Guava's
+ * <a target="_blank" href="https://github.com/google/guava/wiki/CachesExplained">Caching facility<a>.
  * 
  * @author Zhenya Leonov
  * @param <K> the type of keys maintained by this map

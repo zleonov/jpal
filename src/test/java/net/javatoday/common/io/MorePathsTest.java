@@ -44,7 +44,6 @@ class MorePathsTest {
     @AfterAll
     static void tearDownAfterClass() throws Exception {
 
-
         for (final Path p : TEMP_PATHS)
             java.nio.file.Files.delete(p);
     }
@@ -76,11 +75,11 @@ class MorePathsTest {
         watch.reset();
 
         watch.start();
-        MorePaths.readBytes(path);
+        Fs.read(path);
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("MorePaths.toString(Path) vs MoreFiles.asCharSource(Path, Charsets.UTF_8).read():");
+        System.out.println("Fs.read(Path) vs MoreFiles.asCharSource(Path, Charsets.UTF_8).read():");
         System.out.println("jpal : " + jpal);
         System.out.println("guava: " + guava);
         System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
@@ -116,11 +115,11 @@ class MorePathsTest {
         watch.reset();
 
         watch.start();
-        MorePaths.write(lines, tmp2);
+        Fs.write(lines, tmp2);
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("MorePaths.write(Iterable, Path) vs MoreFiles.asCharSink(Path, Charsets.UTF_8).writeLines(lines):");
+        System.out.println("Fs.write(Iterable, Path) vs MoreFiles.asCharSink(Path, Charsets.UTF_8).writeLines(lines):");
         System.out.println("jpal : " + jpal);
         System.out.println("guava: " + guava);
         System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
@@ -155,11 +154,11 @@ class MorePathsTest {
         watch.reset();
 
         watch.start();
-        MorePaths.write(lines, tmp2);
+        Fs.write(lines, tmp2);
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("MorePaths.write(Iterable, Path) vs java.nio.file.Files.write(Path, Iterable):");
+        System.out.println("Fs.write(Iterable, Path) vs java.nio.file.Files.write(Path, Iterable):");
         System.out.println("jpal : " + jpal);
         System.out.println("guava: " + java);
         System.out.println("Percentage Difference: " + percentageDifference(java, jpal) * 100 + "%");
@@ -179,7 +178,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).write(content);
-        MorePaths.append(content, tmp2);
+        Fs.append(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -193,7 +192,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(content, tmp2);
+        Fs.append(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -206,7 +205,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).write(content);
-        MorePaths.append(content, tmp2);
+        Fs.append(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -219,7 +218,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(content, tmp2);
+        Fs.append(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -233,7 +232,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             java.nio.file.Files.write(tmp1, content.getBytes(charset), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            MorePaths.append(content, tmp2, charset);
+            Fs.append(content, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -248,7 +247,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             MoreFiles.asCharSink(tmp1, charset, StandardOpenOption.APPEND).write(content);
-            MorePaths.append(content, tmp2, charset);
+            Fs.append(content, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -263,7 +262,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).writeLines(lines);
-        MorePaths.append(lines, tmp2);
+        Fs.append(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -277,7 +276,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(lines, tmp2);
+        Fs.append(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -290,7 +289,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8, StandardOpenOption.APPEND).writeLines(lines);
-        MorePaths.append(lines, tmp2);
+        Fs.append(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -303,7 +302,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        MorePaths.append(lines, tmp2);
+        Fs.append(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -317,7 +316,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             java.nio.file.Files.write(tmp1, lines, charset, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            MorePaths.append(lines, tmp2, charset);
+            Fs.append(lines, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -332,7 +331,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             MoreFiles.asCharSink(tmp1, charset, StandardOpenOption.APPEND).writeLines(lines);
-            MorePaths.append(lines, tmp2, charset);
+            Fs.append(lines, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -347,7 +346,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8).write(content);
-        MorePaths.write(content, tmp2);
+        Fs.write(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -361,7 +360,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(content, tmp2);
+        Fs.write(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -374,7 +373,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8).write(content);
-        MorePaths.write(content, tmp2);
+        Fs.write(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -387,7 +386,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         java.nio.file.Files.write(tmp1, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(content, tmp2);
+        Fs.write(content, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -401,7 +400,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             java.nio.file.Files.write(tmp1, content.getBytes(charset), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            MorePaths.write(content, tmp2, charset);
+            Fs.write(content, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -416,7 +415,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             MoreFiles.asCharSink(tmp1, charset).write(content);
-            MorePaths.write(content, tmp2, charset);
+            Fs.write(content, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -431,7 +430,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
-        MorePaths.write(lines, tmp2);
+        Fs.write(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -445,7 +444,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPathAndCopy(fin);
 
         java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(lines, tmp2);
+        Fs.write(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -458,7 +457,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         MoreFiles.asCharSink(tmp1, Charsets.UTF_8).writeLines(lines);
-        MorePaths.write(lines, tmp2);
+        Fs.write(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -471,7 +470,7 @@ class MorePathsTest {
         final Path tmp2 = createTempPath();
 
         java.nio.file.Files.write(tmp1, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        MorePaths.write(lines, tmp2);
+        Fs.write(lines, tmp2);
 
         assertTrue(MoreFiles.equal(tmp1, tmp2));
     }
@@ -485,7 +484,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             java.nio.file.Files.write(tmp1, lines, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            MorePaths.write(lines, tmp2, charset);
+            Fs.write(lines, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -500,7 +499,7 @@ class MorePathsTest {
             final Path tmp2 = createTempPath();
 
             MoreFiles.asCharSink(tmp1, charset).writeLines(lines);
-            MorePaths.write(lines, tmp2, charset);
+            Fs.write(lines, tmp2, charset);
 
             assertTrue(MoreFiles.equal(tmp1, tmp2));
         }
@@ -512,7 +511,7 @@ class MorePathsTest {
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
             final String expected = MoreFiles.asCharSource(fin, charset).read();
-            final String actual = MorePaths.readBytes(fin, charset);
+            final String actual = Fs.read(fin, charset);
             assertEquals(expected, actual);
         }
     }
@@ -523,13 +522,13 @@ class MorePathsTest {
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
             final String expected = new String(java.nio.file.Files.readAllBytes(fin), charset);
-            final String actual = MorePaths.readBytes(fin, charset);
+            final String actual = Fs.read(fin, charset);
             assertEquals(expected, actual);
         }
     }
 
     private static Path getResourceAsFile(final String name) throws URISyntaxException {
-        final URI uri = MorePaths.class.getResource(name).toURI();
+        final URI uri = Fs.class.getResource(name).toURI();
         Preconditions.checkArgument(uri != null, "cannot find %s", name);
         return Paths.get(uri);
     }

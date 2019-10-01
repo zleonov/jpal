@@ -20,7 +20,7 @@ import java.util.function.BiPredicate;
 /**
  * Determines a {@code true} or {@code false} value for two arguments.
  * <p>
- * <b>Note:</b> Java 8+ users consider switching to {@link BiPredicate}.
+ * <b>Note:</b> Java 8+ users should consider switching to {@link BiPredicate}.
  * 
  * @param <T> the type of the first argument
  * @param <U> the type of the second argument

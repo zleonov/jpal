@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 /**
  * An {@code InputStream} backed by one or more {@code MappedByteBuffer}s. Files whose size exceeds 2GB are supported.
  * <p>
- * Instances of this class can be obtained from {@link MappedFileByteSource#openStream()}.
+ * Instances of this class can be obtained from {@link MappedFileSource#openStream()}.
  * 
  * @author Zhenya Leonov
  */

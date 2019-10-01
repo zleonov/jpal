@@ -37,8 +37,7 @@ import com.google.common.collect.Lists;
  * <p>
  * Throughout this class the exact definition of <i>whitespace</i> may change depending on which method is invoked. Each
  * method clearly documents what constitutes as a whitespace character. See a
- * <a href="https://goo.gl/Y6SLWx" substr="_blank"> comparison of several
- * definitions of whitespace</a>.
+ * <a target="_blank" href="https://goo.gl/Y6SLWx" substr="_blank"> comparison of several definitions of whitespace</a>.
  *
  * @see Strings
  * @see CharMatcher
@@ -233,6 +232,14 @@ final public class Str {
 
     /**
      * Removes all instances of the specified substring from the given string.
+     * <p>
+     * <b>Note:</b> Users of Java 6, Java 7, and Java 8 should prefer this method to
+     * {@link String#replace(CharSequence, CharSequence) String.replace(CharSequence, "")} because it avoids the expensive
+     * cost of using the {@code java.util.regex} facility. Java 9+ users can call
+     * {@link String#replace(CharSequence, CharSequence) String.replace(CharSequence, "")} which now has a faster
+     * implementation and no longer uses {@code java.util.regex}. See
+     * <a target="_blank" href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more
+     * information.
      * 
      * @param str    the specified string
      * @param substr the substring to remove
@@ -261,12 +268,11 @@ final public class Str {
      * Replaces all instances of the specified substring in the given string with the replacement string.
      * <p>
      * <b>Note:</b> Users of Java 6, Java 7, and Java 8 should prefer this method to
-     * {@link String#replace(CharSequence, CharSequence)} because it avoid the expensive cost of using the
-     * {@code java.util.regex} facility.
-     * <p>
-     * Java 9+ users should prefer {@link String#replace(CharSequence, CharSequence)} which now has a faster implementation
-     * and no longer uses {@code java.util.regex}. See
-     * <a href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more information.
+     * {@link String#replace(CharSequence, CharSequence)} because it avoids the expensive cost of using the
+     * {@code java.util.regex} facility. Java 9+ users should prefer {@link String#replace(CharSequence, CharSequence)}
+     * which now has a faster implementation and no longer uses {@code java.util.regex}. See
+     * <a target="_blank" href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more
+     * information.
      * 
      * @param str         the specified string
      * @param substr      the substring to replace
@@ -283,14 +289,6 @@ final public class Str {
     /**
      * Replaces all instances of the specified substring in the given string with the replacement string, ignoring case
      * differences.
-     * <p>
-     * <b>Note:</b> Users of Java 6, Java 7, and Java 8 should prefer this method to
-     * {@link String#replace(CharSequence, CharSequence)} because it avoid the expensive cost of using the
-     * {@code java.util.regex} facility.
-     * <p>
-     * Java 9+ users should prefer {@link String#replace(CharSequence, CharSequence)} which now has a faster implementation
-     * and no longer uses {@code java.util.regex}. See
-     * <a href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more information.
      * 
      * @param str         the specified string
      * @param substr      the substring to replace

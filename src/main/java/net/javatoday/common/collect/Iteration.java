@@ -184,19 +184,20 @@ final public class Iteration {
      * Invoking the {@code iterator()} method to obtain subsequent iterators will result in an
      * {@code IllegalStateException}.
      * <p>
-     * <b>Note:</b> Jave 8+ users should treat this method as deprecated. You can now create an {@code Iterable} from an
-     * {@code Iterator} using Java's lambda facility, for example:
      * 
-     * <pre>
+     * @deprecated Jave 8+ users can create an {@code Iterable} from an {@code Iterator} using Java's lambda facility, for
+     *             example:
+     * 
+     *             <pre>
      * for (final String s : (Iterable&ltString&gt)() -> iterator) {
      *    ...
      * }
-     * </pre>
+     *             </pre>
      * 
      * @param iterator the underlying iterator
      * @return an {@code Iterable} which returns the underlying iterator on the first call to {@link Iterable#iterator()}
      */
-    public static <T> Iterable<T> forEach(final Iterator<T> iterator) {
+    public static <T> Iterable<T> in(final Iterator<T> iterator) {
         checkNotNull(iterator, "iterator == null");
 
         return new Iterable<T>() {
@@ -219,7 +220,7 @@ final public class Iteration {
 
     /**
      * Returns a random sample of {@code k} elements from the given {@code Iterable} using
-     * <a href="https://en.wikipedia.org/wiki/Reservoir_sampling" target="_blank">reservoir sampling</a>.
+     * <a target="_blank" href="https://en.wikipedia.org/wiki/Reservoir_sampling">reservoir sampling</a>.
      * <p>
      * If {@code k} exceeds the size of the given iterable the returned list will contain all of its elements.
      * 
@@ -233,7 +234,7 @@ final public class Iteration {
 
     /**
      * Returns a random sample of {@code k} elements from the given {@code Iterable} using
-     * <a href="https://en.wikipedia.org/wiki/Reservoir_sampling" target="_blank">reservoir sampling</a>.
+     * <a target="_blank" href="https://en.wikipedia.org/wiki/Reservoir_sampling">reservoir sampling</a>.
      * <p>
      * If {@code k} exceeds the size of the given iterable the returned list will contain all of its elements.
      * 
@@ -249,7 +250,7 @@ final public class Iteration {
 
     /**
      * Returns a random sample of {@code k} elements from the given {@code Iterator} using
-     * <a href="https://en.wikipedia.org/wiki/Reservoir_sampling" target="_blank">reservoir sampling</a>.
+     * <a target="_blank" href="https://en.wikipedia.org/wiki/Reservoir_sampling">reservoir sampling</a>.
      * <p>
      * If {@code k} exceeds the size of the given iterator the returned list will contain all of its elements.
      * 
@@ -263,7 +264,7 @@ final public class Iteration {
 
     /**
      * Returns a random sample of {@code k} elements from the given {@code Iterator} using
-     * <a href="https://en.wikipedia.org/wiki/Reservoir_sampling" target="_blank">reservoir sampling</a>.
+     * <a target="_blank" href="https://en.wikipedia.org/wiki/Reservoir_sampling">reservoir sampling</a>.
      * <p>
      * If {@code k} exceeds the size of the given iterator the returned list will contain all of its elements.
      * 
@@ -304,8 +305,8 @@ final public class Iteration {
      * The returned list iterator does not support {@code add(E)} and {@code set(E)} but does support {@code remove()} if
      * the given list iterator does.
      * 
-     * @param          <E> the type of elements traversed by the given list iterator
-     * @param          <T> the type of output of the specified function
+     * @param <E>      the type of elements traversed by the given list iterator
+     * @param <T>      the type of output of the specified function
      * @param from     the given list iterator
      * @param function the specified function
      * @return a list iterator that applies {@code function} to each element of {@code fromIterator}

@@ -45,7 +45,7 @@ import com.google.common.collect.Ordering;
 
 /**
  * A {@link Sortedlist} implementation, based on a modified
- * <a href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. Elements are sorted from <i>least</i> to
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. Elements are sorted from <i>least</i> to
  * <i>greatest</i> according to their <i>natural ordering</i>, or by an explicit {@link Comparator} provided at
  * creation. Attempting to insert {@code null} elements is prohibited. Querying for {@code null} elements is allowed.
  * Inserting non-comparable elements will result in a {@code ClassCastException}.

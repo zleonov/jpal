@@ -17,7 +17,6 @@ package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -30,13 +29,9 @@ import com.google.common.io.ByteSource;
  * 
  * @author Zhenya Leonov
  */
-final public class ByteBufferByteSource extends ByteSource {
+final public class ByteBufferSource extends ByteSource {
 
     private final ByteBuffer buff;
-
-    private ByteBufferByteSource(final ByteBuffer buff) {
-        this.buff = buff;
-    }
 
     /**
      * Returns a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer.
@@ -44,9 +39,9 @@ final public class ByteBufferByteSource extends ByteSource {
      * @param buff the specified byte buffer
      * @return a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer
      */
-    public static ByteBufferByteSource create(final ByteBuffer buff) {
+    public ByteBufferSource(final ByteBuffer buff) {
         checkNotNull(buff, "buff == null");
-        return new ByteBufferByteSource(buff);
+        this.buff = buff;
     }
 
     /**
@@ -60,16 +55,17 @@ final public class ByteBufferByteSource extends ByteSource {
         return new ByteBufferInputStream(buff);
     }
 
-//  /**
-//  * This method simply delegates to {@link #openStream()}.
-//  * 
-//  * @return a new {@code ByteBufferInputStream} which reads from the byte buffer
-//  * @throws IOException if an I/O error occurs
-//  */
-// Do we benefit from buffering here? Or should we simply delegate to openStream()
+    /**
+     * This method simply delegates to {@link #openStream()}.
+     * 
+     * @return a new {@code ByteBufferInputStream} which reads from the byte buffer
+     * @throws IOException if an I/O error occurs
+     */
     @Override
-    public BufferedInputStream openBufferedStream() throws IOException {
-        return (BufferedInputStream) super.openBufferedStream();
+    public ByteBufferInputStream openBufferedStream() throws IOException {
+        // Do we benefit from buffering here? Or should we simply delegate to openStream()
+        // return (BufferedInputStream) super.openBufferedStream();
+        return openStream();
     }
 
 }

@@ -22,7 +22,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -49,26 +48,26 @@ final public class CharStream {
     }
 
     /**
-     * Returns a new {@code LineNumberReader} which reads from the given input stream using the UTF-8 charset.
+     * Returns a new {@code BufferedReader} which reads from the given input stream using the UTF-8 charset.
      * 
      * @param in the given input stream
-     * @return a new {@code LineNumberReader} which reads from the given input stream using the UTF-8 charset
+     * @return a new {@code BufferedReader} which reads from the given input stream using the UTF-8 charset
      */
-    public static LineNumberReader newLineNumberReader(final InputStream in) {
-        return newLineNumberReader(in, Charsets.UTF_8);
+    public static BufferedReader newReader(final InputStream in) {
+        return newReader(in, Charsets.UTF_8);
     }
 
     /**
-     * Returns a new {@code LineNumberReader} which reads from the given input stream using the specified charset.
+     * Returns a new {@code BufferedReader} which reads from the given input stream using the specified charset.
      * 
      * @param in      the given input stream
      * @param charset the character set to use when reading from the input stream
-     * @return a new {@code LineNumberReader} which reads from the given input stream using the specified charset
+     * @return a new {@code BufferedReader} which reads from the given input stream using the specified charset
      */
-    public static LineNumberReader newLineNumberReader(final InputStream in, final Charset charset) {
+    public static BufferedReader newReader(final InputStream in, final Charset charset) {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
-        return new LineNumberReader(new InputStreamReader(in, charset));
+        return new BufferedReader(new InputStreamReader(in, charset));
     }
 
     /**
@@ -132,7 +131,7 @@ final public class CharStream {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
-        final BufferedReader reader = newLineNumberReader(in, Charsets.UTF_8);
+        final BufferedReader reader = newReader(in, Charsets.UTF_8);
 
         final List<String> lines = Lists.newArrayList();
 

@@ -37,7 +37,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 
 /**
- * A {@code List} optimized for efficient <a href="http://en.wikipedia.org/wiki/Random_access">random access</a>
+ * A {@code List} optimized for efficient <a target="_blank" href="http://en.wikipedia.org/wiki/Random_access">random access</a>
  * insertion and removal operations. Implements all optional list operations, and permits all elements, including
  * {@code null}.
  * <p>
@@ -48,11 +48,11 @@ import com.google.common.collect.Iterables;
  * This list is not <i>thread-safe</i>. If multiple threads modify this list concurrently it must be synchronized
  * externally.
  * <p>
- * This class implements an array-based <a href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> modified to
+ * This class implements an array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> modified to
  * provide logarithmic running time for linear list operations (e.g. insert an element at the i<i>th</i> index). Linear
  * list operations are sometimes referred to as rank operations.
  * <p>
- * Invented by <a href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
+ * Invented by <a target="_blank" href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
  * structure for maintaining items in sorted order. Strictly speaking it is impossible to make any hard guarantees
  * regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be logarithmic with
  * an extremely high degree of probability as the list grows.

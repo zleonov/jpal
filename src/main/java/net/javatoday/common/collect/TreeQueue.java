@@ -36,7 +36,7 @@ import com.google.common.collect.Ordering;
 
 /**
  * An optionally bounded priority {@link Queue} based on a modified
- * <a href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. The elements of this queue are sorted
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. The elements of this queue are sorted
  * according to their <i>natural ordering</i>, or by an explicit {@link Comparator} provided at creation. Attempting to
  * remove or insert {@code null} elements is prohibited. Querying for {@code null} elements is allowed. Inserting
  * non-comparable elements will result in a {@code ClassCastException}. This queue uses the same general ordering rules

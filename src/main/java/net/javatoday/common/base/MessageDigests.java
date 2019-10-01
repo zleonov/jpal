@@ -20,12 +20,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.google.common.hash.Hashing;
-
 /**
  * Common {@code MessageDigest}s which are supported by all Java platform implementations.
- * <p>
- * <b>Note:</b> Users not working with legacy APIs should prefer Guava's robust {@link Hashing} facility.
+ * 
+ * @deprecated Users not working with legacy APIs should prefer Guava's
+ *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility<a>.
  * 
  * @author Zhenya Leonov
  */

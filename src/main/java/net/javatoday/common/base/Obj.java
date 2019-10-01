@@ -15,19 +15,17 @@
  */
 package net.javatoday.common.base;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Objects;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.io.Closer;
 
 import net.javatoday.common.io.Fs;
 
@@ -160,26 +158,20 @@ public final class Obj {
      * will be closed before returning to the caller.
      * 
      * @param object the specified object
-     * @param file   the given file
+     * @param path   the given file
      * @throws InvalidClassException    if something is wrong with a class used by serialization
      * @throws NotSerializableException if any object to be serialized does not implement the {@link java.io.Serializable}
      *                                  interface
      * @throws IOException              if an I/O error occurs
      * @return the specified file
      */
-    public static File writeObject(final Object object, final File file) throws IOException {
+    public static Path writeObject(final Object object, final Path path) throws IOException {
         checkNotNull(object, "object == null");
-        checkNotNull(file, "file == null");
+        checkNotNull(path, "file == null");
 
-        final Closer closer = Closer.create();
-        try {
-            final ObjectOutputStream out = closer.register(new ObjectOutputStream(Fs.newBufferedOutputStream(file, false)));
+        try (final ObjectOutputStream out = new ObjectOutputStream(Fs.newBufferedOutputStream(path, false))) {
             out.writeObject(object);
-            return file;
-        } catch (final Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
+            return path;
         }
     }
 
@@ -191,28 +183,23 @@ public final class Obj {
      * Exceptions are thrown for classes that should not be deserialized. All exceptions are fatal. Any underlying streams
      * will be closed before returning to the caller.
      * 
-     * @param file the specified file
+     * @param path the specified file
      * @param type the class type of the object
-     * @throws ClassNotFoundException if the class of the serialized object cannot be found
-     * @throws InvalidClassException  if something is wrong with a class used by serialization
-     * @throws ClassCastException     if the object is not assignable to the type {@code T}
-     * @throws IOException            if an I/O error occurs
+     * @throws ClassNotFoundException   if the class of the serialized object cannot be found
+     * @throws InvalidClassException    if something is wrong with a class used by serialization
+     * @throws IllegalArgumentException if the object is not assignable to the type {@code T}
+     * @throws IOException              if an I/O error occurs
      * @return the object read from the specified file
      * 
      */
-    public static <T> T readObject(final File file, final Class<? extends T> type) throws IOException {
-        checkNotNull(file, "file == null");
+    public static <T> T readObject(final Path path, final Class<? extends T> type) throws IOException, ClassNotFoundException {
+        checkNotNull(path, "path == null");
         checkNotNull(type, "type == null");
 
-        final Closer closer = Closer.create();
-        try {
-            final ObjectInputStream in = closer.register(new ObjectInputStream(Fs.newBufferedInputStream(file)));
+        try (final ObjectInputStream in = new ObjectInputStream(Fs.newBufferedInputStream(path))) {
             final Object o = in.readObject();
+            checkArgument(type.isAssignableFrom(o.getClass()), "%s cannot be cast to %s", o.getClass(), type);
             return type.cast(o);
-        } catch (final Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
         }
     }
 

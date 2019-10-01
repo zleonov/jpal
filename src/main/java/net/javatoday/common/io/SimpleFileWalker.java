@@ -33,8 +33,8 @@ import java.nio.file.SimpleFileVisitor;
  * of symbolic links, you may encounter files outside the starting directory, or even end up in an infinite loop.
  * <p>
  * <b>Note:</b> While this class is not deprecated, Java 7+ users are highly encouraged to use {@link SimpleFileVisitor}
- * in the <a href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System
- * introduced in JDK 7</a>.
+ * introduced in JDK 7 as part of the
+ * <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System</a>.
  * 
  * @param <R> the type of result returned by this {@code FileWalker}
  * @author Zhenya Leonov

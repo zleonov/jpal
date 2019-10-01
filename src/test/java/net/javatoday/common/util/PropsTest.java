@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,16 +29,16 @@ class PropsTest {
 
     private final static Properties EXPECTED = new Properties();
 
-    private static File utf8_properties;
-    private static File latin1_properties;
+    private static Path utf8_properties;
+    private static Path latin1_properties;
 
     @BeforeAll
     static void setUpBeforeClass() throws Exception {
         EXPECTED.setProperty("foo", "bar");
         EXPECTED.setProperty("hasUnicodeEscapes", "\u019C\u01C2");
 
-        utf8_properties = getResourceAsFile("utf8.properties");
-        latin1_properties = getResourceAsFile("latin1.properties");
+        utf8_properties = getResourceAsPath("utf8.properties");
+        latin1_properties = getResourceAsPath("latin1.properties");
 
     }
 
@@ -78,8 +80,7 @@ class PropsTest {
 
     @Test
     void testSaveUtf8Utf8() throws IOException, URISyntaxException {
-        final File temp = File.createTempFile("tempUtf8", "properties");
-        temp.deleteOnExit();
+        final Path temp = Files.createTempFile("tempUtf8", "properties");
 
         Props.save(EXPECTED, null, temp, Charsets.UTF_8);
 
@@ -90,13 +91,12 @@ class PropsTest {
 
         assertEquals(EXPECTED, Props.load(null, temp, Charsets.UTF_8));
 
-        temp.delete();
+        Files.delete(temp);
     }
 
     @Test
     void testSaveLatin1Latin1() throws IOException, URISyntaxException {
-        final File temp = File.createTempFile("tempLatin1", "properties");
-        temp.deleteOnExit();
+        final Path temp = Files.createTempFile("tempLatin1", "properties");
 
         Props.save(EXPECTED, null, temp, Charsets.ISO_8859_1);
 
@@ -107,13 +107,13 @@ class PropsTest {
 
         assertEquals(EXPECTED, Props.load(null, temp, Charsets.ISO_8859_1));
 
-        temp.delete();
+        Files.delete(temp);
     }
 
-    private static File getResourceAsFile(final String name) throws URISyntaxException {
+    private static Path getResourceAsPath(final String name) throws URISyntaxException {
         final URI uri = PropsTest.class.getResource(name).toURI();
         Preconditions.checkArgument(uri != null, "cannot find %s", name);
-        return new File(uri);
+        return Paths.get(uri);
     }
 
 }

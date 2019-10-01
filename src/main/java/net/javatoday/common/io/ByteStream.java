@@ -25,7 +25,6 @@ import java.util.Arrays;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 
@@ -38,6 +37,7 @@ import net.javatoday.common.base.MessageDigests;
  * @see CharStreams
  * @author Zhenya Leonov
  */
+@SuppressWarnings("deprecation")
 final public class ByteStream {
 
     private final static int DEFAULT_BUFFER_SIZE = 8192;
@@ -57,14 +57,14 @@ final public class ByteStream {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
-     *             Guava's robust {@link Hashing} facility.
+     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility<a>.
      *
      * @param in     the given input stream
      * @param digest the specified message digest object
      * @return the result of {@link MessageDigest#digest()} for all the bytes read from the given input stream
      * @throws IOException if an I/O error occurs
      */
-    public static byte[] digest(final InputStream in, final MessageDigest digest) throws IOException {
+    public static byte[] getDigest(final InputStream in, final MessageDigest digest) throws IOException {
         checkNotNull(in, "in == null");
         checkNotNull(digest, "digest == null");
 

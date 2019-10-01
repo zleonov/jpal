@@ -24,6 +24,10 @@ import java.util.Date;
 
 /**
  * Static utility methods for working with dates.
+ * <p>
+ * <b>Note:</b> Java 8+ users should consider switching to the new
+ * <a target="_blank" href="https://docs.oracle.com/javase/tutorial/datetime/index.html">Date and Time API</a>
+ * introduced in Java 8.
  * 
  * @author Zhenya Leonov
  */

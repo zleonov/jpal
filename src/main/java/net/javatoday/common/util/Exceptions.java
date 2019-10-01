@@ -17,8 +17,6 @@ package net.javatoday.common.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
-
 import com.google.common.base.Throwables;
 
 /**
@@ -53,7 +51,7 @@ public final class Exceptions {
      * </pre>
      * 
      * <b>Warning:</b> This method breaks Java's exception handling idiom and can lead to horrible errors when misused. See
-     * <a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html">Unchecked Exceptions — The
+     * <a target="_blank" href="https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html">Unchecked Exceptions — The
      * Controversy</a> for further discussion.
      * 
      * @param t the specified throwable
@@ -71,8 +69,8 @@ public final class Exceptions {
         throw (T) t;
     }
     
-    public static void main(String[] args) {
-        throw throwUnchecked(new IOException());
-    }
+//    public static void main(String[] args) {
+//        throw throwUnchecked(new IOException());
+//    }
 
 }

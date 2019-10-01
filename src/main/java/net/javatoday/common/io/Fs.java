@@ -27,6 +27,7 @@ import static net.javatoday.common.io.FileWalker.VisitResult.TERMINATE;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -50,7 +50,6 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
@@ -75,9 +74,14 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  * <p>
  * While {@code java.io.File} operations are not deprecated, Java 7+ users are highly encouraged to use
  * {@code java.nio.file.Path} operations introduced in JDK 7 as part of the
- * <a href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File System</a>.
+ * <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
+ * System</a>.
  * <p>
- * The following two tables describe common convenience methods provided by this class and their direct Guava and Java
+ * The class is not intended to substitute the functionality provided in {@link java.nio.file.Files},
+ * {@link com.google.common.io.MoreFiles}, or {@link com.google.common.io.Files}. The intent is to provide unified
+ * access between various Java and Guava I/O classes to several of the most commonly used I/O operations.
+ * <p>
+ * The following tables describe common convenience methods provided by this class and their closest Guava and Java
  * equivalents:
  * 
  * <pre>
@@ -89,16 +93,19 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <th align="center">Method</th><th align="center">Guava</th>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, UTF_8, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#append(byte[], File)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, }{@link FileWriteMode#APPEND APPEND)}{@link ByteSink#write(byte[]) .write(byte[])}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#append(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, UTF_8, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#newBufferedInputStream(File)}</td><td>{@link Files#asByteSource(File) Files.asByteSource(File)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td>
@@ -107,28 +114,28 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, false)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, true)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedOutputStream(File, boolean) newBufferedOutputStream(File, true)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File, }{@link FileWriteMode#APPEND APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newLineNumberReader(File)}</td><td>N/A</td>
+ *     <td>{@link Fs#newReader(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, }{@link Charsets#UTF_8 UTF_8)}{@link CharSource#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newLineNumberReader(File, Charset)}</td><td>N/A</td>
+ *     <td>{@link Fs#newReader(File, Charset)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charset)}{@link CharSource#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newWriter(File, boolean) newWriter(File, false)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newWriter(File, boolean) newWriter(File, false)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newWriter(File, boolean) newWriter(File, true)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, UTF_8, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newWriter(File, boolean) newWriter(File, true)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#newWriter(File, boolean, Charset) newWriter(File, false, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newWriter(File, boolean, Charset) newWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newWriter(File, boolean, Charset) newWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#read(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, UTF_8)}{@link CharSource#read() .read()}</td>
+ *     <td>{@link Fs#read(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, }{@link Charsets#UTF_8 UTF_8)}{@link CharSource#read() .read()}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#read(File, Charset)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, Charset)}{@link CharSource#read() .read()}</td>
@@ -137,19 +144,22 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>{@link Fs#readBytes(File)}</td><td>{@link Files#toByteArray(File)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#readLines(File)}</td><td>{@link Files#readLines(File, Charset) Files.readLines(File, UTF_8)}</td>
+ *     <td>{@link Fs#readLines(File)}</td><td>{@link Files#readLines(File, Charset) Files.readLines(File, }{@link Charsets#UTF_8 UTF_8)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#readLines(File, Charset)}</td><td>{@link Files#readLines(File, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#write(byte[], File)}</td><td>{@link Files#asByteSink(File, FileWriteMode...) Files.asByteSink(File)}{@link ByteSink#write(byte[]) .write(byte[])}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#write(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#write(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#write(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
@@ -170,67 +180,73 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <th align="center">Method</th><th align="center">Guava</th><th align="center">Java 8</th>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, UTF_8, CREATE, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link Fs#append(byte[], Path)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link ByteSink#write(byte[]) .write(byte[])}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, byte[], }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link Fs#append(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(}{@link StandardCharsets#UTF_8 UTF_8), }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, UTF_8, CREATE, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, CREATE, APPEND)}</td>
+ *     <td>{@link Fs#append(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(Charset), }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, Charset, OpenOption...) Files.write(Path, Iterable, Charset, CREATE, APPEND)}</td>
+ *     <td>{@link Fs#append(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedInputStream(Path)}</td><td>{@link MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td><td>N/A</td>
+ *     <td>{@link Fs#append(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, Charset, OpenOption...) Files.write(Path, Iterable, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, false)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td><td>N/A</td>
+ *     <td>{@link Fs#newBufferedInputStream(Path)}</td><td>{@link MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td><td>{@link BufferedInputStream#BufferedInputStream(InputStream) new BufferedInputStream(}{@link java.nio.file.Files#newInputStream(Path, OpenOption...) Files.newInputStream(Path))}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, true)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, CREATE, APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td><td>N/A</td>
+ *     <td>{@link Fs#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, false)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td><td>{@link BufferedOutputStream#BufferedOutputStream(OutputStream) new BufferedOutputStream(}{@link java.nio.file.Files#newOutputStream(Path, OpenOption...) Files.newOutputStream(Path))}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newLineNumberReader(Path)}</td><td>N/A</td><td>N/A</td>
+ *     <td>{@link Fs#newBufferedOutputStream(Path, boolean) newBufferedOutputStream(Path, true)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link ByteSink#openBufferedStream() .openBufferedStream()}</td><td>{@link BufferedOutputStream#BufferedOutputStream(OutputStream) new BufferedOutputStream(}{@link java.nio.file.Files#newOutputStream(Path, OpenOption...) Files.newOutputStream(Path, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND))}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newLineNumberReader(Path, Charset)}</td><td>N/A</td><td>N/A</td>
+ *     <td>{@link Fs#newReader(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSource#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedReader(Path) Files.newBufferedReader(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path)}</td>
+ *     <td>{@link Fs#newReader(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedReader(Path, Charset) Files.newBufferedReader(Path, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, UTF_8, CREATE, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path, CREATE, APPEND)}</td>
+ *     <td>{@link Fs#newWriter(Path, boolean) newWriter(Path, false)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset)}</td>
+ *     <td>{@link Fs#newWriter(Path, boolean) newWriter(Path, true)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, OpenOption...) Files.newBufferedWriter(Path, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>N/A</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, CREATE, APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset, CREATE, APPEND)}</td>
+ *     <td>{@link Fs#newWriter(Path, boolean, Charset) newWriter(Path, false, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#read(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, UTF_8)}{@link CharSource#read() .read()}</td><td>N/A</td>
+ *     <td>{@link Fs#newWriter(Path, boolean, Charset) newWriter(Path, true, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#read(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#read() .read()}</td><td>N/A</td>
+ *     <td>{@link Fs#read(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSource#read() .read()}</td><td>{@link String#String(byte[], Charset) new String(}{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path), }{@link StandardCharsets#UTF_8 UTF_8)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#readBytes(Path)}</td><td>{@link MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path)}{@link ByteSource#read() .read()}</td><td>{@link java.nio.file.Files#readAllBytes(Path)}</td>
+ *     <td>{@link Fs#read(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#read() .read()}</td><td>{@link String#String(byte[], Charset) new String(}{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path), }{@link String#String(byte[], Charset) Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#readLines(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, UTF_8)}{@link CharSource#readLines() .readLines()}</td><td>{@link java.nio.file.Files#readAllLines(Path)}</td>
+ *     <td>{@link Fs#readBytes(Path)}</td><td>{@link MoreFiles#asByteSource(Path, OpenOption...) MoreFiles.asByteSource(Path)}{@link ByteSource#read() .read()}</td><td>{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#readLines(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#readLines() .readLines()}</td><td>{@link java.nio.file.Files#readAllLines(Path, Charset)}</td>
+ *     <td>{@link Fs#readLines(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSource#readLines() .readLines()}</td><td>{@link java.nio.file.Files#readAllLines(Path) Files.readAllLines(Path)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link Fs#readLines(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#readLines() .readLines()}</td><td>{@link java.nio.file.Files#readAllLines(Path, Charset) Files.readAllLines(Path, Charset)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>N/A</td>
+ *     <td>{@link Fs#write(byte[], Path)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path)}{@link ByteSink#write(byte[]) .write(byte[])}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, byte[])}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable)}</td>
+ *     <td>{@link Fs#write(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(}{@link StandardCharsets#UTF_8 UTF_8))}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(Charset))}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#write(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, Charset)}</td>
@@ -250,9 +266,55 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  * 
  * @author Zhenya Leonov
  */
+@SuppressWarnings("deprecation")
 final public class Fs {
 
     private Fs() {
+    }
+
+    /**
+     * Appends bytes to the given file.
+     * <p>
+     * If the file does not exist it will be created.
+     * 
+     * @param bytes the bytes to append
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static File append(final byte[] bytes, final File to) throws IOException {
+        checkNotNull(bytes, "bytes == null");
+        checkNotNull(to, "to == null");
+        final Closer closer = Closer.create();
+        try {
+            final OutputStream out = closer.register(new FileOutputStream(to, true));
+            out.write(bytes);
+            out.flush();
+            return to;
+        } catch (final Throwable e) {
+            throw closer.rethrow(e);
+        } finally {
+            closer.close();
+        }
+    }
+
+    /**
+     * Appends bytes to the given file.
+     * <p>
+     * If the file does not exist it will be created.
+     * 
+     * @param bytes the bytes to append
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final byte[] bytes, final Path to) throws IOException {
+        checkNotNull(bytes, "bytes == null");
+        checkNotNull(to, "to == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            out.write(bytes);
+        }
+        return to;
     }
 
     /**
@@ -458,19 +520,19 @@ final public class Fs {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(File, HashFunction)} which uses Guava's
-     *             robust {@link Hashing} facility.
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility<a>.
      *
      * @param file   the given file
      * @param digest the specified message digest object
      * @return the result of {@link MessageDigest#digest()} for all the bytes in the given file
      * @throws IOException if an I/O error occurs
      */
-    public static byte[] digest(final File file, final MessageDigest digest) throws IOException {
+    public static byte[] getDigest(final File file, final MessageDigest digest) throws IOException {
         checkNotNull(file, "file == null");
         checkNotNull(digest, "digest == null");
         final Closer closer = Closer.create();
         try {
-            return ByteStream.digest(closer.register(new FileInputStream(file)), digest);
+            return ByteStream.getDigest(closer.register(new FileInputStream(file)), digest);
         } catch (final Throwable e) {
             throw closer.rethrow(e);
         } finally {
@@ -487,19 +549,19 @@ final public class Fs {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction)} which uses Guava's
-     *             robust {@link Hashing} facility.
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility<a>.
      *
      * @param path   the given file
      * @param digest the specified message digest object
      * @return the result of {@link MessageDigest#digest()} for all the bytes in the given file
      * @throws IOException if an I/O error occurs
      */
-    public static byte[] digest(final Path path, final MessageDigest digest) throws IOException {
+    public static byte[] getDigest(final Path path, final MessageDigest digest) throws IOException {
         checkNotNull(path, "path == null");
         checkNotNull(digest, "digest == null");
         final Closer closer = Closer.create();
         try {
-            return ByteStream.digest(closer.register(java.nio.file.Files.newInputStream(path)), digest);
+            return ByteStream.getDigest(closer.register(java.nio.file.Files.newInputStream(path)), digest);
         } catch (final Throwable e) {
             throw closer.rethrow(e);
         } finally {
@@ -623,6 +685,8 @@ final public class Fs {
 
     /**
      * Returns a {@code BufferedOutputStream} to the specified file.
+     * <p>
+     * If the file does not exist it will be created.
      *
      * @param file   the specified file
      * @param append whether to truncate or append to the specified file
@@ -636,6 +700,8 @@ final public class Fs {
 
     /**
      * Returns a {@code BufferedOutputStream} to the specified file.
+     * <p>
+     * If the file does not exist it will be created.
      *
      * @param path   the specified file
      * @param append whether to truncate or append to the specified file
@@ -649,7 +715,9 @@ final public class Fs {
 
     /**
      * Returns a {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
-     *
+     * <p>
+     * If the file does not exist it will be created.
+     * 
      * @param file    the given file
      * @param append  whether to truncate or append to the specified file
      * @param charset the character set to use when writing to the file
@@ -662,6 +730,8 @@ final public class Fs {
 
     /**
      * Returns a {@code BufferedWriter} which writes to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
      *
      * @param file    the given file
      * @param append  whether to truncate or append to the specified file
@@ -673,6 +743,38 @@ final public class Fs {
         checkNotNull(file, "file == null");
         checkNotNull(charset, "charset == null");
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), charset));
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path    the given file
+     * @param append  whether to truncate or append to the specified file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which writes to the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter newWriter(final Path path, final boolean append) throws IOException {
+        return newWriter(path, append, Charsets.UTF_8);
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param file    the given file
+     * @param append  whether to truncate or append to the specified file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which writes to the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter newWriter(final Path path, final boolean append, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+        return new BufferedWriter(new OutputStreamWriter(java.nio.file.Files.newOutputStream(path, append ? new OpenOption[] { CREATE, APPEND } : new OpenOption[] { CREATE, TRUNCATE_EXISTING, WRITE }), charset));
     }
 
 //    /**
@@ -700,61 +802,61 @@ final public class Fs {
 //    }
 
     /**
-     * Returns a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset.
+     * Returns a new {@code BufferedReader} which reads from the given file using the UTF-8 charset.
      * <p>
      * Does not close the reader.
      * 
      * @param file the given file
-     * @return a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset
+     * @return a new {@code BufferedReader} which reads from the given file using the UTF-8 charset
      * @throws IOException if an I/O error occurs
      */
-    public static LineNumberReader newLineNumberReader(final File file) throws IOException {
-        return newLineNumberReader(file, Charsets.UTF_8);
+    public static BufferedReader newReader(final File file) throws IOException {
+        return newReader(file, Charsets.UTF_8);
     }
 
     /**
-     * Returns a new {@code LineNumberReader} which reads from the given file using the specified charset.
+     * Returns a new {@code BufferedReader} which reads from the given file using the specified charset.
      * <p>
      * Does not close the reader.
      * 
      * @param file    the given file
      * @param charset the character set to use when reading from the input stream
-     * @return a new {@code LineNumberReader} which reads from the given file using the specified charset
+     * @return a new {@code BufferedReader} which reads from the given file using the specified charset
      * @throws IOException if an I/O error occurs
      */
-    public static LineNumberReader newLineNumberReader(final File file, final Charset charset) throws IOException {
+    public static BufferedReader newReader(final File file, final Charset charset) throws IOException {
         checkNotNull(file, "file == null");
         checkNotNull(file, "charset == null");
-        return new LineNumberReader(new InputStreamReader(new FileInputStream(file), charset));
+        return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
     }
 
     /**
-     * Returns a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset.
+     * Returns a new {@code BufferedReader} which reads from the given file using the UTF-8 charset.
      * <p>
      * Does not close the reader.
      * 
      * @param path the given file
-     * @return a new {@code LineNumberReader} which reads from the given file using the UTF-8 charset
+     * @return a new {@code BufferedReader} which reads from the given file using the UTF-8 charset
      * @throws IOException if an I/O error occurs
      */
-    public static LineNumberReader newLineNumberReader(final Path path) throws IOException {
-        return newLineNumberReader(path, StandardCharsets.UTF_8);
+    public static BufferedReader newReader(final Path path) throws IOException {
+        return newReader(path, StandardCharsets.UTF_8);
     }
 
     /**
-     * Returns a new {@code LineNumberReader} which reads from the given file using the specified charset.
+     * Returns a new {@code BufferedReader} which reads from the given file using the specified charset.
      * <p>
      * Does not close the reader.
      * 
      * @param path    the given file
      * @param charset the character set to use when reading from the input stream
-     * @return a new {@code LineNumberReader} which reads from the given file using the specified charset
+     * @return a new {@code BufferedReader} which reads from the given file using the specified charset
      * @throws IOException if an I/O error occurs
      */
-    public static LineNumberReader newLineNumberReader(final Path path, final Charset charset) throws IOException {
+    public static BufferedReader newReader(final Path path, final Charset charset) throws IOException {
         checkNotNull(path, "path == null");
         checkNotNull(path, "charset == null");
-        return new LineNumberReader(new InputStreamReader(java.nio.file.Files.newInputStream(path), charset));
+        return new BufferedReader(new InputStreamReader(java.nio.file.Files.newInputStream(path), charset));
     }
 
     /**
@@ -1199,6 +1301,51 @@ final public class Fs {
         return to;
     }
 
+    /**
+     * Writes bytes to the given file.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before the bytes are written.
+     * 
+     * @param bytes the bytes to write
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static File write(final byte[] bytes, final File to) throws IOException {
+        checkNotNull(bytes, "bytes == null");
+        checkNotNull(to, "to == null");
+        final Closer closer = Closer.create();
+        try {
+            final OutputStream out = closer.register(new FileOutputStream(to));
+            out.write(bytes);
+            out.flush();
+            return to;
+        } catch (final Throwable e) {
+            throw closer.rethrow(e);
+        } finally {
+            closer.close();
+        }
+    }
+
+    /**
+     * Writes bytes to the given file.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before the bytes are written.
+     * 
+     * @param bytes the bytes to write
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final byte[] bytes, final Path to) throws IOException {
+        checkNotNull(bytes, "bytes == null");
+        checkNotNull(to, "to == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
+            out.write(bytes);
+        }
+        return to;
+    }
+
     private static VisitResult walkFileTree(final File start, int depth, final int maxDepth, final FileWalker<?> walker) throws IOException {
 
         File[] files = null;
@@ -1208,11 +1355,11 @@ final public class Fs {
                 throw new IOException("cannot access " + start.getPath());
             if (depth >= maxDepth || start.isFile())
                 return walker.visitFile(start);
-        } catch (SecurityException ex) {
+        } catch (final SecurityException ex) {
             if (depth == 0)
                 throw ex;
             return CONTINUE;
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             return walker.visitFileFailed(start, ex);
         }
 
@@ -1222,7 +1369,7 @@ final public class Fs {
             return result;
         for (final File file : files) {
             if (!file.exists())
-                return walker.visitFileFailed(file, new FileNotFoundException(file.toString()));
+                return walker.visitFileFailed(file, new FileNotFoundException(file.getPath()));
             result = walkFileTree(file, depth + 1, maxDepth, walker);
             if (result == SKIP_SIBLINGS)
                 break;

@@ -17,7 +17,6 @@ package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -35,7 +34,7 @@ import com.google.common.io.ByteSource;
  * 
  * @author Zhenya Leonov
  */
-final public class MappedFileByteSource extends ByteSource {
+final public class MappedFileSource extends ByteSource {
 
     private static final long PAGE_SIZE = Integer.MAX_VALUE;
 
@@ -43,15 +42,15 @@ final public class MappedFileByteSource extends ByteSource {
     private final long capacity;
 
     /**
-     * Creates a new {@code MappedFileByteSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
+     * Creates a new {@code MappedFileSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
      * file.
      * 
      * @param path the specified file
-     * @return a new {@code MappedFileByteSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
+     * @return a new {@code MappedFileSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
      *         file
      * @throws IOException if an I/O error occurs
      */
-    public MappedFileByteSource(final Path path) throws IOException {
+    public MappedFileSource(final Path path) throws IOException {
         checkNotNull(path, "path == null");
         capacity = Files.size(path);
 
@@ -65,26 +64,27 @@ final public class MappedFileByteSource extends ByteSource {
     }
 
     /**
-     * Opens a new {@link MappedFileInputStream} which reads from this {@code MappedFileByteSource}.
+     * Opens a new {@link MappedFileInputStream} which reads from this {@code MappedFileSource}.
      *
      * @throws IOException if an I/O error occurs
-     * @return a new {@link MappedFileInputStream} which reads from this {@code MappedFileByteSource}
+     * @return a new {@link MappedFileInputStream} which reads from this {@code MappedFileSource}
      */
     @Override
     public MappedFileInputStream openStream() throws IOException {
         return new MappedFileInputStream(buffers, capacity, (int) PAGE_SIZE);
     }
 
-//  /**
-//  * This method simply delegates to {@link #openStream()}.
-//  * 
-//  * @return a new {@code ByteBufferInputStream} which reads from the byte buffer
-//  * @throws IOException if an I/O error occurs
-//  */
-// Do we benefit from buffering here? Or should we simply delegate to openStream()
+    /**
+     * This method simply delegates to {@link #openStream()}.
+     *
+     * @return a new {@code MappedFileInputStream} which reads from the byte buffer
+     * @throws IOException if an I/O error occurs
+     */
     @Override
-    public BufferedInputStream openBufferedStream() throws IOException {
-        return (BufferedInputStream) super.openBufferedStream();
+    public MappedFileInputStream openBufferedStream() throws IOException {
+        // Do we benefit from buffering here? Or should we simply delegate to openStream()
+        // return (BufferedInputStream) super.openBufferedStream();
+        return openStream();
     }
 
 }

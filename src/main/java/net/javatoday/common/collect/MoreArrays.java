@@ -39,15 +39,17 @@ import com.google.common.collect.ObjectArrays;
  * <p>
  * When not working with legacy APIs users should always prefer {@code Collection} types to arrays.
  * <p>
- * Below is table of methods provided in this class and their Guava and Java equivalents (note that methods in this
- * class accepts {@link java.util.function.Predicate java.util.function.Predicate}s while their Guava counterparts
- * accepts {@link com.google.common.base.Predicate com.google.common.base.Predicate}s, the two objects are
- * interchangeable, see {@link com.google.common.base.Predicate com.google.common.base.Predicate} for more information):
+ * <b>Note:</b> Methods in this class accept {@link java.util.function.Predicate java.util.function.Predicate}s while
+ * their Guava counterparts accept {@link com.google.common.base.Predicate com.google.common.base.Predicate}s, the two
+ * objects are interchangeable, see {@link com.google.common.base.Predicate com.google.common.base.Predicate} for more
+ * information.
+ * <p>
+ * Below is table of methods provided in this class and their closest Guava and Java equivalents:
  * 
  * <pre>
  * <table border="1" cellpadding="3" cellspacing="1">
  *   <tr>
- *     <th>Method</th><th width="600">List idioms</th><th>Functional idioms</th>
+ *     <th align="center">Method</th><th align="center">List idioms</th><th align="center">Functional idioms</th>
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#contains(Object[], Object)}</td>
@@ -56,7 +58,8 @@ import com.google.common.collect.ObjectArrays;
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#contains(Object[], Predicate)}</td>
- *     <td colspan="2"> Java: {@link Arrays#asList(Object[])}{@link List#stream() .stream()}{@link Stream#anyMatch(Predicate) .anyMatch(Predicate)}<br />Guava: {@link Iterators#any(Iterator, Predicate) Iterators.any(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), Predicate)}</td>
+ *     <td colspan=
+"2"> Java: {@link Arrays#asList(Object[])}{@link List#stream() .stream()}{@link Stream#anyMatch(Predicate) .anyMatch(Predicate)}<br />Guava: {@link Iterators#any(Iterator, Predicate) Iterators.any(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), Predicate)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#indexOf(Object[], Object)}</td>

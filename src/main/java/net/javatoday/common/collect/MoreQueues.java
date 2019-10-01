@@ -38,11 +38,11 @@ public class MoreQueues {
     }
 
     /**
-     * Attempts to insert the given elements into the specified queue. When using a capacity-restricted queue, some or all
-     * of the elements maybe rejected.
+     * Attempts to insert the given elements into the specified queue.
      * <p>
-     * This method is generally preferable to {@link Collections#addAll(Collection, Object...) Collections.addAll(Queue,
-     * E...)}, which can fail to insert an element only by throwing an exception.
+     * When using a capacity-restricted queue some or all of the elements maybe rejected, thus this method is generally
+     * preferable to {@link Collections#addAll(Collection, Object...) Collections.addAll(Queue, E...)} which can fail to
+     * insert an element only by throwing an exception.
      * 
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
@@ -64,11 +64,11 @@ public class MoreQueues {
     }
 
     /**
-     * Attempts to insert the given elements into the specified queue. When using a capacity-restricted queue, some or all
-     * of the elements maybe rejected.
+     * Attempts to insert the given elements into the specified queue.
      * <p>
-     * This method is generally preferable to {@link Iterables#addAll(Collection, Iterable) Iterables.addAll(Queue,
-     * Iterable)}, which can fail to insert an element only by throwing an exception.
+     * When using a capacity-restricted queue some or all of the elements maybe rejected, thus this method is generally
+     * preferable to {@link Iterables#addAll(Collection, Iterable) Iterables.addAll(Queue, Iterable)} which can fail to
+     * insert an element only by throwing an exception.
      * 
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
@@ -85,11 +85,11 @@ public class MoreQueues {
     }
 
     /**
-     * Attempts to insert the given elements into the specified queue. When using a capacity-restricted queue, some or all
-     * of the elements maybe rejected.
+     * Attempts to insert the given elements into the specified queue
      * <p>
-     * This method is generally preferable to {@link Iterators#addAll(Collection, Iterator) Iterators.addAll(Queue,
-     * Iterator)}, which can fail to insert an element only by throwing an exception.
+     * When using a capacity-restricted queue some or all of the elements maybe rejected, thus this method is generally
+     * preferable to {@link Iterators#addAll(Collection, Iterator) Iterators.addAll(Queue, Iterator)} which can fail to
+     * insert an element only by throwing an exception.
      * 
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue

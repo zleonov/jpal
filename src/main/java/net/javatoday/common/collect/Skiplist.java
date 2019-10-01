@@ -45,14 +45,14 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
 
 /**
- * A {@link Sortedlist} implementation based on a modified <a href="http://en.wikipedia.org/wiki/Skip_list">skip
+ * A {@link Sortedlist} implementation based on a modified <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip
  * list</a>. Elements are sorted from <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by
  * an explicit {@link Comparator} provided at creation. Attempting to insert {@code null} elements is prohibited.
  * Querying for {@code null} elements is allowed. Inserting non-comparable elements will result in a
  * {@code ClassCastException}.
  * <p>
- * The underlying array-based <a href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> is modified to provide
- * logarithmic running time for insertion, removal, and <a href="http://en.wikipedia.org/wiki/Random_access">random
+ * The underlying array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> is modified to provide
+ * logarithmic running time for insertion, removal, and <a target="_blank" href="http://en.wikipedia.org/wiki/Random_access">random
  * access</a> lookup operations (e.g. get the element at the i<i>th</i> index).
  * <p>
  * The iterators obtained from the {@link #iterator()} and {@link #listIterator()} methods are <i>fail-fast</i>.
@@ -68,7 +68,7 @@ import com.google.common.collect.Ordering;
  * are, from the standpoint of this list, equal. Further, no guarantee is made as to the final order of <i>equal</i>
  * elements. Ties may be broken arbitrarily.
  * <p>
- * Invented by <a href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
+ * Invented by <a target="_blank" href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
  * structure for maintaining items in sorted order. Strictly speaking it is impossible to make any hard guarantees
  * regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be logarithmic with
  * an extremely high degree of probability as the list grows.

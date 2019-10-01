@@ -40,7 +40,7 @@ import com.google.common.collect.Ordering;
  * {@link java.util.TreeSet java.util.TreeSet} and lacks navigation methods defined in the {@link NavigableSet}
  * interface.</b>
  * <p>
- * A {@code Set} implementation based on a modified <a href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black
+ * A {@code Set} implementation based on a modified <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black
  * Tree</a>. Elements are sorted from <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by
  * an explicit {@link Comparator} provided at creation. Attempting to remove or insert {@code null} elements is
  * prohibited. Querying for {@code null} elements is allowed. Inserting non-comparable elements will result in a

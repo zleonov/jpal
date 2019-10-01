@@ -17,19 +17,20 @@ package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.logging.Level.WARNING;
 
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -41,24 +42,21 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
-import com.google.common.io.Closer;
-import com.google.common.io.Files;
+import com.google.common.io.MoreFiles;
 
 /**
  * Static utility methods useful for working with {@link ZipFile}s and {@link ZipOutputStream}s.
  * <p>
  * This class is provided as a convenience to developers who are making casual use of the {@code java.util.zip} package.
- * Consider using a robust library like <a href="https://commons.apache.org/proper/commons-compress/
- * target="_blank">Apache Commons Compress</a>.
+ * Consider using a dedicated 3rd party library such as
+ * <a target="_blank" href="https://commons.apache.org/proper/commons-compress">Apache Commons Compress</a> in
+ * production projects.
  * 
  * @author Zhenya Leonov
  */
 final public class Zip {
 
-    private static final Logger LOGGER = Logger.getLogger(Zip.class.getName());
-
-    private Zip() {
-    }
+    private static final Logger logger = Logger.getLogger(Zip.class.getName());
 
     private static Predicate<ZipEntry> IS_DIRECTORY = new Predicate<ZipEntry>() {
 
@@ -70,6 +68,9 @@ final public class Zip {
 
     private static Predicate<ZipEntry> IS_FILE = Predicates.not(IS_DIRECTORY);
 
+    private Zip() {
+    }
+
     /**
      * Closes the specified {@code ZipFile}, with control over whether an {@code IOException} may be thrown. If the zip file
      * is {@code null} it is ignored. This is primarily useful in a finally block, where a thrown exception needs to be
@@ -78,7 +79,7 @@ final public class Zip {
      * If an {@code IOException} occurs and {@code hideIOException} is {@code true} it will be logged but never thrown.
      * Otherwise it will be propagated to the caller.
      * 
-     * @deprecated Java 7+ users should switch to <a href=
+     * @deprecated Java 7+ users should switch to <a target="_blank" href=
      *             "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources</a>
      *             or Guava's {@link Closeables#close(Closeable, boolean)} instead.
      * 
@@ -92,7 +93,7 @@ final public class Zip {
                 zip.close();
         } catch (final IOException e) {
             if (hideIOException)
-                LOGGER.log(WARNING, "An IOException occurred while attempting to close " + zip.getName(), e);
+                logger.log(WARNING, "An IOException occurred while attempting to close " + zip.getName(), e);
             else
                 throw e;
         }
@@ -106,7 +107,7 @@ final public class Zip {
      * to the caller when closing a resource. Use this method only if you sure that no other action can be taken if an
      * {@code IOException} occurs.
      * 
-     * @deprecated Java 7+ users should switch to <a href=
+     * @deprecated Java 7+ users should switch to <a target="_blank" href=
      *             "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources</a>
      *             or Guava's {@link Closeables#close(Closeable, boolean)} instead.
      * 
@@ -123,6 +124,8 @@ final public class Zip {
     /**
      * Returns all the entries in the specified zip file.
      * 
+     * @deprecated Java 8+ users should call {@link ZipFile#stream()}.
+     * 
      * @param zip the specified zip file
      * @return all the entries in the specified zip file
      */
@@ -133,6 +136,8 @@ final public class Zip {
 
     /**
      * Returns all the entries in the specified zip file that match the given predicate.
+     * 
+     * @deprecated Java 8+ users should call {@link ZipFile#stream()}{@link Stream#filter(Predicate) .filter(Predicate)}.
      * 
      * @param zip    the specified zip file
      * @param filter the given predicate
@@ -163,77 +168,57 @@ final public class Zip {
     }
 
     /**
-     * Returns a {@code ByteArrayInputStream} containing all the bytes read from the specified zip entry.
-     * 
-     * @param zip the zip file in which to find the zip entry
-     * @param ze  the specified zip entry
-     * @return a {@code ByteArrayInputStream} containing all the bytes read from the specified zip entry
-     * @throws IOException if an I/O error occurs
-     */
-    public static ByteArrayInputStream newByteArrayInputStream(final ZipFile zip, final ZipEntry ze) throws IOException {
-        checkNotNull(zip, "zip == null");
-        checkNotNull(ze, "ze == null");
-        return new ByteArrayInputStream(Zip.toByteArray(zip, ze));
-    }
-
-    /**
      * Returns a zip input stream to given file using the UTF-8 charset to decode zip entry names. The charset is ignored if
-     * the <a href="package-summary.html#lang_encoding"> language encoding bit</a> of the zip entry's general purpose bit
-     * flag is set.
+     * the <a target="_blank" href="package-summary.html#lang_encoding"> language encoding bit</a> of the zip entry's
+     * general purpose bit flag is set.
      * 
-     * @param file the given file
+     * @param path the given file
      * @return a zip input stream to given file using the UTF-8 charset to decode zip entry names
      * @throws IOException if an I/O error occurs
      */
-    public static ZipInputStream newZipInputStream(final File file) throws IOException {
-        checkNotNull(file, "file == null");
+    public static ZipInputStream newZipInputStream(final Path path) throws IOException {
+        return newZipInputStream(path, UTF_8);
+    }
 
-        return new ZipInputStream(new FileInputStream(file), Charsets.UTF_8);
+    /**
+     * Returns a zip input stream to given file using the specified charset to decode zip entry names. The charset is
+     * ignored if the <a target="_blank" href="package-summary.html#lang_encoding"> language encoding bit</a> of the zip
+     * entry's general purpose bit flag is set.
+     * 
+     * @param path    the given file
+     * @param charset the specified charset
+     * @return a zip input stream to given file using the specified charset to decode zip entry names
+     * @throws IOException if an I/O error occurs
+     */
+    public static ZipInputStream newZipInputStream(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "file == null");
+        checkNotNull(path, "charset == null");
+        return new ZipInputStream(Files.newInputStream(path), charset);
     }
 
     /**
      * Returns a zip output stream to the given file using the UTF-8 charset to encode zip entry names and comments.
      * 
-     * @param file the given file
+     * @param path the given file
      * @return a zip output stream to the given file using the UTF-8 charset to encode zip entry names and comments
      * @throws IOException if an I/O error occurs
      */
-    public static ZipOutputStream newZipOutputStream(final File file) throws IOException {
-        checkNotNull(file, "file == null");
-
-        return new ZipOutputStream(new FileOutputStream(file), Charsets.UTF_8);
-    }
-
-    /**
-     * Returns a zip input stream to given file using the specified charset to decode zip entry names. The charset is
-     * ignored if the <a href="package-summary.html#lang_encoding"> language encoding bit</a> of the zip entry's general
-     * purpose bit flag is set.
-     * 
-     * @param file    the given file
-     * @param charset the specified charset
-     * @return a zip input stream to given file using the specified charset to decode zip entry names
-     * @throws IOException if an I/O error occurs
-     */
-    public static ZipInputStream newZipInputStream(final File file, final Charset charset) throws IOException {
-        checkNotNull(file, "file == null");
-        checkNotNull(file, "charset == null");
-
-        return new ZipInputStream(new FileInputStream(file), charset);
+    public static ZipOutputStream newZipOutputStream(final Path path) throws IOException {
+        return newZipOutputStream(path, UTF_8);
     }
 
     /**
      * Returns a zip output stream to the given file using the specified charset to encode zip entry names and comments.
      * 
-     * @param file    the given file
+     * @param path    the given file
      * @param charset the specified charset
      * @return a zip output stream to the given file using the specified charset to encode zip entry names and comments
      * @throws IOException if an I/O error occurs
      */
-    public static ZipOutputStream newZipOutputStream(final File file, final Charset charset) throws IOException {
-        checkNotNull(file, "file == null");
-        checkNotNull(file, "charset == null");
-
-        return new ZipOutputStream(new FileOutputStream(file), charset);
+    public static ZipOutputStream newZipOutputStream(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(path, "charset == null");
+        return new ZipOutputStream(Files.newOutputStream(path), charset);
     }
 
     /**
@@ -256,30 +241,59 @@ final public class Zip {
     }
 
     /**
-     * Returns all of the lines read from the specified zip entry using the specified charset. The lines do not include
-     * line-termination characters, but do include other leading and trailing whitespace.
+     * Returns a string containing all the characters from the given zip entry in the UTF-8 charset.
      * 
-     * @param zip     the zip file in which to find the zip entry
-     * @param ze      the specified zip entry
-     * @param charset the charset used to decode the zip entry
-     * @return a mutable {@link List} containing all the lines read from a zip entry using the specified charset
+     * @param zip the zip file in which to find the zip entry
+     * @param ze  the given zip entry
+     * @return a string containing all the characters from the given zip entry in the UTF-8 charset
      * @throws IOException              if an I/O error occurs
      * @throws IllegalArgumentException if the specified entry is a directory
+     * @see Charsets
      */
-    public static List<String> readLines(final ZipFile zip, final ZipEntry ze, final Charset charset) throws IOException {
+    public static String read(final ZipFile zip, final ZipEntry ze) throws IOException {
+        checkNotNull(zip, "zip == null");
+        checkNotNull(ze, "ze == null");
+        // checkArgument(!ze.isDirectory(), "ZipEntry is a directory");
+
+        return read(zip, ze, UTF_8);
+    }
+
+    /**
+     * Returns a string containing all the characters from the given zip entry in the specified charset.
+     * 
+     * @param zip     the zip file in which to find the zip entry
+     * @param ze      the given zip entry
+     * @param charset the character set to use when reading the zip entry
+     * @return a string containing all the characters from the given zip entry in the specified charset
+     * @throws IOException              if an I/O error occurs
+     * @throws IllegalArgumentException if the specified entry is a directory
+     * @see Charsets
+     */
+    public static String read(final ZipFile zip, final ZipEntry ze, final Charset charset) throws IOException {
         checkNotNull(zip, "zip == null");
         checkNotNull(ze, "ze == null");
         checkNotNull(charset, "charset == null");
-        checkArgument(isFile().apply(ze), "ZipEntry is a directory");
+        // checkArgument(isFile().apply(ze), "ZipEntry is a directory");
 
-        final Closer closer = Closer.create();
+        try (final InputStream in = zip.getInputStream(ze)) {
+            return CharStream.read(in, charset);
+        }
+    }
 
-        try {
-            return CharStream.readLines(closer.register(zip.getInputStream(ze)), charset);
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
+    /**
+     * Returns a byte array containing all bytes from the specified zip entry.
+     * 
+     * @param zip the zip file in which to find the zip entry
+     * @param ze  the specified zip entry
+     * @return a byte array containing all bytes from the specified zip entry
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] readBytes(final ZipFile zip, final ZipEntry ze) throws IOException {
+        checkNotNull(zip, "zip == null");
+        checkNotNull(ze, "ze == null");
+
+        try (final InputStream in = zip.getInputStream(ze)) {
+            return ByteStreams.toByteArray(in);
         }
     }
 
@@ -294,151 +308,94 @@ final public class Zip {
      * @throws IllegalArgumentException if the specified entry is a directory
      */
     public static List<String> readLines(final ZipFile zip, final ZipEntry ze) throws IOException {
-        checkNotNull(zip, "zip == null");
-        checkNotNull(ze, "ze == null");
-        checkArgument(isFile().apply(ze), "ZipEntry is a directory");
-
-        final Closer closer = Closer.create();
-
-        try {
-            return CharStream.readLines(closer.register(zip.getInputStream(ze)));
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
-        }
+        return readLines(zip, ze, UTF_8);
     }
 
     /**
-     * Returns a byte array containing all bytes from the specified zip entry.
-     * 
-     * @param zip the zip file in which to find the zip entry
-     * @param ze  the specified zip entry
-     * @return a byte array containing all bytes from the specified zip entry
-     * @throws IOException if an I/O error occurs
-     */
-    public static byte[] toByteArray(final ZipFile zip, final ZipEntry ze) throws IOException {
-        checkNotNull(zip, "zip == null");
-        checkNotNull(ze, "ze == null");
-
-        final Closer closer = Closer.create();
-
-        try {
-            return ByteStreams.toByteArray(closer.register(zip.getInputStream(ze)));
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
-        }
-    }
-
-    /**
-     * Returns a string containing all the characters from the given zip entry in the specified charset.
+     * Returns all of the lines read from the specified zip entry using the specified charset. The lines do not include
+     * line-termination characters, but do include other leading and trailing whitespace.
      * 
      * @param zip     the zip file in which to find the zip entry
-     * @param ze      the given zip entry
-     * @param charset the character set to use when reading the zip entry
-     * @return a string containing all the characters from the given zip entry in the specified charset
+     * @param ze      the specified zip entry
+     * @param charset the charset used to decode the zip entry
+     * @return a mutable {@link List} containing all the lines read from a zip entry using the specified charset
      * @throws IOException              if an I/O error occurs
      * @throws IllegalArgumentException if the specified entry is a directory
-     * @see Charsets
      */
-    public static String toString(final ZipFile zip, final ZipEntry ze, final Charset charset) throws IOException {
+    public static List<String> readLines(final ZipFile zip, final ZipEntry ze, final Charset charset) throws IOException {
         checkNotNull(zip, "zip == null");
         checkNotNull(ze, "ze == null");
         checkNotNull(charset, "charset == null");
-        checkArgument(isFile().apply(ze), "ZipEntry is a directory");
+        // checkArgument(isFile().apply(ze), "ZipEntry is a directory");
 
-        final Closer closer = Closer.create();
-
-        try {
-            return CharStream.read(closer.register(zip.getInputStream(ze)), charset);
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
+        try (final InputStream in = zip.getInputStream(ze)) {
+            return CharStream.readLines(in, charset);
         }
     }
 
     /**
-     * Returns a string containing all the characters from the given zip entry in the UTF-8 charset.
-     * 
-     * @param zip the zip file in which to find the zip entry
-     * @param ze  the given zip entry
-     * @return a string containing all the characters from the given zip entry in the UTF-8 charset
-     * @throws IOException              if an I/O error occurs
-     * @throws IllegalArgumentException if the specified entry is a directory
-     * @see Charsets
-     */
-    public static String toString(final ZipFile zip, final ZipEntry ze) throws IOException {
-        checkNotNull(zip, "zip == null");
-        checkNotNull(ze, "ze == null");
-        checkArgument(!ze.isDirectory(), "ZipEntry is a directory");
-
-        final Closer closer = Closer.create();
-
-        try {
-            return CharStream.read(closer.register(zip.getInputStream(ze)));
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
-        }
-    }
-
-    /**
-     * Extracts the give zip file to the destination directory using the UTF-8 charset to decode zip entry names. The
-     * charset is ignored if the <a href="package-summary.html#lang_encoding"> language encoding bit</a> of the zip entry's
-     * general purpose bit flag is set.
+     * Extracts the given zip file to the destination directory using the UTF-8 charset to decode zip entry names. The
+     * charset is ignored if the <a target="_blank" href="package-summary.html#lang_encoding"> language encoding bit</a> of
+     * the zip entry's general purpose bit flag is set.
+     * <p>
+     * If the destination directory does not exist or if the zip file contains entries outside the destination directory
+     * this call will result in an {@code IllegalArgumentException}. If the destination directory is a symbolic link it will
+     * be resolved to its final target. Zip entries representing symbolic links are not supported. Existing files will be
+     * overwritten.
+     * <p>
+     * <b>Note:</b> If this operation fails because of an I/O error or other problems it may have succeeded in extracting
+     * some (but not all) of the files and/or directories.
      * 
      * @param zip  the given zip file
      * @param dest the destination directory
      * @throws IOException if an I/O error occurs
      */
-    public static void unzip(final File zip, final File dest) throws IOException {
+    public static void unzip(final Path zip, final Path dest) throws IOException {
         checkNotNull(zip, "zip == null");
         checkNotNull(dest, "dest == null");
-        checkArgument(zip.isFile(), "% is not a normal file or does not exist", zip.getPath());
-        checkArgument(dest.isDirectory(), "% is not a directory or does not exist", dest.getPath());
-        unzip(zip, dest, Charsets.UTF_8);
+        unzip(zip, dest, UTF_8);
     }
 
     /**
-     * Extracts the give zip file to the destination directory using the specified charset to decode zip entry names. The
-     * charset is ignored if the <a href="package-summary.html#lang_encoding"> language encoding bit</a> of the zip entry's
-     * general purpose bit flag is set.
+     * Extracts the given zip file to the destination directory using the specified charset to decode zip entry names. The
+     * charset is ignored if the <a target="_blank" href="package-summary.html#lang_encoding"> language encoding bit</a> of
+     * the zip entry's general purpose bit flag is set.
+     * <p>
+     * If the destination directory does not exist or if the zip file contains entries outside the destination directory
+     * this call will result in an {@code IllegalArgumentException}. If the destination directory is a symbolic link it will
+     * be resolved to its final target. Zip entries representing symbolic links are not supported. Existing files will be
+     * overwritten.
+     * <p>
+     * <b>Note:</b> If this operation fails because of an I/O error or other problems it may have succeeded in extracting
+     * some (but not all) of the files and/or directories.
      * 
      * @param zip     the given zip file
-     * @param charset the specified charset
      * @param dest    the destination directory
+     * @param charset the specified charset
      * @throws IOException if an I/O error occurs
      */
-    public static void unzip(final File zip, final File dest, final Charset charset) throws IOException {
+    public static void unzip(final Path zip, final Path dest, final Charset charset) throws IOException {
         checkNotNull(zip, "zip == null");
         checkNotNull(dest, "dest == null");
         checkNotNull(charset, "charset == null");
+        checkArgument(Files.isDirectory(dest), "%s is not a directory or does not exist", dest);
 
-        final Closer closer = Closer.create();
+        final Path target = dest.toRealPath();
 
-        try {
-            final ZipInputStream zis = closer.register(newZipInputStream(zip, charset));
+        try (final ZipInputStream zis = newZipInputStream(zip, charset)) {
 
             ZipEntry ze;
             while ((ze = zis.getNextEntry()) != null) {
-                final File fout = new File(dest, ze.getName());
-                Files.createParentDirs(fout);
+                final Path fout = target.resolve(ze.getName());
+                MoreFiles.createParentDirectories(fout);
+
+                checkArgument(fout.startsWith(target), "%s is outside the destination directory", ze.getName());
+
                 if (ze.isDirectory())
-                    fout.mkdir();
-                else {
-                    final OutputStream out = Fs.newBufferedOutputStream(fout, false);
-                    ByteStreams.copy(zis, out);
-                    out.close();
-                }
+                    Files.createDirectory(fout);
+                else
+                    Files.copy(zis, fout, REPLACE_EXISTING);
             }
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
         }
     }
 

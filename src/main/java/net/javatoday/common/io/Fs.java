@@ -67,6 +67,11 @@ import net.javatoday.common.io.FileWalker.VisitResult;
 /**
  * Static utility methods for working with {@link File}s and {@link Path}s.
  * <p>
+ * The class is not intended to substitute the functionality in {@link java.nio.file.Files java.nio.file.Files},
+ * {@link com.google.common.io.MoreFiles com.google.common.io.MoreFiles}, or {@link com.google.common.io.Files
+ * com.google.common.io.Files}. The intent is to provide unified access between various Java and Guava I/O classes to
+ * several of the most commonly used I/O operations.
+ * <p>
  * <b>Warning:</b> The {@code java.io.File} facility does not scale with large file systems, suffers from race
  * conditions, and provides no platform-independent way to detect symbolic links. As such there is no way to ensure a
  * symbolic link to a directory is not followed when traversing a file tree. In the presence of symbolic links, you may
@@ -76,10 +81,6 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  * {@code java.nio.file.Path} operations introduced in JDK 7 as part of the
  * <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
  * System</a>.
- * <p>
- * The class is not intended to substitute the functionality provided in {@link java.nio.file.Files},
- * {@link com.google.common.io.MoreFiles}, or {@link com.google.common.io.Files}. The intent is to provide unified
- * access between various Java and Guava I/O classes to several of the most commonly used I/O operations.
  * <p>
  * The following tables describe common convenience methods provided by this class and their closest Guava and Java
  * equivalents:

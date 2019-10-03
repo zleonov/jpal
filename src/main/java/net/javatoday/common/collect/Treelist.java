@@ -73,19 +73,19 @@ import com.google.common.collect.Ordering;
  *     <th style="text-align:center;">Running Time</th>
  *   </tr>
  *   <tr>
- *     <td>{@link #addAll(Collection) addAll(Collection)}<br/>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}</td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br>{@link #containsAll(Collection) containsAll(Collection)}<br>{@link #retainAll(Collection) retainAll(Collection)}<br>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td style="text-align:center;"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #indexOf(Object)}<br/>{@link #lastIndexOf(Object)}<br/>{@link #get(int)}<br/>{@link #remove(int)}<br/>{@link #listIterator(int)}</td>
+ *     <td>{@link #indexOf(Object)}<br>{@link #lastIndexOf(Object)}<br>{@link #get(int)}<br>{@link #remove(int)}<br>{@link #listIterator(int)}</td>
  *     <td style="text-align:center;"><i>O(n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #add(Object) add(E)}<br/>{@link #contains(Object)}<br/>{@link #remove(Object)}</td>
+ *     <td>{@link #add(Object) add(E)}<br>{@link #contains(Object)}<br>{@link #remove(Object)}</td>
  *     <td style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #clear() clear()}<br/>{@link #isEmpty() isEmpty()}<br/>{@link #size()}<br/>{@link Iterator#remove()}<br/>{@link ListIterator#remove()}</td>
+ *     <td>{@link #clear() clear()}<br>{@link #isEmpty() isEmpty()}<br>{@link #size()}<br>{@link Iterator#remove()}<br>{@link ListIterator#remove()}</td>
  *     <td style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  * </table>

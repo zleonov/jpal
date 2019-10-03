@@ -97,7 +97,6 @@ public interface FileWalker<R> {
      * @return {@link VisitResult#CONTINUE CONTINUE} to continue with the next file or directory<br>
      *         {@link VisitResult#SKIP_SIBLINGS SKIP_SIBLINGS} to skip the <i>siblings</i> of this directory<br>
      *         {@link VisitResult#TERMINATE TERMINATE} to terminate the traversal
-     * @throws IOException if an I/O error occurs
      */
     public VisitResult postVisitDirectory(final File dir);
 

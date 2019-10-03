@@ -53,17 +53,17 @@ import com.google.common.collect.ObjectArrays;
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#contains(Object[], Object)}</td>
- *     <td> Java: {@link Arrays#asList(Object[])}{@link List#contains(Object) .contains(Object)}<br/>Guava: {@link ImmutableList#copyOf(Object[])}{@link List#contains(Object) .contains(Object)}</td>
- *     <td> Java: {@link Arrays#stream(Object[])}{@link Stream#anyMatch(Predicate) .anyMatch(}{@link Predicate#isEqual(Object) Predicate.isEqual(Object))}<br/>Guava: {@link Iterators#contains(Iterator, Object) Iterators.contains(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), Object)}</td>
+ *     <td> Java: {@link Arrays#asList(Object[])}{@link List#contains(Object) .contains(Object)}<br>Guava: {@link ImmutableList#copyOf(Object[])}{@link List#contains(Object) .contains(Object)}</td>
+ *     <td> Java: {@link Arrays#stream(Object[])}{@link Stream#anyMatch(Predicate) .anyMatch(}{@link Predicate#isEqual(Object) Predicate.isEqual(Object))}<br>Guava: {@link Iterators#contains(Iterator, Object) Iterators.contains(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), Object)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#contains(Object[], Predicate)}</td>
  *     <td colspan=
-"2"> Java: {@link Arrays#asList(Object[])}{@link List#stream() .stream()}{@link Stream#anyMatch(Predicate) .anyMatch(Predicate)}<br />Guava: {@link Iterators#any(Iterator, Predicate) Iterators.any(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), Predicate)}</td>
+"2"> Java: {@link Arrays#asList(Object[])}{@link List#stream() .stream()}{@link Stream#anyMatch(Predicate) .anyMatch(Predicate)}<br>Guava: {@link Iterators#any(Iterator, Predicate) Iterators.any(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), Predicate)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#indexOf(Object[], Object)}</td>
- *     <td> Java: {@link Arrays#asList(Object[])}{@link List#indexOf(Object) .indexOf(Object)}<br/>Guava: {@link ImmutableList#copyOf(Object[])}{@link List#indexOf(Object) .indexOf(Object)}</td>
+ *     <td> Java: {@link Arrays#asList(Object[])}{@link List#indexOf(Object) .indexOf(Object)}<br>Guava: {@link ImmutableList#copyOf(Object[])}{@link List#indexOf(Object) .indexOf(Object)}</td>
  *     <td>Guava: {@link Iterators#indexOf(Iterator, com.google.common.base.Predicate) Iterators.indexOf(}{@link Iterators#forArray(Object[]) Iterators.forArray(Object[]), }{@link Predicates#equalTo(Object) Predicates.equalTo(Object))}</td>
  *   </tr>
  *   <tr>
@@ -83,7 +83,7 @@ import com.google.common.collect.ObjectArrays;
  *   </tr>
  *   <tr>
  *     <td>{@link MoreArrays#lastIndexOf(Object[], Object)}</td>
- *     <td> Java: {@link Arrays#asList(Object[])}{@link List#lastIndexOf(Object) .lastIndexOf(Object)}<br/>Guava: {@link ImmutableList#copyOf(Object[])}{@link List#lastIndexOf(Object) .lastIndexOf(Object)}</td>
+ *     <td> Java: {@link Arrays#asList(Object[])}{@link List#lastIndexOf(Object) .lastIndexOf(Object)}<br>Guava: {@link ImmutableList#copyOf(Object[])}{@link List#lastIndexOf(Object) .lastIndexOf(Object)}</td>
  *     <td>N/A</td>
  *   </tr>
  *   <tr>

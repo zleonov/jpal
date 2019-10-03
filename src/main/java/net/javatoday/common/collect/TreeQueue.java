@@ -86,11 +86,11 @@ import com.google.common.collect.Ordering;
  *     <td style="text-align:center;"><b>PriorityQueue</b><br>(<i>worst-case</i>)</td>
  *   </tr>
  *   <tr>
- *     <td>{@link #addAll(Collection) addAll(Collection)}<br>{@link #containsAll(Collection) containsAll(Collection)}</br>{@link #retainAll(Collection) retainAll(Collection)}</br>{@link #removeAll(Collection) removeAll(Collection)}</td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br>{@link #containsAll(Collection) containsAll(Collection)}<br>{@link #retainAll(Collection) retainAll(Collection)}<br>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td colspan="2" style="text-align:center;"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #add(Object) add(E)}</br>{@link #offer(Object) offer(E)}</br>{@link #remove(Object)}</td>
+ *     <td>{@link #add(Object) add(E)}<br>{@link #offer(Object) offer(E)}<br>{@link #remove(Object)}</td>
  *     <td colspan="2" style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
@@ -103,15 +103,15 @@ import com.google.common.collect.Ordering;
  *     <td bgcolor="FFCC99" rowspan="2" style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #poll()}</br>{@link #remove() remove()}</br></td>
+ *     <td>{@link #poll()}<br>{@link #remove() remove()}<br></td>
  *     <td bgcolor="FFCCCC" style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #element() element()}</br>{@link #isEmpty() isEmpty()}</br>{@link #peek()}</br>{@link #size()}</td>
+ *     <td>{@link #element() element()}<br>{@link #isEmpty() isEmpty()}<br>{@link #peek()}<br>{@link #size()}</td>
  *     <td colspan="2" style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #peekLast() peekLast()}</br>{@link #pollLast() pollLast()}</br>{@link #removeLast() removeLast()}</td>
+ *     <td>{@link #peekLast() peekLast()}<br>{@link #pollLast() pollLast()}<br>{@link #removeLast() removeLast()}</td>
  *     <td style="text-align:center;"><i>O(1)</i></td>
  *     <td style="text-align:center;">&nbsp</td>
  *   </tr>

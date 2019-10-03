@@ -183,13 +183,12 @@ final public class Iteration {
      * like a general purpose {@code Iterable} because it supports only a single call to {@link Iterable#iterator()}.
      * Invoking the {@code iterator()} method to obtain subsequent iterators will result in an
      * {@code IllegalStateException}.
-     * <p>
      * 
      * @deprecated Jave 8+ users can create an {@code Iterable} from an {@code Iterator} using Java's lambda facility, for
      *             example:
      * 
      *             <pre>
-     * for (final String s : (Iterable&ltString&gt)() -> iterator) {
+     * for (final String s : (Iterable&lt;String&gt;)() -> iterator) {
      *    ...
      * }
      *             </pre>

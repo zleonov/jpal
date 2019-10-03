@@ -16,6 +16,7 @@
 package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,10 +27,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 
@@ -48,52 +47,57 @@ final public class CharStream {
     }
 
     /**
-     * Returns a new {@code BufferedReader} which reads from the given input stream using the UTF-8 charset.
+     * Returns a new {@code BufferedReader} which reads from the given input stream in an efficient manner using the UTF-8
+     * charset.
      * 
      * @param in the given input stream
-     * @return a new {@code BufferedReader} which reads from the given input stream using the UTF-8 charset
+     * @return a new {@code BufferedReader} which reads from the given input stream in an efficient manner using the UTF-8
+     *         charset
      */
-    public static BufferedReader newReader(final InputStream in) {
-        return newReader(in, Charsets.UTF_8);
+    public static BufferedReader newBufferedReader(final InputStream in) {
+        return newBufferedReader(in, UTF_8);
     }
 
     /**
-     * Returns a new {@code BufferedReader} which reads from the given input stream using the specified charset.
+     * Returns a new {@code BufferedReader} which reads from the given input stream in an efficient manner using the
+     * specified charset.
      * 
      * @param in      the given input stream
      * @param charset the character set to use when reading from the input stream
-     * @return a new {@code BufferedReader} which reads from the given input stream using the specified charset
+     * @return a new {@code BufferedReader} which reads from the given input stream in an efficient manner using the
+     *         specified charset
      */
-    public static BufferedReader newReader(final InputStream in, final Charset charset) {
+    public static BufferedReader newBufferedReader(final InputStream in, final Charset charset) {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
         return new BufferedReader(new InputStreamReader(in, charset));
     }
 
     /**
-     * Returning a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
-     * UTF-8 charset.
+     * Returning a new {@code BufferedWriter} that writes to the given output stream in an efficient manner using the UTF-8
+     * charset.
      * 
      * @param out the given output stream
-     * @return a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
-     *         UTF-8 charset
+     * @return a new {@code BufferedWriter} that writes to the given output stream in an efficient manner using the UTF-8
+     *         charset
      */
-    public static BufferedWriter newWriter(final OutputStream out) {
-        return newWriter(out, StandardCharsets.UTF_8);
+    public static BufferedWriter newBufferedWriter(final OutputStream out) {
+        return newBufferedWriter(out, UTF_8);
     }
 
     /**
-     * Returning a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
+     * Returning a new {@code BufferedWriter} that writes to the given output stream in an efficient manner using the
      * specified charset.
      * 
      * @param out     the given output stream
      * @param charset the character set to use when writing to the output stream
-     * @return a new {@code BufferedWriter} that writes text to the given output stream in an efficient manner using the
+     * @return a new {@code BufferedWriter} that writes to the given output stream in an efficient manner using the
      *         specified charset
      */
-    public static BufferedWriter newWriter(final OutputStream out, final Charset charset) {
+    public static BufferedWriter newBufferedWriter(final OutputStream out, final Charset charset) {
+        checkNotNull(out, "out == null");
+        checkNotNull(charset, "charset == null");
         return new BufferedWriter(new OutputStreamWriter(out, charset));
-
     }
 
     /**
@@ -102,15 +106,16 @@ final public class CharStream {
      * <p>
      * Does not close the input stream.
      * <p>
-     * <b>Guava equivalent:</b> {@link CharStreams#readLines(Readable) CharStreams.readLines(new InputStreamReader(in,
-     * Charsets.UTF_8))}
+     * <b>Guava equivalent:</b> {@link CharStreams#readLines(Readable)
+     * CharStreams.readLines(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
+     * InputStreamReader(InputStream, UTF_8))}
      * 
      * @param in the input stream to read from
      * @return a mutable {@code List} containing all the lines read from the given input stream using the UTF-8 charset
      * @throws IOException if an I/O error occurs
      */
     public static List<String> readLines(final InputStream in) throws IOException {
-        return readLines(in, Charsets.UTF_8);
+        return readLines(in, UTF_8);
     }
 
     /**
@@ -119,8 +124,9 @@ final public class CharStream {
      * <p>
      * Does not close the input stream.
      * <p>
-     * <b>Guava equivalent:</b> {@link CharStreams#readLines(Readable) CharStreams.readLines(new InputStreamReader(in,
-     * Charset))}
+     * <b>Guava equivalent:</b> {@link CharStreams#readLines(Readable)
+     * CharStreams.readLines(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
+     * InputStreamReader(InputStream, Charset))}
      * 
      * @param in      the input stream to read from
      * @param charset the character set to use
@@ -131,7 +137,7 @@ final public class CharStream {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
-        final BufferedReader reader = newReader(in, Charsets.UTF_8);
+        final BufferedReader reader = newBufferedReader(in, UTF_8);
 
         final List<String> lines = Lists.newArrayList();
 
@@ -147,15 +153,16 @@ final public class CharStream {
      * <p>
      * Does not close the input stream.
      * <p>
-     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable) CharStreams.toString(new
-     * InputStreamReader(InputStream, Charsets.UTF_8))}
+     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable)
+     * CharStreams.toString(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
+     * InputStreamReader(InputStream, UTF_8))}
      * 
      * @param in the given input stream
      * @return a string of all the characters read from the given input stream using the UTF-8 charset
      * @throws IOException if an I/O error occurs
      */
     public static String read(final InputStream in) throws IOException {
-        return read(in, Charsets.UTF_8);
+        return read(in, UTF_8);
     }
 
     /**
@@ -163,7 +170,8 @@ final public class CharStream {
      * <p>
      * Does not close the input stream.
      * <p>
-     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable) CharStreams.toString(new
+     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable)
+     * CharStreams.toString(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
      * InputStreamReader(InputStream, Charset))}
      * 
      * @param in      the given input stream
@@ -176,7 +184,7 @@ final public class CharStream {
         checkNotNull(charset, "charset == null");
 
         // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
-        return new String(ByteStream.readBytes(in), charset);
+        return new String(ByteStream.toByteArray(in), charset);
     }
 
     /**
@@ -190,7 +198,7 @@ final public class CharStream {
      * @throws IOException if an I/O error occurs
      */
     public static OutputStream write(final CharSequence chars, final OutputStream out) throws IOException {
-        return write(chars, out, Charsets.UTF_8);
+        return write(chars, out, UTF_8);
     }
 
     /**
@@ -205,6 +213,9 @@ final public class CharStream {
      * @throws IOException if an I/O error occurs
      */
     public static OutputStream write(final CharSequence chars, final OutputStream out, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
+        checkNotNull(out, "out == null");
+        checkNotNull(charset, "charset == null");
         new OutputStreamWriter(out, charset).append(chars).flush();
         return out;
     }
@@ -221,7 +232,7 @@ final public class CharStream {
      * @throws IOException if an I/O error occurs
      */
     public static OutputStream write(final Iterable<? extends CharSequence> lines, final OutputStream out) throws IOException {
-        return write(lines, out, Charsets.UTF_8);
+        return write(lines, out, UTF_8);
     }
 
     /**

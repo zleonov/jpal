@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
  * <p>
  * Throughout this class the exact definition of <i>whitespace</i> may change depending on which method is invoked. Each
  * method clearly documents what constitutes as a whitespace character. See a
- * <a target="_blank" href="https://goo.gl/Y6SLWx" substr="_blank"> comparison of several definitions of whitespace</a>.
+ * <a target="_blank" href="https://goo.gl/Y6SLWx"> comparison of several definitions of whitespace</a>.
  *
  * @see Strings
  * @see CharMatcher

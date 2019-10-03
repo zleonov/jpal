@@ -67,15 +67,15 @@ import com.google.common.collect.Ordering;
  *     <th style="text-align:center;">Running Time</th>
  *   </tr>
  *   <tr>
- *     <td>{@link #addAll(Collection) addAll(Collection)}<br/>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}</td>
+ *     <td>{@link #addAll(Collection) addAll(Collection)}<br>{@link #containsAll(Collection) containsAll(Collection)}<br>{@link #retainAll(Collection) retainAll(Collection)}<br>{@link #removeAll(Collection) removeAll(Collection)}</td>
  *     <td style="text-align:center;"><i>O(m log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #add(Object) add(E)}<br/>{@link #contains(Object)}<br/>{@link #remove(Object)}</td>
+ *     <td>{@link #add(Object) add(E)}<br>{@link #contains(Object)}<br>{@link #remove(Object)}</td>
  *     <td style="text-align:center;"><i>O(log n)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #clear() clear()}<br/>{@link #isEmpty() isEmpty()}<br/>{@link #size()}<br/>{@link Iterator#remove()}</td>
+ *     <td>{@link #clear() clear()}<br>{@link #isEmpty() isEmpty()}<br>{@link #size()}<br>{@link Iterator#remove()}</td>
  *     <td style="text-align:center;"><i>O(1)</i></td>
  *   </tr>
  * </table>
@@ -83,7 +83,6 @@ import com.google.common.collect.Ordering;
  * 
  * @author Zhenya Leonov
  * @param <E> the type of elements maintained by this set
- * @see SkiplistSet
  */
 final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection<E>, Cloneable, Serializable {
 

@@ -16,10 +16,7 @@
 package net.javatoday.common.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -206,11 +203,11 @@ public final class Props {
         checkNotNull(charset, "charset == null");
 
         if (charset == Charsets.ISO_8859_1)
-            try (final OutputStream out = Files.newOutputStream(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
+            try (final OutputStream out = Files.newOutputStream(path)) {
                 properties.store(out, comments);
             }
         else
-            try (final Writer writer = Files.newBufferedWriter(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
+            try (final Writer writer = Files.newBufferedWriter(path)) {
                 properties.store(writer, comments);
             }
 
@@ -241,7 +238,7 @@ public final class Props {
         checkNotNull(path, "path == null");
         checkNotNull(charset, "charset == null");
 
-        try (final OutputStream out = Files.newOutputStream(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
+        try (final OutputStream out = Files.newOutputStream(path)) {
             properties.storeToXML(out, comment, charset.toString());
         }
 

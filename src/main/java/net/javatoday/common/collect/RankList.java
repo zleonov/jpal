@@ -79,7 +79,7 @@ import com.google.common.collect.Iterables;
  *     <td style="text-align:center;" bgcolor="9999CC"><i>O(m)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #containsAll(Collection) containsAll(Collection)}<br/>{@link #removeAll(Collection) removeAll(Collection)}<br/>{@link #retainAll(Collection) retainAll(Collection)}</td>
+ *     <td>{@link #containsAll(Collection) containsAll(Collection)}<br>{@link #removeAll(Collection) removeAll(Collection)}<br>{@link #retainAll(Collection) retainAll(Collection)}</td>
  *     <td style="text-align:center;" colspan="3"><i>O(m * n)</i></td>
  *   </tr>
  *     <td>{@link #add(Object) add(E)}</td>
@@ -115,11 +115,11 @@ import com.google.common.collect.Iterables;
  *     <td>{@link ListIterator#remove()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link ListIterator#set(Object) ListIterator.set(E)}<br/>{@link #clear()}</td>
+ *     <td>{@link ListIterator#set(Object) ListIterator.set(E)}<br>{@link #clear()}</td>
  *     <td style="text-align:center;" colspan="3"><i>O(1)</i></td>
  *   </tr>
  *   <tr>
- *     <td>{@link #contains(Object) contains(Object)}<br/>{@link #indexOf(Object) indexOf(Object)}<br/>{@link #lastIndexOf(Object)}<br/>{@link #remove(Object) remove(Object)}</td>
+ *     <td>{@link #contains(Object) contains(Object)}<br>{@link #indexOf(Object) indexOf(Object)}<br>{@link #lastIndexOf(Object)}<br>{@link #remove(Object) remove(Object)}</td>
  *     <td style="text-align:center;" rowspan="4" colspan="3"><i>O(n)</i></td>
  *   </tr>
  * </table>

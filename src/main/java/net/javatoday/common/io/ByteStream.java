@@ -57,7 +57,7 @@ final public class ByteStream {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
-     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility<a>.
+     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility</a>.
      *
      * @param in     the given input stream
      * @param digest the specified message digest object
@@ -113,12 +113,12 @@ final public class ByteStream {
      * @return a byte array containing all the bytes read from the input stream
      * @throws IOException if an I/O error occurs
      */
-    public static byte[] readBytes(final InputStream in) throws IOException {
+    public static byte[] toByteArray(final InputStream in) throws IOException {
         checkNotNull(in, "in == null");
-        return readBytes(in, DEFAULT_BUFFER_SIZE);
+        return toByteArray(in, DEFAULT_BUFFER_SIZE);
     }
 
-    static byte[] readBytes(final InputStream in, long size) throws IOException {
+    static byte[] toByteArray(final InputStream in, long size) throws IOException {
 
         // size is a suggestion but it is not guaranteed to be accurate so we don't throw an OOME if it's too large
         byte[] bytes = new byte[size > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size];

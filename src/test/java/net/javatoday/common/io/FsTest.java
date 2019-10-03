@@ -130,7 +130,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesBenchmarkVsGuava() throws URISyntaxException, IOException {
+    void testwriteBenchmarkVsGuava() throws URISyntaxException, IOException {
         final File fin = getResourceAsFile("War and Peace.txt");
 
         final int numLines = 66055 * 100;
@@ -162,7 +162,7 @@ class FsTest {
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
-        System.out.println("Fs.write(Iterable, File) vs Files.asCharSink(File, Charsets.UTF_8).writeLines(lines):");
+        System.out.println("Fs.write(Iterable, File) vs Files.asCharSink(File, Charsets.UTF_8).write(lines):");
         System.out.println("jpal : " + jpal);
         System.out.println("guava: " + guava);
         System.out.println("Percentage Difference: " + percentageDifference(guava, jpal) * 100 + "%");
@@ -426,7 +426,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesFileExistsVsGuava() throws IOException, URISyntaxException {
+    void testwriteFileExistsVsGuava() throws IOException, URISyntaxException {
         final File fin = getResourceAsFile("War and Peace.txt");
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
@@ -440,7 +440,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesFileExistsVsJava7() throws IOException, URISyntaxException {
+    void testwriteFileExistsVsJava7() throws IOException, URISyntaxException {
         final File fin = getResourceAsFile("War and Peace.txt");
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
@@ -454,7 +454,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesFileNotExistsVsGuava() throws IOException, URISyntaxException {
+    void testwriteFileNotExistsVsGuava() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         final File tmp1 = createTempFile();
@@ -467,7 +467,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesFileNotExistsVsJava7() throws IOException, URISyntaxException {
+    void testwriteFileNotExistsVsJava7() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         final File tmp1 = createTempFile();
@@ -480,7 +480,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesWithCharsetsFileNotExistsVsJava7() throws IOException, URISyntaxException {
+    void testwriteWithCharsetsFileNotExistsVsJava7() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
@@ -495,7 +495,7 @@ class FsTest {
     }
 
     @Test
-    void testWriteLinesWithCharsetsFileNotExistsVsGuava() throws IOException, URISyntaxException {
+    void testwriteWithCharsetsFileNotExistsVsGuava() throws IOException, URISyntaxException {
         final List<String> lines = ImmutableList.of("The quick brown fox", "jumps over the lazy dog");
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {

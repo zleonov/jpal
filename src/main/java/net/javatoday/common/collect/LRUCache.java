@@ -42,12 +42,11 @@ import java.util.function.Function;
  * <p>
  * <b>Note:</b> This class is provided as a convenience to developers who are making casual use of caching idioms.
  * Production projects should consider using Guava's
- * <a target="_blank" href="https://github.com/google/guava/wiki/CachesExplained">Caching facility<a>.
+ * <a target="_blank" href="https://github.com/google/guava/wiki/CachesExplained">Caching facility</a>.
  * 
  * @author Zhenya Leonov
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
- * @see MoreMaps
  */
 final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements BoundedMap<K, V> {
 

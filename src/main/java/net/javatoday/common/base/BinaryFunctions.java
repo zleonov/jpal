@@ -18,6 +18,7 @@ package net.javatoday.common.base;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Serializable;
+import java.util.function.BiFunction;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -28,9 +29,15 @@ import com.google.common.base.Supplier;
  * <p>
  * The methods in this class return serializable {@code BinaryFunction}s as long as they are given serializable
  * parameters.
+ * <p>
+ * <b>Note:</b> The {@link BinaryFunction} interface is the legacy version of {@link BiFunction}. It has been refactored
+ * to extend {@code BiFunction} for backwards compatibility. Java 8+ users should reference {@code BiFunction} directly.
+ * <p>
+ * For example: {@code BiFunction<Object, Object, T> bf = BinaryFunctions.constant(value);}
  * 
  * @author Zhenya Leonov
  */
+@SuppressWarnings("deprecation")
 public final class BinaryFunctions {
 
     private BinaryFunctions() {
@@ -38,7 +45,7 @@ public final class BinaryFunctions {
 
     private static final class ConstantBinaryFunction<E> implements BinaryFunction<Object, Object, E>, Serializable {
         private static final long serialVersionUID = -3006748005728974855L;
-        
+
         private final E value;
 
         public ConstantBinaryFunction(final E value) {

@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
@@ -30,9 +31,16 @@ import com.google.common.collect.Iterators;
  * <p>
  * The methods in this class return serializable {@code BinaryPredicate}s as long as they are given serializable
  * parameters.
+ * <p>
+ * <b>Note:</b> The {@link BinaryPredicate} interface is the legacy version of {@link BiPredicate}. It has been
+ * refactored to extend {@code BiPredicate} for backwards compatibility. Java 8+ users should reference
+ * {@code BiPredicate} directly.
+ * <p>
+ * For example: {@code BiPredicate<Object, Object> pred = BinaryPredicates.alwaysTrue();}
  * 
  * @author Zhenya Leonov
  */
+@SuppressWarnings("deprecation")
 public final class BinaryPredicates {
 
     private BinaryPredicates() {
@@ -198,6 +206,8 @@ public final class BinaryPredicates {
      * This method creates a defensive copy of {@code parts} so future changes to it the array won't affect the behavior of
      * the returned {@code BinaryPredicate}.
      * 
+     * @deprecated Use {@link BiPredicate#or(BiPredicate)} instead.
+     * 
      * @param first  the first {@code BinaryPredicate}
      * @param second the second {@code BinaryPredicate}
      * @param rest   the rest of the {@code BinaryPredicate}s
@@ -221,6 +231,8 @@ public final class BinaryPredicates {
      * <p>
      * This method creates a defensive copy of {@code parts} so future changes to it the array won't affect the behavior of
      * the returned {@code BinaryPredicate}.
+     * 
+     * @deprecated Use {@link BiPredicate#and(BiPredicate)} instead.
      * 
      * @param first  the first {@code BinaryPredicate}
      * @param second the second {@code BinaryPredicate}

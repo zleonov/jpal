@@ -82,13 +82,13 @@ final public class Str {
     }
 
     /**
-     * Returns {@code true} if {@code str} contains {@code substr}, ignoring case differences; else {@code false}.
+     * Returns {@code true} if {@code str} contains {@code substr}, ignoring case differences, else {@code false}.
      * <p>
      * <b>Note:</b> This method uses the rules of the default locale.
      *
      * @param str    the specified string
      * @param substr the string to search for
-     * @return {@code true} if {@code str} contains the {@code substr}, ignoring case differences; {@code false} otherwise
+     * @return {@code true} if {@code str} contains the {@code substr}, ignoring case differences, {@code false} otherwise
      * @throws NullPointerException if either {@code str} or {@code substr} is {@code null}
      */
     public static boolean containsIgnoreCase(final String str, final String substr) {
@@ -121,11 +121,11 @@ final public class Str {
     }
 
     /**
-     * Returns {@code true} if {@code str} ends with {@code suffix}, ignoring case differences; else {@code false}.
+     * Returns {@code true} if {@code str} ends with {@code suffix}, ignoring case differences, else {@code false}.
      * 
      * @param str    the specified string
      * @param suffix the suffix
-     * @return {@code true} if {@code str} ends with {@code suffix}, ignoring case differences; else {@code false}
+     * @return {@code true} if {@code str} ends with {@code suffix}, ignoring case differences, else {@code false}
      */
     public static boolean endsWithIgnoreCase(final String str, final String suffix) {
         checkNotNull(str, "str == null");
@@ -203,7 +203,7 @@ final public class Str {
      *
      * @param chars the specified character sequence or {@code null}
      * @return {@code true} if the specified character sequence is {@code null}, empty, or contains only white space
-     *         characters; {@code false} otherwise
+     *         characters, {@code false} otherwise
      * @see CharMatcher#whitespace()
      * @see Strings#isNullOrEmpty(String)
      * @see Strings#nullToEmpty(String)
@@ -336,11 +336,11 @@ final public class Str {
     }
 
     /**
-     * Returns {@code true} if {@code str} starts with {@code prefix}, ignoring case differences; else {@code false}.
+     * Returns {@code true} if {@code str} starts with {@code prefix}, ignoring case differences, else {@code false}.
      * 
      * @param str    the specified string
      * @param prefix the prefix
-     * @return {@code true} if {@code str} starts with {@code prefix}, ignoring case differences; else {@code false}
+     * @return {@code true} if {@code str} starts with {@code prefix}, ignoring case differences, else {@code false}
      */
     public static boolean startsWithIgnoreCase(final String str, final String prefix) {
         return indexOfIgnoreCase(str, prefix) == 0;
@@ -532,7 +532,7 @@ final public class Str {
      * 
      * @param chars     the given character sequence or {@code null}
      * @param maxLength the specified maximum length
-     * @return the given character sequence truncated to the specified maximum length
+     * @return the given character sequence truncated to the specified maximum length or {@code null}
      * @throws IllegalArgumentException if {@code maxLength} < 1
      */
     public static String truncate(final CharSequence chars, final int maxLength) {
@@ -551,7 +551,7 @@ final public class Str {
      * @param chars     the given character sequence or {@code null}
      * @param maxLength the specified maximum length
      * @param suffix    the string to append to the truncated sequence or {@code null} for no suffix
-     * @return the given character sequence truncated to the specified maximum length
+     * @return the given character sequence truncated to the specified maximum length or {@code null}
      * @throws IllegalArgumentException if {@code maxLength} < 1
      * @throws IllegalArgumentException if {@code suffix} is not {@code null} and its length is not less than
      *                                  {@code maxLength}

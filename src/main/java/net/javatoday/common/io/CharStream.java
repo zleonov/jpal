@@ -20,6 +20,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +28,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
@@ -101,6 +104,47 @@ final public class CharStream {
     }
 
     /**
+     * Returns a string of all the characters read from the given input stream using the UTF-8 charset.
+     * <p>
+     * Does not close the input stream.
+     * <p>
+     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable)
+     * CharStreams.toString(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
+     * InputStreamReader(InputStream, UTF_8))}
+     * 
+     * @param in the given input stream
+     * @return a string of all the characters read from the given input stream using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     * @see CharStreams#toString(Readable)
+     */
+    public static String read(final InputStream in) throws IOException {
+        return read(in, UTF_8);
+    }
+
+    /**
+     * Returns a string of all the characters read from the given input stream using the specified charset.
+     * <p>
+     * Does not close the input stream.
+     * <p>
+     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable)
+     * CharStreams.toString(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
+     * InputStreamReader(InputStream, Charset))}
+     * 
+     * @param in      the given input stream
+     * @param charset the character set to use when reading the input stream
+     * @return a string of all the characters read from the given input stream using the specified charset
+     * @throws IOException if an I/O error occurs
+     * @see CharStreams#toString(Readable)
+     */
+    public static String read(final InputStream in, final Charset charset) throws IOException {
+        checkNotNull(in, "in == null");
+        checkNotNull(charset, "charset == null");
+
+        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
+        return new String(ByteStream.toByteArray(in), charset);
+    }
+
+    /**
      * Returns all the lines read from the given input stream using the UTF-8 charset. The lines do not include
      * line-termination characters, but do include other leading and trailing whitespace.
      * <p>
@@ -113,6 +157,7 @@ final public class CharStream {
      * @param in the input stream to read from
      * @return a mutable {@code List} containing all the lines read from the given input stream using the UTF-8 charset
      * @throws IOException if an I/O error occurs
+     * @see CharStreams#readLines(Readable)
      */
     public static List<String> readLines(final InputStream in) throws IOException {
         return readLines(in, UTF_8);
@@ -132,12 +177,13 @@ final public class CharStream {
      * @param charset the character set to use
      * @return a mutable {@code List} containing all the lines read from the given input stream using the specified charset
      * @throws IOException if an I/O error occurs
+     * @see CharStreams#readLines(Readable)
      */
     public static List<String> readLines(final InputStream in, final Charset charset) throws IOException {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
-        final BufferedReader reader = newBufferedReader(in, UTF_8);
+        final BufferedReader reader = newBufferedReader(in, charset);
 
         final List<String> lines = Lists.newArrayList();
 
@@ -149,42 +195,20 @@ final public class CharStream {
     }
 
     /**
-     * Returns a string of all the characters read from the given input stream using the UTF-8 charset.
+     * Writes a character sequence to the given {@link Appendable} target.
      * <p>
-     * Does not close the input stream.
-     * <p>
-     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable)
-     * CharStreams.toString(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
-     * InputStreamReader(InputStream, UTF_8))}
+     * Does not attempt close the target even if it is {@link Closeable}.
      * 
-     * @param in the given input stream
-     * @return a string of all the characters read from the given input stream using the UTF-8 charset
+     * @param chars the character sequence to write
+     * @param out   the given {@code OutputStream}
+     * @return the given {@link Appendable} target
      * @throws IOException if an I/O error occurs
      */
-    public static String read(final InputStream in) throws IOException {
-        return read(in, UTF_8);
-    }
-
-    /**
-     * Returns a string of all the characters read from the given input stream using the specified charset.
-     * <p>
-     * Does not close the input stream.
-     * <p>
-     * <b>Guava equivalent:</b> {@link CharStreams#toString(Readable)
-     * CharStreams.toString(}{@link InputStreamReader#InputStreamReader(InputStream, Charset) new
-     * InputStreamReader(InputStream, Charset))}
-     * 
-     * @param in      the given input stream
-     * @param charset the character set to use when reading the input stream
-     * @return a string of all the characters read from the given input stream using the specified charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static String read(final InputStream in, final Charset charset) throws IOException {
-        checkNotNull(in, "in == null");
-        checkNotNull(charset, "charset == null");
-
-        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
-        return new String(ByteStream.toByteArray(in), charset);
+    public static Appendable write(final CharSequence chars, final Appendable out) throws IOException {
+        checkNotNull(chars, "chars == null");
+        checkNotNull(out, "out == null");
+        CharStreams.asWriter(out).append(chars).flush();
+        return out;
     }
 
     /**
@@ -213,10 +237,27 @@ final public class CharStream {
      * @throws IOException if an I/O error occurs
      */
     public static OutputStream write(final CharSequence chars, final OutputStream out, final Charset charset) throws IOException {
-        checkNotNull(chars, "chars == null");
         checkNotNull(out, "out == null");
         checkNotNull(charset, "charset == null");
-        new OutputStreamWriter(out, charset).append(chars).flush();
+        write(chars, new OutputStreamWriter(out, charset));
+        return out;
+    }
+
+    /**
+     * Writes lines of text to the given {@link Appendable} target (with each line, including the last, terminated with the
+     * operating system's default line separator).
+     * <p>
+     * Does not attempt close the target even if it is {@link Closeable}.
+     * 
+     * @param lines the lines of text to be written to the output stream
+     * @param out   the given {@link Appendable} target
+     * @return the given {@link Appendable} target
+     * @throws IOException if an I/O error occurs
+     */
+    public static Appendable write(final Iterable<? extends CharSequence> lines, final Appendable out) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(out, "out == null");
+        write(lines.iterator(), out);
         return out;
     }
 
@@ -226,8 +267,8 @@ final public class CharStream {
      * <p>
      * Does not close the stream.
      * 
-     * @param out   the given {@code OutputStream}
      * @param lines the lines of text to be written to the output stream
+     * @param out   the given {@code OutputStream}
      * @return the given {@code OutputStream}
      * @throws IOException if an I/O error occurs
      */
@@ -241,22 +282,78 @@ final public class CharStream {
      * <p>
      * Does not close the stream.
      * 
+     * @param lines   the lines of text to be written to the output stream
      * @param out     the given {@code OutputStream}
      * @param charset the character set to use when writing the lines
-     * @param lines   the lines of text to be written to the output stream
      * @return the given {@code OutputStream}
      * @throws IOException if an I/O error occurs
      */
     public static OutputStream write(final Iterable<? extends CharSequence> lines, final OutputStream out, final Charset charset) throws IOException {
         checkNotNull(out, "out == null");
-        checkNotNull(lines, "lines == null");
         checkNotNull(charset, "charset == null");
-
-        final Writer writer = new BufferedWriter(new OutputStreamWriter(out, charset));
-        for (final CharSequence line : lines)
-            writer.append(line).append(LINE_SEPARATOR);
-        writer.flush();
+        write(lines, new OutputStreamWriter(out, charset));
         return out;
+    }
+
+    /**
+     * Writes lines of text to the given {@link Appendable} target (with each line, including the last, terminated with the
+     * operating system's default line separator).
+     * <p>
+     * Does not attempt close the target even if it is {@link Closeable}.
+     * 
+     * @param lines the lines of text to be written to the output stream
+     * @param out   the given {@link Appendable} target
+     * @return the given {@link Appendable} target
+     * @throws IOException if an I/O error occurs
+     */
+    public static Appendable write(final Stream<? extends CharSequence> lines, final Appendable out) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(out, "out == null");
+        write(lines.iterator(), out);
+        return out;
+    }
+
+    /**
+     * Writes lines of text to the given output stream (with each line, including the last, terminated with the operating
+     * system's default line separator) using the UTF-8 charset.
+     * <p>
+     * Does not close the stream.
+     * 
+     * @param lines the lines of text to be written to the output stream
+     * @param out   the given {@code OutputStream}
+     * @return the given {@code OutputStream}
+     * @throws IOException if an I/O error occurs
+     */
+    public static OutputStream write(final Stream<? extends CharSequence> lines, final OutputStream out) throws IOException {
+        return write(lines, out, UTF_8);
+    }
+
+    /**
+     * Writes lines of text to the given output stream (with each line, including the last, terminated with the operating
+     * system's default line separator) using the specified charset.
+     * <p>
+     * Does not close the stream.
+     * 
+     * @param lines   the lines of text to be written to the output stream
+     * @param out     the given {@code OutputStream}
+     * @param charset the character set to use when writing the lines
+     * @return the given {@code OutputStream}
+     * @throws IOException if an I/O error occurs
+     */
+    public static OutputStream write(final Stream<? extends CharSequence> lines, final OutputStream out, final Charset charset) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(out, "out == null");
+        checkNotNull(charset, "charset == null");
+        write(lines.iterator(), new OutputStreamWriter(out, charset));
+        return out;
+    }
+
+    private static void write(final Iterator<? extends CharSequence> lines, final Appendable out) throws IOException {
+        @SuppressWarnings("resource")
+        final Writer writer = out instanceof BufferedWriter ? (BufferedWriter) out : new BufferedWriter(CharStreams.asWriter(out));
+        while (lines.hasNext())
+            writer.append(lines.next()).append(LINE_SEPARATOR);
+        writer.flush();
     }
 
 }

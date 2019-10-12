@@ -19,6 +19,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -40,29 +44,44 @@ public final class Numbers {
 
     /**
      * Returns a pseudorandom, uniformly distributed value between the given {@code least} value (inclusive) and
-     * {@code bound} (exclusive).
+     * {@code bound} (exclusive) using a default {@link Random} instance.
+     * <p>
+     * <b>Note:</b> In most cases you should no longer use {@link Random}. {@link ThreadLocalRandom} is much quicker and
+     * produces higher quality random numbers. {@link SplittableRandom} is available for use in {@link ForkJoinPool}s and
+     * {@link Stream#parallel() parallel} streams. Only use {@link Random} if you plan to share it across threads (it is
+     * thread-safe at the cost of extremely poor performance during high contention).
+     * 
+     * @deprecated Java 8+ users should use {@link ThreadLocalRandom#nextInt(int, int)} or
+     *             {@link SplittableRandom#nextInt(int, int)}.
      * 
      * @param least the least value
      * @param bound the upper bound (exclusive)
      * @return a pseudorandom, uniformly distributed value between the given {@code least} value (inclusive) and
      *         {@code bound} (exclusive)
+     * @throws IllegalArgumentException if {@code least} < 0 or {@code bound} < 0 or {@code least} >= {@code bound}
      */
     public static int nextRandomInt(final int least, final int bound) {
-        checkArgument(least >= 0, "least < 0");
-        checkArgument(bound >= 0, "bound < 0");
-        checkArgument(least < bound, "least >= bound");
-        return least + R.nextInt(bound - least);
+        return nextRandomInt(R, least, bound);
     }
 
     /**
      * Returns a pseudorandom, uniformly distributed value between the given {@code least} value (inclusive) and
-     * {@code bound} (exclusive).
+     * {@code bound} (exclusive) using the specified {@link Random} instance.
+     * <p>
+     * <b>Note:</b> In most cases you should no longer use {@link Random}. {@link ThreadLocalRandom} is much quicker and
+     * produces higher quality random numbers. {@link SplittableRandom} is available for use in {@link ForkJoinPool}s and
+     * {@link Stream#parallel() parallel} streams. Only use {@link Random} if you plan to share it across threads (it is
+     * thread-safe at the cost of extremely poor performance during high contention).
      * 
-     * @param random the {@code Random} instance to use to generate a stream of pseudorandom numbers
+     * @deprecated Java 8+ users should use {@link ThreadLocalRandom#nextInt(int, int)} or
+     *             {@link SplittableRandom#nextInt(int, int)}.
+     * 
+     * @param random the {@code Random} instance to use to generate random integers
      * @param least  the least value
      * @param bound  the upper bound (exclusive)
      * @return a pseudorandom, uniformly distributed value between the given {@code least} value (inclusive) and
      *         {@code bound} (exclusive)
+     * @throws IllegalArgumentException if {@code least} < 0 or {@code bound} < 0 or {@code least} >= {@code bound}
      */
     public static int nextRandomInt(final Random random, final int least, final int bound) {
         checkNotNull(random, "random == null");

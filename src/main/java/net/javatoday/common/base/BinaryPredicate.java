@@ -19,14 +19,16 @@ import java.util.function.BiPredicate;
 
 /**
  * Determines a {@code true} or {@code false} value for two arguments.
- * <p>
- * <b>Note:</b> Java 8+ users should consider switching to {@link BiPredicate}.
+ * 
+ * @deprecated This interface is the legacy version of {@link BiPredicate}. It has been refactored to extend
+ *             {@code BiPredicate} for backwards compatibility. Java 8+ users should use to {@code BiPredicate}
+ *             directly.
  * 
  * @param <T> the type of the first argument
  * @param <U> the type of the second argument
  * @author Zhenya Leonov
  */
-public interface BinaryPredicate<T, U> {
+public interface BinaryPredicate<T, U> extends BiPredicate<T, U> {
 
     /**
      * Returns the result of applying this binary predicate to the specified arguments. This method is <i>generally
@@ -37,5 +39,10 @@ public interface BinaryPredicate<T, U> {
      * @return the result of applying this binary predicate to the specified arguments
      */
     public boolean apply(T t, U u);
+
+    @Override
+    default boolean test(T t, U u) {
+        return apply(t, u);
+    }
 
 }

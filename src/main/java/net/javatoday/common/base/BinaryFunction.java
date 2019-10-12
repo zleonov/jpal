@@ -19,15 +19,16 @@ import java.util.function.BiFunction;
 
 /**
  * Determines an output value for two arguments.
- * <p>
- * <b>Note:</b> Java 8+ users should consider switching to {@link BiFunction}.
+ * 
+ * @deprecated This interface is the legacy version of {@link BiFunction}. It has been refactored to extend
+ *             {@code BiFunction} for backwards compatibility. Java 8+ users should use to {@code BiFunction} directly.
  *
  * @param <T> the type of the first argument
  * @param <U> the type of the second argument
  * @param <R> the type of result
  * @author Zhenya Leonov
  */
-public interface BinaryFunction<T, U, R> {
+public interface BinaryFunction<T, U, R> extends BiFunction<T, U, R> {
 
     /**
      * Returns the result of applying this binary function to the specified arguments.

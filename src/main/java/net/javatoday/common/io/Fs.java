@@ -42,13 +42,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.zip.Checksum;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
@@ -252,6 +256,12 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>{@link Fs#write(Iterable, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, Charset)}</td>
  *   </tr>
  *   <tr>
+ *     <td>{@link Fs#write(Stream, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#writeLines(Stream) .writeLines(Stream)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, (Iterable)Stream::iterator)}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link Fs#write(Stream, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#writeLines(Stream) .writeLines(Stream)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, (Iterable)Stream::iterator), Charset)}</td>
+ *   </tr>
+ *   <tr>
  *     <td>N/A</td><td>{@link MoreFiles#deleteDirectoryContents(Path, RecursiveDeleteOption...)}</td><td>N/A</td>
  *   </tr>
  *   <tr>
@@ -268,6 +278,8 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  */
 @SuppressWarnings("deprecation")
 final public class Fs {
+
+    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     private Fs() {
     }
@@ -296,25 +308,6 @@ final public class Fs {
         } finally {
             closer.close();
         }
-    }
-
-    /**
-     * Appends bytes to the given file.
-     * <p>
-     * If the file does not exist it will be created.
-     * 
-     * @param bytes the bytes to append
-     * @param to    the file write to
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path append(final byte[] bytes, final Path to) throws IOException {
-        checkNotNull(bytes, "bytes == null");
-        checkNotNull(to, "to == null");
-        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
-            out.write(bytes);
-        }
-        return to;
     }
 
     /**
@@ -356,41 +349,6 @@ final public class Fs {
         } finally {
             closer.close();
         }
-    }
-
-    /**
-     * Appends a character sequence to the given file using the UTF-8 charset.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param chars the character sequence to append
-     * @param to    the file to append to
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path append(final CharSequence chars, final Path to) throws IOException {
-        return append(chars, to, UTF_8);
-    }
-
-    /**
-     * Appends a character sequence to the given file using the specified charset.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param chars   the character sequence to append
-     * @param to      the file to append to
-     * @param charset the character set to use when writing to the file
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path append(final CharSequence chars, final Path to, final Charset charset) throws IOException {
-        checkNotNull(chars, "chars == null");
-        checkNotNull(to, "to == null");
-        checkNotNull(charset, "charset == null");
-        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
-            CharStream.write(chars, out, charset);
-        }
-        return to;
     }
 
     /**
@@ -437,44 +395,6 @@ final public class Fs {
     }
 
     /**
-     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
-     * default line separator) using the UTF-8 charset.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param lines the lines of text to append
-     * @param to    the file to append to
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path append(final Iterable<? extends CharSequence> lines, final Path to) throws IOException {
-        append(lines, to, UTF_8);
-        return to;
-    }
-
-    /**
-     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
-     * default line separator) using the specified charset.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param lines   the lines of text to append
-     * @param to      the file to append to
-     * @param charset the character set to use when writing to the file
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path append(final Iterable<? extends CharSequence> lines, final Path to, final Charset charset) throws IOException {
-        checkNotNull(lines, "lines == null");
-        checkNotNull(to, "to == null");
-        checkNotNull(charset, "charset == null");
-        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
-            CharStream.write(lines, out, charset);
-        }
-        return to;
-    }
-
-    /**
      * Deletes all the files within a directory. Does not delete the directory itself.
      * 
      * @param dir the directory to delete the contents of
@@ -512,27 +432,27 @@ final public class Fs {
     }
 
     /**
-     * Computes and returns the digest value of the given file using the specified message digest object.
+     * Computes and returns the checksum value of the given file using the specified checksum object.
      * <p>
-     * Invoke {@link MessageDigests#toString(byte[])} to get a lower case hexadecimal string representation of the digest
-     * value which conveniently matches the output of Unix-like commands such as {@code md5sum}.
-     * <p>
-     * The {@code MessageDigest} is reset when this method returns successfully.
+     * The {@code Checksum} is reset when this method returns successfully.
      * 
-     * @deprecated Users not working with legacy APIs should prefer {@link #hash(File, HashFunction)} which uses Guava's
-     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility</a>.
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(File, HashFunction) hash(File,
+     *             }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
+     *             {@link #hash(File, HashFunction) hash(File, }{@link Hashing#adler32()
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
-     * @param file   the given file
-     * @param digest the specified message digest object
-     * @return the result of {@link MessageDigest#digest()} for all the bytes in the given file
+     * @param file     the given file
+     * @param checksum the specified checksum object
+     * @return the result of {@link Checksum#getValue()} for all the bytes in the given file
      * @throws IOException if an I/O error occurs
      */
-    public static byte[] getDigest(final File file, final MessageDigest digest) throws IOException {
+    public static long getChecksum(final File file, final Checksum checksum) throws IOException {
         checkNotNull(file, "file == null");
-        checkNotNull(digest, "digest == null");
+        checkNotNull(checksum, "checksum == null");
         final Closer closer = Closer.create();
         try {
-            return ByteStream.getDigest(closer.register(new FileInputStream(file)), digest);
+            return ByteStream.getChecksum(closer.register(new FileInputStream(file)), checksum);
         } catch (final Throwable e) {
             throw closer.rethrow(e);
         } finally {
@@ -548,20 +468,20 @@ final public class Fs {
      * <p>
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
-     * @deprecated Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction)} which uses Guava's
-     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility</a>.
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(File, HashFunction)} which uses Guava's
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
-     * @param path   the given file
+     * @param file   the given file
      * @param digest the specified message digest object
      * @return the result of {@link MessageDigest#digest()} for all the bytes in the given file
      * @throws IOException if an I/O error occurs
      */
-    public static byte[] getDigest(final Path path, final MessageDigest digest) throws IOException {
-        checkNotNull(path, "path == null");
+    public static byte[] getDigest(final File file, final MessageDigest digest) throws IOException {
+        checkNotNull(file, "file == null");
         checkNotNull(digest, "digest == null");
         final Closer closer = Closer.create();
         try {
-            return ByteStream.getDigest(closer.register(java.nio.file.Files.newInputStream(path)), digest);
+            return ByteStream.getDigest(closer.register(new FileInputStream(file)), digest);
         } catch (final Throwable e) {
             throw closer.rethrow(e);
         } finally {
@@ -613,31 +533,6 @@ final public class Fs {
     }
 
     /**
-     * Computes and returns the {@code HashCode} of the given file using the specified hash function.
-     * <p>
-     * Invoke {@link HashCode#asBytes()} to get the hash code value as a byte array or {@link HashCode#toString()} for a
-     * lower case hexadecimal string representation which conveniently matches the output of Unix-like commands such as
-     * {@code md5sum}.
-     * 
-     * @param path the specified file
-     * @param func the given hash function
-     * @return the {@code HashCode} of the given file using the specified hash function
-     * @throws IOException if an I/O error occurs
-     */
-    public static HashCode hash(final Path path, HashFunction func) throws IOException {
-        checkNotNull(path, "path == null");
-        checkNotNull(func, "func == null");
-        final Closer closer = Closer.create();
-        try {
-            return ByteStream.hash(closer.register(java.nio.file.Files.newInputStream(path)), func);
-        } catch (final Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
-        }
-    }
-
-    /**
      * Moves the file from one path to another. This method can rename a file or move it to a different directory, like the
      * Unix {@code mv} command.
      *
@@ -672,18 +567,6 @@ final public class Fs {
     }
 
     /**
-     * Returns a new {@code BufferedInputStream} that reads from the specified file in an efficient manner.
-     *
-     * @param path the specified file
-     * @return a new {@code BufferedInputStream} that reads from the specified file in an efficient manner
-     * @throws IOException if an I/O error occurs
-     */
-    public static BufferedInputStream newBufferedInputStream(final Path path) throws IOException {
-        checkNotNull(path, "path == null");
-        return new BufferedInputStream(java.nio.file.Files.newInputStream(path));
-    }
-
-    /**
      * Returns a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner.
      * <p>
      * If the file does not exist it will be created.
@@ -696,21 +579,6 @@ final public class Fs {
     public static BufferedOutputStream newBufferedOutputStream(final File file, final boolean append) throws IOException {
         checkNotNull(file, "file == null");
         return new BufferedOutputStream(new FileOutputStream(file, append));
-    }
-
-    /**
-     * Returns a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param path   the specified file
-     * @param append whether to truncate or append to the specified file
-     * @return a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner
-     * @throws IOException if an I/O error occurs
-     */
-    public static BufferedOutputStream newBufferedOutputStream(final Path path, final boolean append) throws IOException {
-        checkNotNull(path, "path == null");
-        return new BufferedOutputStream(java.nio.file.Files.newOutputStream(path, append ? new StandardOpenOption[] { CREATE, APPEND } : new StandardOpenOption[] {}));
     }
 
     /**
@@ -745,37 +613,6 @@ final public class Fs {
     }
 
     /**
-     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset.
-     * <p>
-     * Does not close the reader.
-     * 
-     * @param path the given file
-     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static BufferedReader newBufferedReader(final Path path) throws IOException {
-        return newBufferedReader(path, UTF_8);
-    }
-
-    /**
-     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
-     * charset.
-     * <p>
-     * Does not close the reader.
-     * 
-     * @param path    the given file
-     * @param charset the character set to use when reading from the input stream
-     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
-     *         charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static BufferedReader newBufferedReader(final Path path, final Charset charset) throws IOException {
-        checkNotNull(path, "path == null");
-        checkNotNull(path, "charset == null");
-        return new BufferedReader(new InputStreamReader(java.nio.file.Files.newInputStream(path), charset));
-    }
-
-    /**
      * Returns a new {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
      * <p>
      * If the file does not exist it will be created.
@@ -804,37 +641,6 @@ final public class Fs {
         checkNotNull(file, "file == null");
         checkNotNull(charset, "charset == null");
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), charset));
-    }
-
-    /**
-     * Returns a {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param path   the given file
-     * @param append whether to truncate or append to the specified file
-     * @return a {@code BufferedWriter} which writes to the given file using the UTF-8 charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static BufferedWriter newBufferedWriter(final Path path, final boolean append) throws IOException {
-        return newBufferedWriter(path, append, UTF_8);
-    }
-
-    /**
-     * Returns a {@code BufferedWriter} which writes to the given file using the specified charset.
-     * <p>
-     * If the file does not exist it will be created.
-     *
-     * @param path    the given file
-     * @param append  whether to truncate or append to the specified file
-     * @param charset the character set to use when writing to the file
-     * @return a {@code BufferedWriter} which writes to the given file using the specified charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static BufferedWriter newBufferedWriter(final Path path, final boolean append, final Charset charset) throws IOException {
-        checkNotNull(path, "path == null");
-        checkNotNull(charset, "charset == null");
-        return new BufferedWriter(new OutputStreamWriter(java.nio.file.Files.newOutputStream(path, append ? new OpenOption[] { CREATE, APPEND } : new OpenOption[] {}), charset));
     }
 
     /**
@@ -868,71 +674,6 @@ final public class Fs {
             throw closer.rethrow(e);
         } finally {
             closer.close();
-        }
-    }
-
-    /**
-     * Returns the contents of the specified file as a string in the UTF-8 charset.
-     * 
-     * @param path the specified file
-     * @return the contents of the specified file as a string in the UTF-8 charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static String read(final Path path) throws IOException {
-        return read(path, UTF_8);
-    }
-
-    /**
-     * Returns the contents of the given file as a string in the specified charset.
-     * 
-     * @param path    the given file
-     * @param charset the specified charset
-     * @return the contents of the given file as a string in the specified charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static String read(final Path path, final Charset charset) throws IOException {
-        checkNotNull(path, "path == null");
-        checkNotNull(charset, "charset == null");
-
-        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
-        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
-            return new String(ByteStream.toByteArray(in, java.nio.file.Files.size(path)), charset);
-        }
-    }
-
-    /**
-     * Returns a byte array containing all the bytes read from the specified file.
-     * 
-     * @param file the specified file
-     * @return a byte array containing all the bytes read from the specified file
-     * @throws IOException if an I/O error occurs
-     */
-    public static byte[] toByteArray(final File file) throws IOException {
-        checkNotNull(file, "file == null");
-
-        final Closer closer = Closer.create();
-        try {
-
-            return ByteStream.toByteArray(closer.register(new FileInputStream(file)), file.length());
-        } catch (final Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
-        }
-    }
-
-    /**
-     * Returns a byte array containing all the bytes read from the specified file.
-     * 
-     * @param path the specified file
-     * @return a byte array containing all the bytes read from the specified file
-     * @throws IOException if an I/O error occurs
-     */
-    public static byte[] toByteArray(final Path path) throws IOException {
-        checkNotNull(path, "path == null");
-
-        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
-            return ByteStream.toByteArray(in, java.nio.file.Files.size(path));
         }
     }
 
@@ -985,40 +726,6 @@ final public class Fs {
     }
 
     /**
-     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
-     * line-termination characters.
-     * 
-     * @param path the specified file
-     * @return a list of all lines read from the specified file in the UTF-8 charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static List<String> readLines(final Path path) throws IOException {
-        checkNotNull(path, "path == null");
-
-        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
-            return CharStream.readLines(in, UTF_8);
-        }
-    }
-
-    /**
-     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
-     * line-termination characters.
-     * 
-     * @param path    the specified file
-     * @param charset the character set to use when reading the file
-     * @return a list of all lines read from the specified file in the UTF-8 charset
-     * @throws IOException if an I/O error occurs
-     */
-    public static List<String> readLines(final Path path, final Charset charset) throws IOException {
-        checkNotNull(path, "path == null");
-        checkNotNull(charset, "charset == null");
-
-        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
-            return CharStream.readLines(in, charset);
-        }
-    }
-
-    /**
      * Returns the relative path between {@code base} and {@code child}.
      * 
      * @param base  the base path
@@ -1040,6 +747,31 @@ final public class Fs {
     public static String separatorsToUnix(final String path) {
         checkNotNull(path, "path == null");
         return Str.replace(path, "\\", "/");
+    }
+
+    /**
+     * Returns a byte array containing all the bytes read from the specified file.
+     * 
+     * @param file the specified file
+     * @return a byte array containing all the bytes read from the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] toByteArray(final File file) throws IOException {
+        checkNotNull(file, "file == null");
+
+        final long size = file.length();
+
+        if (size > (long) MAX_ARRAY_SIZE)
+            throw new OutOfMemoryError("required array size is too large");
+
+        final Closer closer = Closer.create();
+        try {
+            return ByteStream.toByteArray(closer.register(new FileInputStream(file)), size);
+        } catch (final Throwable e) {
+            throw closer.rethrow(e);
+        } finally {
+            closer.close();
+        }
     }
 
     /**
@@ -1146,25 +878,6 @@ final public class Fs {
     }
 
     /**
-     * Writes bytes to the given file.
-     * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before the bytes are written.
-     * 
-     * @param bytes the bytes to write
-     * @param to    the file write to
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path write(final byte[] bytes, final Path to) throws IOException {
-        checkNotNull(bytes, "bytes == null");
-        checkNotNull(to, "to == null");
-        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
-            out.write(bytes);
-        }
-        return to;
-    }
-
-    /**
      * Writes a character sequence to the given file using the UTF-8 charset.
      * <p>
      * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
@@ -1205,43 +918,6 @@ final public class Fs {
         } finally {
             closer.close();
         }
-    }
-
-    /**
-     * Writes a character sequence to the given file using the UTF-8 charset.
-     * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
-     * written.
-     *
-     * @param chars the character sequence to append
-     * @param to    the file to write to
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path write(final CharSequence chars, final Path to) throws IOException {
-        return write(chars, to, UTF_8);
-    }
-
-    /**
-     * Writes a character sequence to the given file using the specified charset.
-     * <p>
-     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
-     * written.
-     * 
-     * @param chars   the character sequence to append
-     * @param to      the file to write to
-     * @param charset the character set to use when writing to the file
-     * @return the given file
-     * @throws IOException if an I/O error occurs
-     */
-    public static Path write(final CharSequence chars, final Path to, final Charset charset) throws IOException {
-        checkNotNull(chars, "chars == null");
-        checkNotNull(to, "to == null");
-        checkNotNull(charset, "charset == null");
-        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
-            CharStream.write(chars, out, charset);
-        }
-        return to;
     }
 
     /**
@@ -1287,6 +963,499 @@ final public class Fs {
         }
     }
 
+    private static VisitResult walkFileTree(final File start, int depth, final int maxDepth, final FileWalker<?> walker) throws IOException {
+
+        File[] files = null;
+
+        try {
+            if (start.isDirectory() && (files = start.listFiles()) == null)
+                throw new IOException("cannot access " + start.getPath());
+            if (depth >= maxDepth || start.isFile())
+                return walker.visitFile(start);
+        } catch (final SecurityException ex) {
+            if (depth == 0)
+                throw ex;
+            return CONTINUE;
+        } catch (final IOException ex) {
+            return walker.visitFileFailed(start, ex);
+        }
+
+        VisitResult result = walker.preVisitDirectory(start);
+
+        if (result != CONTINUE)
+            return result;
+        for (final File file : files) {
+            if (!file.exists())
+                return walker.visitFileFailed(file, new FileNotFoundException(file.getPath()));
+            result = walkFileTree(file, depth + 1, maxDepth, walker);
+            if (result == SKIP_SIBLINGS)
+                break;
+            if (result == TERMINATE)
+                return TERMINATE;
+        }
+        return walker.postVisitDirectory(start);
+    }
+
+    /**
+     * Appends bytes to the given file.
+     * <p>
+     * If the file does not exist it will be created.
+     * 
+     * @param bytes the bytes to append
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final byte[] bytes, final Path to) throws IOException {
+        checkNotNull(bytes, "bytes == null");
+        checkNotNull(to, "to == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            out.write(bytes);
+        }
+        return to;
+    }
+
+    /**
+     * Appends a character sequence to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param chars the character sequence to append
+     * @param to    the file to append to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final CharSequence chars, final Path to) throws IOException {
+        return append(chars, to, UTF_8);
+    }
+
+    /**
+     * Appends a character sequence to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param chars   the character sequence to append
+     * @param to      the file to append to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final CharSequence chars, final Path to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            CharStream.write(chars, out, charset);
+        }
+        return to;
+    }
+
+    /**
+     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param lines the lines of text to append
+     * @param to    the file to append to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final Iterable<? extends CharSequence> lines, final Path to) throws IOException {
+        append(lines, to, UTF_8);
+        return to;
+    }
+
+    /**
+     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param lines   the lines of text to append
+     * @param to      the file to append to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final Iterable<? extends CharSequence> lines, final Path to, final Charset charset) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            CharStream.write(lines, out, charset);
+        }
+        return to;
+    }
+
+    /**
+     * Creates any necessary but nonexistent parent directories of the specified path.
+     * <p>
+     * The {@code attrs} parameter is optional {@link FileAttribute file-attributes} to set when creating the nonexistent
+     * directories. Each file attribute is identified by its {@link FileAttribute#name name}. If more than one attribute of
+     * the same name is included in the array then all but the last occurrence is ignored.
+     * <p>
+     * This method is identical to {@link MoreFiles#createParentDirectories(Path, FileAttribute...)
+     * MoreFiles.createParentDirectories(Path, FileAttribute...)} save for returning the target directory which allows for
+     * method chaining.
+     * <p>
+     * For example: {@code java.nio.file.Files.copy(InputStream, Fs.createParentDirectories(Path));}
+     * <p>
+     * <b>Note:</b> If all parent directories exist calling this method is a no-op. If this operation fails because of an
+     * I/O error or other problems it may have succeeded in creating some (but not all) of the parent directories.
+     * 
+     * @param path  the directory to create
+     * @param attrs an optional list of file attributes to set atomically when creating the directories
+     * @return the specified directory
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path createParentDirectories(final Path path, final FileAttribute<?>... attrs) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(attrs, "attrs == null");
+
+        final Path parent = path.toAbsolutePath().normalize().getParent();
+
+        if (parent != null && !java.nio.file.Files.isDirectory(parent) && !java.nio.file.Files.isDirectory(java.nio.file.Files.createDirectories(parent, attrs)))
+            throw new IOException("failed to create parent directories of: " + path);
+
+        return path;
+    }
+
+    /**
+     * Creates a directory by {@link #createParentDirectories(Path, FileAttribute...) creating all nonexistent parent
+     * directories first}. Unlike the {@link java.nio.file.Files#createDirectory(Path, FileAttribute...)
+     * Files.createDirectory(Path, FileAttribute...)} method, an exception is not thrown if the directory could not be
+     * created because it already exists.
+     * <p>
+     * The {@code attrs} parameter is optional {@link FileAttribute file-attributes} to set when creating the nonexistent
+     * directories. Each file attribute is identified by its {@link FileAttribute#name name}. If more than one attribute of
+     * the same name is included in the array then all but the last occurrence is ignored.
+     * <p>
+     * The nearly identical {@link java.nio.file.Files#createDirectories(Path, FileAttribute...)
+     * Files.createParentDirectories(Path, FileAttribute...)} method bizarrely fails if the path already exists, but is a
+     * symlink to a directory. While in the strict sense this does not violate the API Documentation which states a
+     * {@code FileAlreadyExistsException} will be thrown if the path <i>exists but is not a directory</i>, it is completely
+     * counterintuitive, since the call should succeed if the target directory already exists. This method provides the same
+     * functionality but will not fail if the path is a symlink to the target directory.
+     * <p>
+     * <b>Note:</b> If the target directory and all its parent directories exist calling this method is a no-op. If this
+     * operation fails because of an I/O error or other problems it may have succeeded in creating some (but not all) of the
+     * parent directories.
+     *
+     * @param path  the directory to create
+     * @param attrs an optional list of file attributes to set atomically when creating the directory
+     * @return the specified directory
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path createDirectories(final Path path, final FileAttribute<?>... attrs) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(attrs, "attrs == null");
+
+        if (!java.nio.file.Files.isDirectory(path))
+            java.nio.file.Files.createDirectory(createParentDirectories(path, attrs), attrs);
+
+        return path;
+    }
+
+    /**
+     * Computes and returns the checksum value of the given file using the specified checksum object.
+     * <p>
+     * The {@code Checksum} is reset when this method returns successfully.
+     * 
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction) hash(Path,
+     *             }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
+     *             {@link #hash(Path, HashFunction) hash(Path, }{@link Hashing#adler32()
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *
+     * @param path     the given file
+     * @param checksum the specified checksum object
+     * @return the result of {@link Checksum#getValue()} for all the bytes in the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static long getChecksum(final Path path, final Checksum checksum) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(checksum, "checksum == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return ByteStream.getChecksum(in, checksum);
+        }
+    }
+
+    /**
+     * Computes and returns the digest value of the given file using the specified message digest object.
+     * <p>
+     * Invoke {@link MessageDigests#toString(byte[])} to get a lower case hexadecimal string representation of the digest
+     * value which conveniently matches the output of Unix-like commands such as {@code md5sum}.
+     * <p>
+     * The {@code MessageDigest} is reset when this method returns successfully.
+     * 
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction)} which uses Guava's
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *
+     * @param path   the given file
+     * @param digest the specified message digest object
+     * @return the result of {@link MessageDigest#digest()} for all the bytes in the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] getDigest(final Path path, final MessageDigest digest) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(digest, "digest == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return ByteStream.getDigest(in, digest);
+        }
+    }
+
+    /**
+     * Computes and returns the {@code HashCode} of the given file using the specified hash function.
+     * <p>
+     * Invoke {@link HashCode#asBytes()} to get the hash code value as a byte array or {@link HashCode#toString()} for a
+     * lower case hexadecimal string representation which conveniently matches the output of Unix-like commands such as
+     * {@code md5sum}.
+     * 
+     * @param path the specified file
+     * @param func the given hash function
+     * @return the {@code HashCode} of the given file using the specified hash function
+     * @throws IOException if an I/O error occurs
+     */
+    public static HashCode hash(final Path path, HashFunction func) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(func, "func == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return ByteStream.hash(in, func);
+        }
+    }
+
+    /**
+     * Returns a new {@code BufferedInputStream} that reads from the specified file in an efficient manner.
+     *
+     * @param path the specified file
+     * @return a new {@code BufferedInputStream} that reads from the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedInputStream newBufferedInputStream(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedInputStream(java.nio.file.Files.newInputStream(path));
+    }
+
+    /**
+     * Returns a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path   the specified file
+     * @param append whether to truncate or append to the specified file
+     * @return a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedOutputStream newBufferedOutputStream(final Path path, final boolean append) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedOutputStream(java.nio.file.Files.newOutputStream(path, append ? new StandardOpenOption[] { CREATE, APPEND } : new StandardOpenOption[] {}));
+    }
+
+    /**
+     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param path the given file
+     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedReader newBufferedReader(final Path path) throws IOException {
+        return newBufferedReader(path, UTF_8);
+    }
+
+    /**
+     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
+     * charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param path    the given file
+     * @param charset the character set to use when reading from the input stream
+     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
+     *         charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedReader newBufferedReader(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(path, "charset == null");
+        return new BufferedReader(new InputStreamReader(java.nio.file.Files.newInputStream(path), charset));
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path   the given file
+     * @param append whether to truncate or append to the specified file
+     * @return a {@code BufferedWriter} which writes to the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter newBufferedWriter(final Path path, final boolean append) throws IOException {
+        return newBufferedWriter(path, append, UTF_8);
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path    the given file
+     * @param append  whether to truncate or append to the specified file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which writes to the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter newBufferedWriter(final Path path, final boolean append, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+        return new BufferedWriter(new OutputStreamWriter(java.nio.file.Files.newOutputStream(path, append ? new OpenOption[] { CREATE, APPEND } : new OpenOption[] {}), charset));
+    }
+
+    /**
+     * Returns the contents of the specified file as a string in the UTF-8 charset.
+     * 
+     * @param path the specified file
+     * @return the contents of the specified file as a string in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static String read(final Path path) throws IOException {
+        return read(path, UTF_8);
+    }
+
+    /**
+     * Returns the contents of the given file as a string in the specified charset.
+     * 
+     * @param path    the given file
+     * @param charset the specified charset
+     * @return the contents of the given file as a string in the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static String read(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+
+        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return new String(ByteStream.toByteArray(in, java.nio.file.Files.size(path)), charset);
+        }
+    }
+
+    /**
+     * Returns a byte array containing all the bytes read from the specified file.
+     * 
+     * @param path the specified file
+     * @return a byte array containing all the bytes read from the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] toByteArray(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+
+        final long size = java.nio.file.Files.size(path);
+
+        if (size > (long) MAX_ARRAY_SIZE)
+            throw new OutOfMemoryError("required array size is too large");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return ByteStream.toByteArray(in, size);
+        }
+    }
+
+    /**
+     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * line-termination characters.
+     * 
+     * @param path the specified file
+     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static List<String> readLines(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return CharStream.readLines(in, UTF_8);
+        }
+    }
+
+    /**
+     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * line-termination characters.
+     * 
+     * @param path    the specified file
+     * @param charset the character set to use when reading the file
+     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static List<String> readLines(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return CharStream.readLines(in, charset);
+        }
+    }
+
+    /**
+     * Writes bytes to the given file.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before the bytes are written.
+     * 
+     * @param bytes the bytes to write
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final byte[] bytes, final Path to) throws IOException {
+        checkNotNull(bytes, "bytes == null");
+        checkNotNull(to, "to == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
+            out.write(bytes);
+        }
+        return to;
+    }
+
+    /**
+     * Writes a character sequence to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
+     * written.
+     *
+     * @param chars the character sequence to append
+     * @param to    the file to write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final CharSequence chars, final Path to) throws IOException {
+        return write(chars, to, UTF_8);
+    }
+
+    /**
+     * Writes a character sequence to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
+     * written.
+     * 
+     * @param chars   the character sequence to append
+     * @param to      the file to write to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final CharSequence chars, final Path to, final Charset charset) throws IOException {
+        checkNotNull(chars, "chars == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
+            CharStream.write(chars, out, charset);
+        }
+        return to;
+    }
+
     /**
      * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
      * default line separator) using the UTF-8 charset.
@@ -1324,37 +1493,41 @@ final public class Fs {
         return to;
     }
 
-    private static VisitResult walkFileTree(final File start, int depth, final int maxDepth, final FileWalker<?> walker) throws IOException {
+    /**
+     * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
+     * 
+     * @param lines the lines of text to write
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final Stream<? extends CharSequence> lines, final Path to) throws IOException {
+        return write(lines, to, UTF_8);
+    }
 
-        File[] files = null;
-
-        try {
-            if (start.isDirectory() && (files = start.listFiles()) == null)
-                throw new IOException("cannot access " + start.getPath());
-            if (depth >= maxDepth || start.isFile())
-                return walker.visitFile(start);
-        } catch (final SecurityException ex) {
-            if (depth == 0)
-                throw ex;
-            return CONTINUE;
-        } catch (final IOException ex) {
-            return walker.visitFileFailed(start, ex);
+    /**
+     * Writes lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the specified charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
+     * 
+     * @param lines   the lines of text to write
+     * @param to      the file write to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path write(final Stream<? extends CharSequence> lines, final Path to, final Charset charset) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to)) {
+            CharStream.write(lines, out, charset);
         }
-
-        VisitResult result = walker.preVisitDirectory(start);
-
-        if (result != CONTINUE)
-            return result;
-        for (final File file : files) {
-            if (!file.exists())
-                return walker.visitFileFailed(file, new FileNotFoundException(file.getPath()));
-            result = walkFileTree(file, depth + 1, maxDepth, walker);
-            if (result == SKIP_SIBLINGS)
-                break;
-            if (result == TERMINATE)
-                return TERMINATE;
-        }
-        return walker.postVisitDirectory(start);
+        return to;
     }
 
 }

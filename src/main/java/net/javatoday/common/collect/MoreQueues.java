@@ -46,7 +46,7 @@ public class MoreQueues {
      * 
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
-     * @return {@code true} if at least one elements was inserted into the queue; {@code false} otherwise
+     * @return {@code true} if at least one elements was inserted into the queue, {@code false} otherwise
      * @throws ClassCastException       if the class of one or more elements prevents them from being inserted into this
      *                                  queue
      * @throws NullPointerException     if one or more elements is {@code null} and this queue does not permit null elements
@@ -72,7 +72,7 @@ public class MoreQueues {
      * 
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
-     * @return {@code true} if at least one elements was inserted into the queue; {@code false} otherwise
+     * @return {@code true} if at least one elements was inserted into the queue, {@code false} otherwise
      * @throws ClassCastException       if the class of one or more elements prevents them from being inserted into this
      *                                  queue
      * @throws NullPointerException     if one or more elements is {@code null} and this queue does not permit null elements
@@ -93,7 +93,7 @@ public class MoreQueues {
      * 
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
-     * @return {@code true} if at least one elements was inserted into the queue; {@code false} otherwise
+     * @return {@code true} if at least one elements was inserted into the queue, {@code false} otherwise
      * @throws ClassCastException       if the class of one or more elements prevents them from being inserted into this
      *                                  queue
      * @throws NullPointerException     if one or more elements is {@code null} and this queue does not permit null elements

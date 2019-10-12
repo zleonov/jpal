@@ -16,7 +16,7 @@
 package net.javatoday.common.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import com.google.common.base.Charsets;
+import net.javatoday.common.io.Fs;
 
 /**
  * Static utility methods for working with {@link Properties}.
@@ -53,7 +53,7 @@ public final class Props {
      * @throws IOException if an I/O error occurs
      */
     public static Properties load(final Path path) throws IOException {
-        return load(null, path, Charsets.ISO_8859_1);
+        return load(null, path, ISO_8859_1);
     }
 
     /**
@@ -69,7 +69,7 @@ public final class Props {
      * @throws IOException if an I/O error occurs
      */
     public static Properties load(final Properties defaults, final Path path) throws IOException {
-        return load(defaults, path, Charsets.ISO_8859_1);
+        return load(defaults, path, ISO_8859_1);
     }
 
     /**
@@ -90,7 +90,7 @@ public final class Props {
 
         final Properties props = defaults == null ? new Properties() : new Properties(defaults);
 
-        try (final Reader in = new InputStreamReader(Files.newInputStream(path, READ), charset)) {
+        try (final Reader in = new InputStreamReader(Files.newInputStream(path), charset)) {
             props.load(in);
         }
 
@@ -149,7 +149,7 @@ public final class Props {
 
         final Properties props = defaults == null ? new Properties() : new Properties(defaults);
 
-        try (final InputStream in = Files.newInputStream(path, READ)) {
+        try (final InputStream in = Files.newInputStream(path)) {
             props.loadFromXML(in);
         }
 
@@ -178,7 +178,7 @@ public final class Props {
      * @throws IOException if an I/O error occurs
      */
     public static Path save(final Properties properties, final String comments, final Path path) throws IOException {
-        return save(properties, comments, path, Charsets.ISO_8859_1);
+        return save(properties, comments, path, ISO_8859_1);
     }
 
     /**
@@ -202,12 +202,12 @@ public final class Props {
         checkNotNull(path, "path == null");
         checkNotNull(charset, "charset == null");
 
-        if (charset == Charsets.ISO_8859_1)
+        if (charset == ISO_8859_1)
             try (final OutputStream out = Files.newOutputStream(path)) {
                 properties.store(out, comments);
             }
         else
-            try (final Writer writer = Files.newBufferedWriter(path)) {
+            try (final Writer writer = Fs.newBufferedWriter(path, false, charset)) {
                 properties.store(writer, comments);
             }
 

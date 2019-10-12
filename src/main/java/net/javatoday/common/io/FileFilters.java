@@ -23,11 +23,18 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 
 import com.google.common.base.Predicate;
+import com.google.common.io.PatternFilenameFilter;
 
 /**
  * Static utility methods pertaining to {@link FileFilter}s.
+ * <p>
+ * <b>Warning:</b> The {@code java.io.File} facility should be considered deprecated. Java 7+ users are highly
+ * encouraged to use {@code java.nio.file.Path} operations introduced in JDK 7 as part of the
+ * <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
+ * System</a>. See {@link Fs} for more information.
  *
  * @author Zhenya Leonov
+ * @see PatternFilenameFilter
  */
 final public class FileFilters {
 

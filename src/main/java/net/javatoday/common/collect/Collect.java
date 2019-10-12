@@ -40,7 +40,7 @@ final public class Collect {
      * 
      * @param c        the collection
      * @param elements the specified elements
-     * @return {@code true} if a collection contains all of the specified elements, {@code false otherwise}
+     * @return {@code true} if a collection contains all of the specified elements, {@code false} otherwise
      */
     public static boolean containsAll(final Collection<?> c, final Iterable<?> elements) {
         checkNotNull(c, "c == null");
@@ -55,7 +55,7 @@ final public class Collect {
      * 
      * @param c        the collection
      * @param elements the specified elements
-     * @return {@code true} if a collection contains all of the specified elements, {@code false otherwise}
+     * @return {@code true} if a collection contains all of the specified elements, {@code false} otherwise
      */
     public static boolean containsAll(final Collection<?> c, final Iterator<?> elements) {
         checkNotNull(c, "c == null");

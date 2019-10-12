@@ -15,7 +15,6 @@
  */
 
 /**
- * Static utilities useful for working with {@code Collection}s and {@code Iterable}s.
+ * Static utilities useful for working with {@link Collection}s, {@link Iterable}s, and {@link Iterator}s.
  */
 package net.javatoday.common.collect;
-

@@ -51,10 +51,7 @@ public final class Obj {
      * @return a hash code value for the specified object, or 0 if {@code obj} is {@code null}
      */
     public static int hashCode(final Object obj) {
-        if (obj == null)
-            return 0;
-        else
-            return obj.hashCode();
+        return obj == null ? 0 : obj.hashCode();
     }
 
     /**
@@ -167,7 +164,7 @@ public final class Obj {
      */
     public static Path writeObject(final Object object, final Path path) throws IOException {
         checkNotNull(object, "object == null");
-        checkNotNull(path, "file == null");
+        checkNotNull(path, "path == null");
 
         try (final ObjectOutputStream out = new ObjectOutputStream(Fs.newBufferedOutputStream(path, false))) {
             out.writeObject(object);

@@ -21,10 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.zip.Checksum;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 
@@ -57,7 +59,8 @@ final public class ByteStream {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
-     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility</a>.
+     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing
+     *             facility</a>.
      *
      * @param in     the given input stream
      * @param digest the specified message digest object
@@ -74,6 +77,39 @@ final public class ByteStream {
             digest.update(buff, 0, r);
 
         return digest.digest();
+    }
+
+    /**
+     * Computes and returns the checksum value for all the bytes read from given input stream using the specified checksum
+     * object.
+     * <p>
+     * Does not close the stream.
+     * <p>
+     * The {@code Checksum} is reset when this method returns successfully.
+     * 
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)
+     *             hash(InputStream, }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
+     *             {@link #hash(InputStream, HashFunction) hash(InputStream, }{@link Hashing#adler32()
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *
+     * @param in       the given input stream
+     * @param checksum the specified message digest object
+     * @return the result of {@link Checksum#getValue()} for all the bytes read from the given input stream
+     * @throws IOException if an I/O error occurs
+     */
+    public static long getChecksum(final InputStream in, final Checksum checksum) throws IOException {
+        checkNotNull(in, "in == null");
+        checkNotNull(checksum, "checksum == null");
+
+        final byte[] buff = new byte[DEFAULT_BUFFER_SIZE];
+
+        for (int r = in.read(buff); r != -1; r = in.read(buff))
+            checksum.update(buff, 0, r);
+
+        final long value = checksum.getValue();
+        checksum.reset();
+        return value;
     }
 
     /**
@@ -118,18 +154,24 @@ final public class ByteStream {
         return toByteArray(in, DEFAULT_BUFFER_SIZE);
     }
 
-    static byte[] toByteArray(final InputStream in, long size) throws IOException {
+    static byte[] toByteArray(final InputStream in, final long size) throws IOException {
 
         // size is a suggestion but it is not guaranteed to be accurate so we don't throw an OOME if it's too large
-        byte[] bytes = new byte[size > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size];
+        int length = size == -1 ? DEFAULT_BUFFER_SIZE : (int) size;
+        byte[] bytes = new byte[length];
         int total = 0;
         int n;
 
         do {
-            total += (n = in.read(bytes, total, (int) size - total));
+            /*
+             * a loop is required because we are not guaranteed that InputStream.read will return all the requested bytes in a
+             * single call, even if they are available
+             */
+            while ((n = in.read(bytes, total, length - total)) > 0)
+                total += n;
 
             if ((n = in.read()) != -1) {
-                bytes = Arrays.copyOf(bytes, (size *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size);
+                bytes = Arrays.copyOf(bytes, (length *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : length);
                 bytes[total++] = (byte) n;
             }
         } while (n != -1);

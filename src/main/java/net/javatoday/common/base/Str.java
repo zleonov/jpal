@@ -18,6 +18,8 @@ package net.javatoday.common.base;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
+import java.nio.CharBuffer;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -28,6 +30,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
 
 /**
  * Static utility methods that operate on or return {@link String}s.
@@ -216,6 +219,8 @@ final public class Str {
     /**
      * Returns {@code true} if the specified character sequence is empty or contains only white space characters according
      * to {@link CharMatcher#whitespace()}.
+     * <p>
+     * <b>Note:</b> {@link String#isBlank()} is available in Java 11+
      *
      * @param chars the specified character sequence
      * @return {@code true} if the specified character sequence is empty or contains only white space characters;
@@ -228,6 +233,25 @@ final public class Str {
     public static boolean isWhitespace(final CharSequence chars) {
         checkNotNull(chars, "chars == null");
         return CharMatcher.whitespace().matchesAllOf(chars);
+    }
+
+    /**
+     * Returns all the lines read from a character sequence. The lines do not include line-termination characters, but do
+     * include other leading and trailing whitespace.
+     * <p>
+     * <b>Note:</b> {@link String#lines() String.lines()} is available in Java 11+
+     * 
+     * @param chars the character sequence to read from
+     * @return a mutable {@code List} containing all the lines read from a character sequence
+     */
+    public static List<String> readLines(final CharSequence chars) {
+        checkNotNull(chars, "chars == null");
+
+        try {
+            return CharStreams.readLines(CharBuffer.wrap(chars));
+        } catch (final IOException e) {
+            throw new AssertionError(); // cannot happen
+        }
     }
 
     /**
@@ -351,6 +375,8 @@ final public class Str {
      * {@link CharMatcher#whitespace()} omitted.
      * <p>
      * This method is {@code null} safe.
+     * <p>
+     * <b>Note:</b> {@link String#strip() String.strip()} is available in Java 11+
      *
      * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with trailing and leading whitespace omitted
@@ -364,7 +390,9 @@ final public class Str {
      * {@link CharMatcher#whitespace()} omitted.
      * <p>
      * This method is {@code null} safe.
-     *
+     * <p>
+     * <b>Note:</b> {@link String#stripTrailing() String.stripTrailing()} is available in Java 11+
+     * 
      * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with trailing whitespace omitted
      */
@@ -394,6 +422,8 @@ final public class Str {
      * {@link CharMatcher#whitespace()} omitted.
      * <p>
      * This method is {@code null} safe.
+     * <p>
+     * <b>Note:</b> {@link String#stripLeading() String.stripLeading()} is available in Java 11+
      *
      * @param chars the specified character sequence or {@code null}
      * @return a copy of the specified character sequence, with leading whitespace omitted or {@code null}

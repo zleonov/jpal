@@ -52,7 +52,7 @@ public final class Exceptions {
      * 
      * <b>Warning:</b> This method breaks Java's exception handling idiom and can lead to horrible errors when misused. See
      * <a target="_blank" href="https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html">Unchecked Exceptions — The
-     * Controversy</a> for further discussion.
+     * Controversy</a> for further discussion. If in doubt <b>do not use</b>.
      * 
      * @param t the specified throwable
      * @return the specified throwable

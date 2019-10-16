@@ -48,38 +48,6 @@ final public class ByteStream {
     }
 
     /**
-     * Computes and returns the digest value for all the bytes read from given input stream using the specified message
-     * digest object.
-     * <p>
-     * Does not close the stream.
-     * <p>
-     * Invoke {@link MessageDigests#toString(byte[])} to get a lower case hexadecimal string representation of the digest
-     * value which conveniently matches the output of Unix-like commands such as {@code md5sum}.
-     * <p>
-     * The {@code MessageDigest} is reset when this method returns successfully.
-     * 
-     * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
-     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing
-     *             facility</a>.
-     *
-     * @param in     the given input stream
-     * @param digest the specified message digest object
-     * @return the result of {@link MessageDigest#digest()} for all the bytes read from the given input stream
-     * @throws IOException if an I/O error occurs
-     */
-    public static byte[] getDigest(final InputStream in, final MessageDigest digest) throws IOException {
-        checkNotNull(in, "in == null");
-        checkNotNull(digest, "digest == null");
-
-        final byte[] buff = new byte[DEFAULT_BUFFER_SIZE];
-
-        for (int r = in.read(buff); r != -1; r = in.read(buff))
-            digest.update(buff, 0, r);
-
-        return digest.digest();
-    }
-
-    /**
      * Computes and returns the checksum value for all the bytes read from given input stream using the specified checksum
      * object.
      * <p>
@@ -110,6 +78,38 @@ final public class ByteStream {
         final long value = checksum.getValue();
         checksum.reset();
         return value;
+    }
+
+    /**
+     * Computes and returns the digest value for all the bytes read from given input stream using the specified message
+     * digest object.
+     * <p>
+     * Does not close the stream.
+     * <p>
+     * Invoke {@link MessageDigests#toString(byte[])} to get a lower case hexadecimal string representation of the digest
+     * value which conveniently matches the output of Unix-like commands such as {@code md5sum}.
+     * <p>
+     * The {@code MessageDigest} is reset when this method returns successfully.
+     * 
+     * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)} which uses
+     *             Guava's <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing
+     *             facility</a>.
+     *
+     * @param in     the given input stream
+     * @param digest the specified message digest object
+     * @return the result of {@link MessageDigest#digest()} for all the bytes read from the given input stream
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] getDigest(final InputStream in, final MessageDigest digest) throws IOException {
+        checkNotNull(in, "in == null");
+        checkNotNull(digest, "digest == null");
+
+        final byte[] buff = new byte[DEFAULT_BUFFER_SIZE];
+
+        for (int r = in.read(buff); r != -1; r = in.read(buff))
+            digest.update(buff, 0, r);
+
+        return digest.digest();
     }
 
     /**

@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
  * Common {@code MessageDigest}s which are supported by all Java platform implementations.
  * 
  * @deprecated Users not working with legacy APIs should prefer Guava's
- *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Caching facility</a>.
+ *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
  * 
  * @author Zhenya Leonov
  */

@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
@@ -35,9 +37,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
-import java.util.Random;
 import java.util.RandomAccess;
 import java.util.SortedSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.collect.ForwardingListIterator;
 import com.google.common.collect.Iterables;
@@ -120,12 +122,12 @@ import com.google.common.collect.Ordering;
  */
 public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>, Serializable, Cloneable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -2116113073710983813L;
     private static final double P = .5;
     private static final int MAX_LEVEL = 32;
     transient int size = 0;
     private transient int level = 1;
-    private transient Random random = new Random();
+    private transient ThreadLocalRandom random = ThreadLocalRandom.current();
     private transient Node<E> head = new Node<E>(null, MAX_LEVEL);
     private final Comparator<? super E> comparator;
     private transient int[] index = new int[MAX_LEVEL];
@@ -521,9 +523,9 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
                 if (comparator.compare(e, i.next()) != 0)
                     return false;
             return !i.hasNext();
-        } catch (ClassCastException e) {
+        } catch (final ClassCastException e) {
             return false;
-        } catch (NullPointerException e) {
+        } catch (final NullPointerException e) {
             return false;
         }
     }
@@ -545,7 +547,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         Skiplist<E> clone;
         try {
             clone = (Skiplist<E>) super.clone();
-        } catch (java.lang.CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }
         for (int i = 0; i < MAX_LEVEL; i++) {
@@ -553,7 +555,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             clone.head.dist[i] = 1;
         }
         clone.head.prev = clone.head;
-        clone.random = new Random();
+        clone.random = ThreadLocalRandom.current();
         clone.level = 1;
         clone.modCount = 0;
         clone.size = 0;
@@ -561,7 +563,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         return clone;
     }
 
-    private void writeObject(java.io.ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -569,7 +571,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
         ois.defaultReadObject();
         head = new Node<E>(null, MAX_LEVEL);
         for (int i = 0; i < MAX_LEVEL; i++) {
@@ -578,7 +580,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         }
         index = new int[MAX_LEVEL];
         head.prev = head;
-        random = new Random();
+        random = ThreadLocalRandom.current();
         level = 1;
         int size = ois.readInt();
         for (int i = 0; i < size; i++)
@@ -757,7 +759,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         }
 
         // do we need this?
-        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
             throw new NotSerializableException();
         }
 

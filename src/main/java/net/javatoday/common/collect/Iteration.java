@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ForwardingListIterator;
@@ -42,7 +43,7 @@ import com.google.common.collect.UnmodifiableListIterator;
  */
 final public class Iteration {
 
-    private static final Random RANDOM = new Random();
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
     private static final ListIterator<Object> EMPTY_LIST_ITERATOR = new ListIterator<Object>() {
 

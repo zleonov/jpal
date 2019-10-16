@@ -51,7 +51,7 @@ final public class Collect {
     /**
      * Returns {@code true} if a collection contains all of the specified elements.
      * <p>
-     * Guava equivalent: {@code Iterators.all(Iterator, Predicates.in(Collection))}
+     * <b>Guava equivalent:</b> {@code Iterators.all(Iterator, Predicates.in(Collection))}
      * 
      * @param c        the collection
      * @param elements the specified elements

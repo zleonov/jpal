@@ -187,10 +187,10 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>{@link Fs#append(byte[], Path)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link ByteSink#write(byte[]) .write(byte[])}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, byte[], }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(}{@link StandardCharsets#UTF_8 UTF_8), }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
+ *     <td>{@link Fs#append(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(}{@link StandardCharsets#UTF_8 UTF_8), }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}<br><b>Java 11+ equivalent:</b> Files.writeString(Path, CharSequence, CREATE, APPEND)</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(Charset), }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
+ *     <td>{@link Fs#append(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(Charset), }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}<br><b>Java 11+ equivalent:</b> Files.writeString(Path, CharSequence, Charset, CREATE, APPEND)</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#append(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
@@ -226,10 +226,10 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>{@link Fs#newBufferedWriter(Path, boolean, Charset) newBufferedWriter(Path, true, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td><td>{@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...) Files.newBufferedWriter(Path, Charset, }{@link StandardOpenOption#CREATE CREATE, }{@link StandardOpenOption#APPEND APPEND)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#read(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSource#read() .read()}</td><td>{@link String#String(byte[], Charset) new String(}{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path), }{@link StandardCharsets#UTF_8 UTF_8)}</td>
+ *     <td>{@link Fs#read(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSource#read() .read()}</td><td>{@link String#String(byte[], Charset) new String(}{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path), }{@link StandardCharsets#UTF_8 UTF_8)}<br><b>Java 11+ equivalent:</b> Files.readString(Path)</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#read(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#read() .read()}</td><td>{@link String#String(byte[], Charset) new String(}{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path), }{@link String#String(byte[], Charset) Charset)}</td>
+ *     <td>{@link Fs#read(Path, Charset)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, Charset)}{@link CharSource#read() .read()}</td><td>{@link String#String(byte[], Charset) new String(}{@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path), }{@link String#String(byte[], Charset) Charset)}<br><b>Java 11+ equivalent:</b> Files.readString(Path, Charset)</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#readLines(Path)}</td><td>{@link MoreFiles#asCharSource(Path, Charset, OpenOption...) MoreFiles.asCharSource(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSource#readLines() .readLines()}</td><td>{@link java.nio.file.Files#readAllLines(Path) Files.readAllLines(Path)}</td>
@@ -244,10 +244,10 @@ import net.javatoday.common.io.FileWalker.VisitResult;
  *     <td>{@link Fs#write(byte[], Path)}</td><td>{@link MoreFiles#asByteSink(Path, OpenOption...) MoreFiles.asByteSink(Path)}{@link ByteSink#write(byte[]) .write(byte[])}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, byte[])}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(}{@link StandardCharsets#UTF_8 UTF_8))}</td>
+ *     <td>{@link Fs#write(CharSequence, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(}{@link StandardCharsets#UTF_8 UTF_8))}<br><b>Java 11+ equivalent:</b> Files.writeString(Path, CharSequence)</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#write(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(Charset))}</td>
+ *     <td>{@link Fs#write(CharSequence, Path, Charset)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, Charset)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td><td>{@link java.nio.file.Files#write(Path, byte[], OpenOption...) Files.write(Path, }{@link String#getBytes(Charset) CharSequence.toString().getBytes(Charset))}<br><b>Java 11+ equivalent:</b> Files.writeString(Path, CharSequence, Charset)</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#write(Iterable, Path)}</td><td>{@link MoreFiles#asCharSink(Path, Charset, OpenOption...) MoreFiles.asCharSink(Path, }{@link StandardCharsets#UTF_8 UTF_8)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td><td>{@link java.nio.file.Files#write(Path, Iterable, OpenOption...) Files.write(Path, Iterable)}</td>
@@ -666,15 +666,8 @@ final public class Fs {
         checkNotNull(file, "file == null");
         checkNotNull(charset, "charset == null");
 
-        final Closer closer = Closer.create();
-        try {
-            // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
-            return new String(ByteStream.toByteArray(closer.register(new FileInputStream(file)), file.length()), charset);
-        } catch (final Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
-        }
+        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
+        return new String(toByteArray(file), charset);
     }
 
     /**
@@ -1019,6 +1012,9 @@ final public class Fs {
      * Appends a character sequence to the given file using the UTF-8 charset.
      * <p>
      * If the file does not exist it will be created.
+     * <p>
+     * <b>Java 11+ equivalent:</b> {@link java.nio.file.Files#writeString(Path, CharSequence, OpenOption...)
+     * Files.writeString(Path, CharSequence, CREATE, APPEND)}
      *
      * @param chars the character sequence to append
      * @param to    the file to append to
@@ -1033,7 +1029,10 @@ final public class Fs {
      * Appends a character sequence to the given file using the specified charset.
      * <p>
      * If the file does not exist it will be created.
-     *
+     * <p>
+     * <b>Java 11+ equivalent:</b> {@link java.nio.file.Files#writeString(Path, CharSequence, Charset, OpenOption...)
+     * Files.writeString(Path, CharSequence, Charset, CREATE, APPEND)}
+     * 
      * @param chars   the character sequence to append
      * @param to      the file to append to
      * @param charset the character set to use when writing to the file
@@ -1135,8 +1134,9 @@ final public class Fs {
      * Files.createParentDirectories(Path, FileAttribute...)} method bizarrely fails if the path already exists, but is a
      * symlink to a directory. While in the strict sense this does not violate the API Documentation which states a
      * {@code FileAlreadyExistsException} will be thrown if the path <i>exists but is not a directory</i>, it is completely
-     * counterintuitive, since the call should succeed if the target directory already exists. This method provides the same
-     * functionality but will not fail if the path is a symlink to the target directory.
+     * counterintuitive, since {@link java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)
+     * Files.createDirectory(Path)} will return {@code true}. This method provides the same functionality but will not fail
+     * if the path is a symlink to the target directory.
      * <p>
      * <b>Note:</b> If the target directory and all its parent directories exist calling this method is a no-op. If this
      * operation fails because of an I/O error or other problems it may have succeeded in creating some (but not all) of the
@@ -1151,10 +1151,7 @@ final public class Fs {
         checkNotNull(path, "path == null");
         checkNotNull(attrs, "attrs == null");
 
-        if (!java.nio.file.Files.isDirectory(path))
-            java.nio.file.Files.createDirectory(createParentDirectories(path, attrs), attrs);
-
-        return path;
+        return java.nio.file.Files.isDirectory(path) ? path : java.nio.file.Files.createDirectory(createParentDirectories(path, attrs), attrs);
     }
 
     /**
@@ -1319,6 +1316,8 @@ final public class Fs {
 
     /**
      * Returns the contents of the specified file as a string in the UTF-8 charset.
+     * <p>
+     * <b>Java 11+ equivalent:</b> {@link java.nio.file.Files#readString(Path) Files.readString(Path)}
      * 
      * @param path the specified file
      * @return the contents of the specified file as a string in the UTF-8 charset
@@ -1330,6 +1329,8 @@ final public class Fs {
 
     /**
      * Returns the contents of the given file as a string in the specified charset.
+     * <p>
+     * <b>Java 11+ equivalent:</b> {@link java.nio.file.Files#readString(Path, Charset) Files.readString(Path, Charset)}
      * 
      * @param path    the given file
      * @param charset the specified charset
@@ -1341,29 +1342,7 @@ final public class Fs {
         checkNotNull(charset, "charset == null");
 
         // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
-        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
-            return new String(ByteStream.toByteArray(in, java.nio.file.Files.size(path)), charset);
-        }
-    }
-
-    /**
-     * Returns a byte array containing all the bytes read from the specified file.
-     * 
-     * @param path the specified file
-     * @return a byte array containing all the bytes read from the specified file
-     * @throws IOException if an I/O error occurs
-     */
-    public static byte[] toByteArray(final Path path) throws IOException {
-        checkNotNull(path, "path == null");
-
-        final long size = java.nio.file.Files.size(path);
-
-        if (size > (long) MAX_ARRAY_SIZE)
-            throw new OutOfMemoryError("required array size is too large");
-
-        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
-            return ByteStream.toByteArray(in, size);
-        }
+        return new String(toByteArray(path), charset);
     }
 
     /**
@@ -1401,6 +1380,26 @@ final public class Fs {
     }
 
     /**
+     * Returns a byte array containing all the bytes read from the specified file.
+     * 
+     * @param path the specified file
+     * @return a byte array containing all the bytes read from the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static byte[] toByteArray(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+
+        final long size = java.nio.file.Files.size(path);
+
+        if (size > (long) MAX_ARRAY_SIZE)
+            throw new OutOfMemoryError("required array size is too large");
+
+        try (final InputStream in = java.nio.file.Files.newInputStream(path)) {
+            return ByteStream.toByteArray(in, size);
+        }
+    }
+
+    /**
      * Writes bytes to the given file.
      * <p>
      * If the file does not exist it will be created. If the file exists it will be truncated before the bytes are written.
@@ -1424,6 +1423,9 @@ final public class Fs {
      * <p>
      * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
      * written.
+     * <p>
+     * <b>Java 11+ equivalent:</b> {@link java.nio.file.Files#writeString(Path, CharSequence, OpenOption...)
+     * Files.writeString(Path, CharSequence)}
      *
      * @param chars the character sequence to append
      * @param to    the file to write to
@@ -1439,6 +1441,9 @@ final public class Fs {
      * <p>
      * If the file does not exist it will be created. If the file exists it will be truncated before new characters are
      * written.
+     * <p>
+     * <b>Java 11+ equivalent:</b> {@link java.nio.file.Files#writeString(Path, CharSequence, Charset, OpenOption...)
+     * Files.writeString(Path, Charset, CharSequence)}
      * 
      * @param chars   the character sequence to append
      * @param to      the file to write to
@@ -1528,6 +1533,10 @@ final public class Fs {
             CharStream.write(lines, out, charset);
         }
         return to;
+    }
+
+    public static void main(String[] args) {
+
     }
 
 }

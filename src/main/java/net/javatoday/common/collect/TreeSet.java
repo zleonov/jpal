@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static net.javatoday.common.collect.TreeSet.Color.BLACK;
 import static net.javatoday.common.collect.TreeSet.Color.RED;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -252,7 +254,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         TreeSet<E> clone;
         try {
             clone = (TreeSet<E>) super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }
         clone.modCount = clone.size = 0;
@@ -261,7 +263,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         return clone;
     }
 
-    private void writeObject(java.io.ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         int actual = 0;
@@ -276,7 +278,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
         ois.defaultReadObject();
         root = min = nil = new Node();
         int size = ois.readInt();

@@ -24,6 +24,8 @@ import static net.javatoday.common.collect.Treelist.Color.BLACK;
 import static net.javatoday.common.collect.Treelist.Color.RED;
 
 import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
@@ -439,9 +441,9 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
                 if (comparator.compare(e, i.next()) != 0)
                     return false;
             return !i.hasNext();
-        } catch (ClassCastException e) {
+        } catch (final ClassCastException e) {
             return false;
-        } catch (NullPointerException e) {
+        } catch (final NullPointerException e) {
             return false;
         }
     }
@@ -464,7 +466,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         Treelist<E> clone;
         try {
             clone = (Treelist<E>) super.clone();
-        } catch (java.lang.CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }
         clone.nil = new Node();
@@ -477,7 +479,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         return clone;
     }
 
-    private void writeObject(java.io.ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -485,7 +487,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
         ois.defaultReadObject();
         nil = new Node();
         root = nil;
@@ -670,11 +672,11 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             throw new CloneNotSupportedException();
         }
 
-        private void writeObject(java.io.ObjectOutputStream oos) throws NotSerializableException {
+        private void writeObject(final ObjectOutputStream oos) throws NotSerializableException {
             throw new NotSerializableException();
         }
 
-        private void readObject(java.io.ObjectInputStream ois) throws NotSerializableException {
+        private void readObject(final ObjectInputStream ois) throws NotSerializableException {
             throw new NotSerializableException();
         }
 

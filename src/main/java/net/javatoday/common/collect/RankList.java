@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -133,7 +135,7 @@ import com.google.common.collect.Iterables;
  */
 public final class RankList<E> extends AbstractList<E> implements List<E>, RandomAccess, Serializable, Cloneable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8518776166489425758L;
     private static final double P = .5;
     private static final int MAX_LEVEL = 32;
     private transient int size = 0;
@@ -372,7 +374,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
         RankList<E> clone;
         try {
             clone = (RankList<E>) super.clone();
-        } catch (java.lang.CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }
         for (int i = 0; i < MAX_LEVEL; i++) {
@@ -388,7 +390,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
         return clone;
     }
 
-    private void writeObject(java.io.ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -396,7 +398,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
         ois.defaultReadObject();
         head = new Node<E>(null, MAX_LEVEL);
         for (int i = 0; i < MAX_LEVEL; i++) {

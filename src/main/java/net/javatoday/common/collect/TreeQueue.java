@@ -486,7 +486,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         TreeQueue<E> clone;
         try {
             clone = (TreeQueue<E>) super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }
         clone.nil = new Node();

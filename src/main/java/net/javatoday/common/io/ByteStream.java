@@ -16,9 +16,18 @@
 package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.zip.Checksum;
@@ -46,6 +55,34 @@ final public class ByteStream {
 
     private ByteStream() {
     }
+    
+    /**
+     * Returns a new {@code BufferedOutputStream} that appends to the specified file in an efficient manner.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param file   the specified file
+     * @return a new {@code BufferedOutputStream} that appends to the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedOutputStream append(final File file) throws IOException {
+        checkNotNull(file, "file == null");
+        return new BufferedOutputStream(new FileOutputStream(file, true));
+    }
+    
+    /**
+     * Returns a new {@code BufferedOutputStream} that appends to the specified file in an efficient manner.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path   the specified file
+     * @return a new {@code BufferedOutputStream} that appends to the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedOutputStream append(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedOutputStream(Files.newOutputStream(path, CREATE, APPEND));
+    }
 
     /**
      * Computes and returns the checksum value for all the bytes read from given input stream using the specified checksum
@@ -58,7 +95,7 @@ final public class ByteStream {
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)
      *             hash(InputStream, }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
      *             {@link #hash(InputStream, HashFunction) hash(InputStream, }{@link Hashing#adler32()
-     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which uses Guava's
      *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param in       the given input stream
@@ -152,6 +189,58 @@ final public class ByteStream {
     public static byte[] toByteArray(final InputStream in) throws IOException {
         checkNotNull(in, "in == null");
         return toByteArray(in, DEFAULT_BUFFER_SIZE);
+    }
+    
+    /**
+     * Returns a new {@code BufferedInputStream} that reads from the specified file in an efficient manner.
+     *
+     * @param file the specified file
+     * @return a new {@code BufferedInputStream} that reads from the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedInputStream read(final File file) throws IOException {
+        checkNotNull(file, "file == null");
+        return new BufferedInputStream(new FileInputStream(file));
+    }
+
+    /**
+     * Returns a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param file   the specified file
+     * @return a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedOutputStream write(final File file) throws IOException {
+        checkNotNull(file, "file == null");
+        return new BufferedOutputStream(new FileOutputStream(file));
+    }
+    
+    /**
+     * Returns a new {@code BufferedInputStream} that reads from the specified file in an efficient manner.
+     *
+     * @param path the specified file
+     * @return a new {@code BufferedInputStream} that reads from the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedInputStream read(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedInputStream(Files.newInputStream(path));
+    }
+
+    /**
+     * Returns a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path   the specified file
+     * @return a new {@code BufferedOutputStream} that writes to the specified file in an efficient manner
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedOutputStream write(final Path path) throws IOException {
+        checkNotNull(path, "path == null");
+        return new BufferedOutputStream(Files.newOutputStream(path));
     }
 
     static byte[] toByteArray(final InputStream in, final long size) throws IOException {

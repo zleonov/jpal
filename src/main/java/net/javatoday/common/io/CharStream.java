@@ -17,10 +17,15 @@ package net.javatoday.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +33,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -57,8 +63,8 @@ final public class CharStream {
      * @return a new {@code BufferedReader} which reads from the given input stream in an efficient manner using the UTF-8
      *         charset
      */
-    public static BufferedReader newBufferedReader(final InputStream in) {
-        return newBufferedReader(in, UTF_8);
+    public static BufferedReader read(final InputStream in) {
+        return read(in, UTF_8);
     }
 
     /**
@@ -70,7 +76,7 @@ final public class CharStream {
      * @return a new {@code BufferedReader} which reads from the given input stream in an efficient manner using the
      *         specified charset
      */
-    public static BufferedReader newBufferedReader(final InputStream in, final Charset charset) {
+    public static BufferedReader read(final InputStream in, final Charset charset) {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
         return new BufferedReader(new InputStreamReader(in, charset));
@@ -84,8 +90,8 @@ final public class CharStream {
      * @return a new {@code BufferedWriter} that writes to the given output stream in an efficient manner using the UTF-8
      *         charset
      */
-    public static BufferedWriter newBufferedWriter(final OutputStream out) {
-        return newBufferedWriter(out, UTF_8);
+    public static BufferedWriter write(final OutputStream out) {
+        return write(out, UTF_8);
     }
 
     /**
@@ -97,7 +103,7 @@ final public class CharStream {
      * @return a new {@code BufferedWriter} that writes to the given output stream in an efficient manner using the
      *         specified charset
      */
-    public static BufferedWriter newBufferedWriter(final OutputStream out, final Charset charset) {
+    public static BufferedWriter write(final OutputStream out, final Charset charset) {
         checkNotNull(out, "out == null");
         checkNotNull(charset, "charset == null");
         return new BufferedWriter(new OutputStreamWriter(out, charset));
@@ -117,8 +123,8 @@ final public class CharStream {
      * @throws IOException if an I/O error occurs
      * @see CharStreams#toString(Readable)
      */
-    public static String read(final InputStream in) throws IOException {
-        return read(in, UTF_8);
+    public static String toString(final InputStream in) throws IOException {
+        return toString(in, UTF_8);
     }
 
     /**
@@ -136,7 +142,7 @@ final public class CharStream {
      * @throws IOException if an I/O error occurs
      * @see CharStreams#toString(Readable)
      */
-    public static String read(final InputStream in, final Charset charset) throws IOException {
+    public static String toString(final InputStream in, final Charset charset) throws IOException {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
@@ -183,7 +189,7 @@ final public class CharStream {
         checkNotNull(in, "in == null");
         checkNotNull(charset, "charset == null");
 
-        final BufferedReader reader = newBufferedReader(in, charset);
+        final BufferedReader reader = read(in, charset);
 
         final List<String> lines = Lists.newArrayList();
 
@@ -356,4 +362,182 @@ final public class CharStream {
         writer.flush();
     }
 
+    /**
+     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param file the given file
+     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedReader read(final File file) throws IOException {
+        return read(file, UTF_8);
+    }
+    
+    /**
+     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
+     * charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param file    the given file
+     * @param charset the character set to use when reading from the input stream
+     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
+     *         charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedReader read(final File file, final Charset charset) throws IOException {
+        checkNotNull(file, "file == null");
+        checkNotNull(file, "charset == null");
+        return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
+    }
+
+    /**
+     * Returns a new {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     * 
+     * @param file   the given file
+     * @return a new {@code BufferedWriter} which writes to the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter write(final File file) throws IOException {
+        return write(file, UTF_8);
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param file    the given file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which writes to the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter write(final File file, final Charset charset) throws IOException {
+        checkNotNull(file, "file == null");
+        checkNotNull(charset, "charset == null");
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
+    }
+    
+    /**
+     * Returns a new {@code BufferedWriter} which appends to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     * 
+     * @param file   the given file
+     * @return a new {@code BufferedWriter} which appends to the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter append(final File file) throws IOException {
+        return append(file, UTF_8);
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which appends to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param file    the given file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which appends to the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter append(final File file, final Charset charset) throws IOException {
+        checkNotNull(file, "file == null");
+        checkNotNull(charset, "charset == null");
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), charset));
+    }
+    
+    /**
+     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param path the given file
+     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedReader read(final Path path) throws IOException {
+        return read(path, UTF_8);
+    }
+
+    /**
+     * Returns a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
+     * charset.
+     * <p>
+     * Does not close the reader.
+     * 
+     * @param path    the given file
+     * @param charset the character set to use when reading from the input stream
+     * @return a new {@code BufferedReader} which reads from the given file in an efficient manner using the specified
+     *         charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedReader read(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(path, "charset == null");
+        return new BufferedReader(new InputStreamReader(java.nio.file.Files.newInputStream(path), charset));
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path   the given file
+     * @return a {@code BufferedWriter} which writes to the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter write(final Path path) throws IOException {
+        return write(path, UTF_8);
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which writes to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path    the given file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which writes to the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter write(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+        return new BufferedWriter(new OutputStreamWriter(java.nio.file.Files.newOutputStream(path), charset));
+    }
+    
+    /**
+     * Returns a {@code BufferedWriter} which appends to the given file using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path   the given file
+     * @return a {@code BufferedWriter} which appends to the given file using the UTF-8 charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter append(final Path path) throws IOException {
+        return append(path, UTF_8);
+    }
+
+    /**
+     * Returns a {@code BufferedWriter} which appends to the given file using the specified charset.
+     * <p>
+     * If the file does not exist it will be created.
+     *
+     * @param path    the given file
+     * @param charset the character set to use when writing to the file
+     * @return a {@code BufferedWriter} which appends to the given file using the specified charset
+     * @throws IOException if an I/O error occurs
+     */
+    public static BufferedWriter append(final Path path, final Charset charset) throws IOException {
+        checkNotNull(path, "path == null");
+        checkNotNull(charset, "charset == null");
+        return new BufferedWriter(new OutputStreamWriter(java.nio.file.Files.newOutputStream(path, CREATE, APPEND), charset));
+    }
+    
 }

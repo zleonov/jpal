@@ -27,7 +27,7 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Objects;
 
-import net.javatoday.common.io.Fs;
+import net.javatoday.common.io.ByteStream;
 
 /**
  * Static utility methods that operate on or return {@link Object}s.
@@ -166,7 +166,7 @@ public final class Obj {
         checkNotNull(object, "object == null");
         checkNotNull(path, "path == null");
 
-        try (final ObjectOutputStream out = new ObjectOutputStream(Fs.newBufferedOutputStream(path, false))) {
+        try (final ObjectOutputStream out = new ObjectOutputStream(ByteStream.write(path))) {
             out.writeObject(object);
             return path;
         }
@@ -193,7 +193,7 @@ public final class Obj {
         checkNotNull(path, "path == null");
         checkNotNull(type, "type == null");
 
-        try (final ObjectInputStream in = new ObjectInputStream(Fs.newBufferedInputStream(path))) {
+        try (final ObjectInputStream in = new ObjectInputStream(ByteStream.read(path))) {
             final Object o = in.readObject();
             checkArgument(type.isAssignableFrom(o.getClass()), "%s cannot be cast to %s", o.getClass(), type);
             return type.cast(o);

@@ -75,7 +75,7 @@ class MorePathsTest {
         watch.reset();
 
         watch.start();
-        Fs.read(path);
+        Fs.toString(path);
         watch.stop();
         final long jpal = watch.elapsed(TimeUnit.MILLISECONDS);
 
@@ -511,7 +511,7 @@ class MorePathsTest {
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
             final String expected = MoreFiles.asCharSource(fin, charset).read();
-            final String actual = Fs.read(fin, charset);
+            final String actual = Fs.toString(fin, charset);
             assertEquals(expected, actual);
         }
     }
@@ -522,7 +522,7 @@ class MorePathsTest {
 
         for (final Charset charset : ImmutableList.of(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII, StandardCharsets.UTF_16, StandardCharsets.UTF_16BE, StandardCharsets.UTF_16LE, StandardCharsets.UTF_8)) {
             final String expected = new String(java.nio.file.Files.readAllBytes(fin), charset);
-            final String actual = Fs.read(fin, charset);
+            final String actual = Fs.toString(fin, charset);
             assertEquals(expected, actual);
         }
     }

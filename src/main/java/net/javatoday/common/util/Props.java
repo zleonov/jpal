@@ -29,7 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import net.javatoday.common.io.Fs;
+import net.javatoday.common.io.CharStream;
 
 /**
  * Static utility methods for working with {@link Properties}.
@@ -207,7 +207,7 @@ public final class Props {
                 properties.store(out, comments);
             }
         else
-            try (final Writer writer = Fs.newBufferedWriter(path, false, charset)) {
+            try (final Writer writer = CharStream.write(path, charset)) {
                 properties.store(writer, comments);
             }
 

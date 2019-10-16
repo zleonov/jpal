@@ -439,7 +439,7 @@ final public class Fs {
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(File, HashFunction) hash(File,
      *             }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
      *             {@link #hash(File, HashFunction) hash(File, }{@link Hashing#adler32()
-     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which uses Guava's
      *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param file     the given file
@@ -1085,6 +1085,43 @@ final public class Fs {
             CharStream.write(lines, out, charset);
         }
         return to;
+    }    
+    
+    /**
+     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the UTF-8 charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
+     * 
+     * @param lines the lines of text to write
+     * @param to    the file write to
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final Stream<? extends CharSequence> lines, final Path to) throws IOException {
+        return append(lines, to, UTF_8);
+    }
+
+    /**
+     * Appends lines of text to the given file (with each line, including the last, terminated with the operating system's
+     * default line separator) using the specified charset.
+     * <p>
+     * If the file does not exist it will be created. If the file exists it will be truncated before new lines are written.
+     * 
+     * @param lines   the lines of text to write
+     * @param to      the file write to
+     * @param charset the character set to use when writing to the file
+     * @return the given file
+     * @throws IOException if an I/O error occurs
+     */
+    public static Path append(final Stream<? extends CharSequence> lines, final Path to, final Charset charset) throws IOException {
+        checkNotNull(lines, "lines == null");
+        checkNotNull(to, "to == null");
+        checkNotNull(charset, "charset == null");
+        try (final OutputStream out = java.nio.file.Files.newOutputStream(to, CREATE, APPEND)) {
+            CharStream.write(lines, out, charset);
+        }
+        return to;
     }
 
     /**
@@ -1162,7 +1199,7 @@ final public class Fs {
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction) hash(Path,
      *             }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
      *             {@link #hash(Path, HashFunction) hash(Path, }{@link Hashing#adler32()
-     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which uses Guava's
      *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param path     the given file
@@ -1533,10 +1570,6 @@ final public class Fs {
             CharStream.write(lines, out, charset);
         }
         return to;
-    }
-
-    public static void main(String[] args) {
-
     }
 
 }

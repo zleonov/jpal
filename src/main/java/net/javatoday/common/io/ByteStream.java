@@ -58,7 +58,7 @@ final public class ByteStream {
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(InputStream, HashFunction)
      *             hash(InputStream, }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
      *             {@link #hash(InputStream, HashFunction) hash(InputStream, }{@link Hashing#adler32()
-     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which use Guava's
+     *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which uses Guava's
      *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param in       the given input stream

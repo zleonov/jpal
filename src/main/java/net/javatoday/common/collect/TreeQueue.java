@@ -20,6 +20,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static net.javatoday.common.collect.TreeQueue.Color.BLACK;
 import static net.javatoday.common.collect.TreeQueue.Color.RED;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractQueue;
 import java.util.Collection;
@@ -499,7 +502,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         return clone;
     }
 
-    private void writeObject(final java.io.ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -507,7 +510,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(final java.io.ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
         nil = new Node();
         root = nil;

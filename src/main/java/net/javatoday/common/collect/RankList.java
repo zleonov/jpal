@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -34,14 +35,15 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.RandomAccess;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 
 /**
- * A {@code List} optimized for efficient <a target="_blank" href="http://en.wikipedia.org/wiki/Random_access">random access</a>
- * insertion and removal operations. Implements all optional list operations, and permits all elements, including
- * {@code null}.
+ * A {@code List} optimized for efficient <a target="_blank" href="http://en.wikipedia.org/wiki/Random_access">random
+ * access</a> insertion and removal operations. Implements all optional list operations, and permits all elements,
+ * including {@code null}.
  * <p>
  * The iterators obtained from the {@link #iterator()} and {@link #listIterator()} methods are <i>fail-fast</i>.
  * Attempts to modify the elements in this list at any time after an iterator is created, in any way except through the
@@ -50,14 +52,14 @@ import com.google.common.collect.Iterables;
  * This list is not <i>thread-safe</i>. If multiple threads modify this list concurrently it must be synchronized
  * externally.
  * <p>
- * This class implements an array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> modified to
- * provide logarithmic running time for linear list operations (e.g. insert an element at the i<i>th</i> index). Linear
- * list operations are sometimes referred to as rank operations.
+ * This class implements an array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a>
+ * modified to provide logarithmic running time for linear list operations (e.g. insert an element at the i<i>th</i>
+ * index). Linear list operations are sometimes referred to as rank operations.
  * <p>
- * Invented by <a target="_blank" href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
- * structure for maintaining items in sorted order. Strictly speaking it is impossible to make any hard guarantees
- * regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be logarithmic with
- * an extremely high degree of probability as the list grows.
+ * Invented by <a target="_blank" href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a
+ * probabilistic data structure for maintaining items in sorted order. Strictly speaking it is impossible to make any
+ * hard guarantees regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be
+ * logarithmic with an extremely high degree of probability as the list grows.
  * <p>
  * The following table summarizes the <i>big-O</i> performance of this class compared to an {@link ArrayList} and a
  * {@link LinkedList} (where n is the size of this list and <i>m</i> is the size of the specified collection which is
@@ -140,7 +142,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     private static final int MAX_LEVEL = 32;
     private transient int size = 0;
     private transient int level = 1;
-    private transient Random random = new Random();
+    private transient Random random = ThreadLocalRandom.current();
     private transient Node<E> head = new Node<E>(null, MAX_LEVEL);
 
     private RankList() {
@@ -382,7 +384,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
             clone.head.dist[i] = 1;
         }
         clone.head.prev = clone.head;
-        clone.random = new Random();
+        clone.random = ThreadLocalRandom.current();
         clone.level = 1;
         clone.modCount = 0;
         clone.size = 0;
@@ -390,7 +392,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
         return clone;
     }
 
-    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -398,7 +400,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
         head = new Node<E>(null, MAX_LEVEL);
         for (int i = 0; i < MAX_LEVEL; i++) {
@@ -406,7 +408,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
             head.dist[i] = 1;
         }
         head.prev = head;
-        random = new Random();
+        random = ThreadLocalRandom.current();
         level = 1;
         int size = ois.readInt();
         for (int i = 0; i < size; i++)

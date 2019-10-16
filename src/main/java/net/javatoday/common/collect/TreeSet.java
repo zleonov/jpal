@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static net.javatoday.common.collect.TreeSet.Color.BLACK;
 import static net.javatoday.common.collect.TreeSet.Color.RED;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -263,7 +264,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
         return clone;
     }
 
-    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         int actual = 0;
@@ -278,7 +279,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
         root = min = nil = new Node();
         int size = ois.readInt();

@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static net.javatoday.common.collect.Treelist.Color.BLACK;
 import static net.javatoday.common.collect.Treelist.Color.RED;
 
+import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -479,7 +480,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         return clone;
     }
 
-    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -487,7 +488,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
         nil = new Node();
         root = nil;

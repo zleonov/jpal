@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.RandomAccess;
 import java.util.SortedSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -127,7 +128,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     private static final int MAX_LEVEL = 32;
     transient int size = 0;
     private transient int level = 1;
-    private transient ThreadLocalRandom random = ThreadLocalRandom.current();
+    private transient Random random = ThreadLocalRandom.current();
     private transient Node<E> head = new Node<E>(null, MAX_LEVEL);
     private final Comparator<? super E> comparator;
     private transient int[] index = new int[MAX_LEVEL];
@@ -563,7 +564,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         return clone;
     }
 
-    private void writeObject(final ObjectOutputStream oos) throws java.io.IOException {
+    private void writeObject(final ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeInt(size);
         for (E e : this)
@@ -571,7 +572,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(final ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
         head = new Node<E>(null, MAX_LEVEL);
         for (int i = 0; i < MAX_LEVEL; i++) {

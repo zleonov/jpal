@@ -44,8 +44,8 @@ public final class BinaryFunctions {
     }
 
     private static final class ConstantBinaryFunction<E> implements BinaryFunction<Object, Object, E>, Serializable {
-        private static final long serialVersionUID = -3006748005728974855L;
-
+        private static final long serialVersionUID = -3035505608495294198L;
+        
         private final E value;
 
         public ConstantBinaryFunction(final E value) {

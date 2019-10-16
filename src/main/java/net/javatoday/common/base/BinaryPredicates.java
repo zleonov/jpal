@@ -82,9 +82,9 @@ public final class BinaryPredicates {
     }
 
     private static class OrPredicate<T, U> implements BinaryPredicate<T, U>, Serializable {
-
-        private static final long serialVersionUID = 2618799120921008218L;
-
+        
+        private static final long serialVersionUID = -1574683260852996990L;
+        
         private final List<? extends BinaryPredicate<? super T, ? super U>> parts;
 
         private OrPredicate(final List<? extends BinaryPredicate<? super T, ? super U>> parts) {
@@ -122,8 +122,9 @@ public final class BinaryPredicates {
     }
 
     private static class AndPredicate<T, U> implements BinaryPredicate<T, U>, Serializable {
-        private static final long serialVersionUID = 380785103078896860L;
-
+        
+        private static final long serialVersionUID = 8801949836401489178L;
+        
         private final List<? extends BinaryPredicate<? super T, ? super U>> parts;
 
         private AndPredicate(final List<? extends BinaryPredicate<? super T, ? super U>> parts) {

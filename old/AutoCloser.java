@@ -1,4 +1,4 @@
-package net.javatoday.common.io;
+package software.leonov.common.io;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

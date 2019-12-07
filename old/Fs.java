@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.javatoday.common.io;
+package software.leonov.common.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static net.javatoday.common.io.FileWalker.VisitResult.CONTINUE;
-import static net.javatoday.common.io.FileWalker.VisitResult.SKIP_SIBLINGS;
-import static net.javatoday.common.io.FileWalker.VisitResult.TERMINATE;
+import static software.leonov.common.io.FileWalker.VisitResult.CONTINUE;
+import static software.leonov.common.io.FileWalker.VisitResult.SKIP_SIBLINGS;
+import static software.leonov.common.io.FileWalker.VisitResult.TERMINATE;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -52,9 +52,9 @@ import com.google.common.io.Closer;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
-import net.javatoday.common.base.MessageDigests;
-import net.javatoday.common.base.MoreStrings;
-import net.javatoday.common.io.FileWalker.VisitResult;
+import software.leonov.common.base.MessageDigests;
+import software.leonov.common.base.MoreStrings;
+import software.leonov.common.io.FileWalker.VisitResult;
 
 /**
  * Static utility methods for working with {@link File}s.

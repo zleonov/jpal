@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.javatoday.common.io;
+package software.leonov.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.file.StandardOpenOption.APPEND;
@@ -49,7 +49,7 @@ import com.google.common.io.CharSource;
 import com.google.common.io.Closer;
 import com.google.common.io.MoreFiles;
 
-import net.javatoday.common.base.MessageDigests;
+import software.leonov.common.base.MessageDigests;
 
 /**
  * Static utility methods for working with {@link Path}s.

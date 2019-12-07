@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.javatoday.common</groupId>
+    <groupId>software.leonov.common</groupId>
     <artifactId>jpal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <!-- default packaging is a jar <packaging>jar</packaging> -->
@@ -76,7 +76,7 @@
 
                 <configuration>
                     <sourcepath>${project.build.sourceDirectory}:${java.src.path}:${guava.src.path}</sourcepath>
-                    <subpackages>net.javatoday</subpackages>
+                    <subpackages>software.leonov</subpackages>
                     <quiet>false</quiet>
                     <notimestamp>true</notimestamp>
                     <encoding>UTF-8</encoding>

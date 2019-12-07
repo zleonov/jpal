@@ -1,4 +1,4 @@
-package net.javatoday.common.io;
+package software.leonov.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -10,7 +10,7 @@ import java.io.StringReader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import net.javatoday.common.util.Exceptions;
+import software.leonov.common.util.Exceptions;
 
 final public class LineIterator implements Iterable<String>, Iterator<String>, AutoCloseable {
 

@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -72,6 +73,15 @@ public final class Dates {
     public static Timestamp getTimestamp(final Date date) {
         checkNotNull(date, "date == null");
         return new Timestamp(date.getTime());
+    }
+
+//    public static String format(final long time, final TimeUnit unit) {
+//        
+//    }
+
+    public static void main(String[] args) {
+
+        System.out.println(Duration.ofDays(32).plus(Duration.ofMillis(65487995)).toString().toLowerCase().substring(2));
     }
 
 }

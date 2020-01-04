@@ -19,10 +19,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Serializable;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.base.Supplier;
 
 /**
  * Static utility methods pertaining to {@code BinaryFunction} instances.
@@ -83,13 +83,13 @@ public final class BinaryFunctions {
      * @param value the constant value for the {@code BinaryFunction} to return
      * @return a {@code BinaryFunction} that always returns the specified {@code value}
      */
-    public static <E> BinaryFunction<Object, Object, E> constant(E value) {
+    public static <E> BinaryFunction<Object, Object, E> constant(final E value) {
         return new ConstantBinaryFunction<E>(value);
     }
 
     private static final class SupplierBinaryFunction<E> implements BinaryFunction<Object, Object, E>, Serializable {
-        private static final long serialVersionUID = -6407521582397705434L;
-
+        private static final long serialVersionUID = 9041489237895725564L;
+        
         private final Supplier<E> supplier;
 
         private SupplierBinaryFunction(final Supplier<E> supplier) {
@@ -129,7 +129,7 @@ public final class BinaryFunctions {
      * @return a {@code BinaryFunction} that always returns the result of invoking {@link Supplier#get()} on the specified
      *         {@code supplier}
      */
-    public static <E> BinaryFunction<Object, Object, E> forSupplier(Supplier<E> supplier) {
+    public static <E> BinaryFunction<Object, Object, E> forSupplier(final Supplier<E> supplier) {
         return new SupplierBinaryFunction<E>(supplier);
     }
 

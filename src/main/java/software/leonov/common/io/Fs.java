@@ -674,14 +674,12 @@ final public class Fs {
     }
 
     /**
-     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * Returns a list of all lines read from the specified file in the specified charset. The lines do not include
      * line-termination characters.
-     * <p>
-     * <b>Note:</b> Use {@link Files#readLines(File, Charset)} to specify a different charset.
      * 
-     * @param file    the specified file *
+     * @param file    the specified file
      * @param charset the character set to use when reading the file
-     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @return a list of all lines read from the specified file in the specified charset
      * @throws IOException if an I/O error occurs
      */
     public static List<String> readLines(final File file, final Charset charset) throws IOException {
@@ -1165,12 +1163,12 @@ final public class Fs {
      * the same name is included in the array then all but the last occurrence is ignored.
      * <p>
      * The nearly identical {@link java.nio.file.Files#createDirectories(Path, FileAttribute...)
-     * Files.createParentDirectories(Path, FileAttribute...)} method bizarrely fails if the path already exists, but is a
-     * symlink to a directory. While in the strict sense this does not violate the API Documentation which states a
+     * Files.createDirectories(Path, FileAttribute...)} method bizarrely fails if the path already exists, but is a symlink
+     * to a directory. While in the strict sense this does not violate the API Documentation which states a
      * {@code FileAlreadyExistsException} will be thrown if the path <i>exists but is not a directory</i>, it is completely
      * counterintuitive, since {@link java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)
-     * Files.isDirectory(Path)} will return {@code true}. This method provides the same functionality but will not fail if
-     * the path is a symlink to the target directory.
+     * Files.isDirectory(Path)} will return {@code true} when a symlink references a directory. This method provides the same
+     * functionality but will not fail if the path is a symlink to the target directory.
      * <p>
      * <b>Note:</b> If the target directory and all its parent directories exist calling this method is a no-op. If this
      * operation fails because of an I/O error or other problems it may have succeeded in creating some (but not all) of the
@@ -1396,12 +1394,12 @@ final public class Fs {
     }
 
     /**
-     * Returns a list of all lines read from the specified file in the UTF-8 charset. The lines do not include
+     * Returns a list of all lines read from the specified file in the specified charset. The lines do not include
      * line-termination characters.
      * 
      * @param path    the specified file
      * @param charset the character set to use when reading the file
-     * @return a list of all lines read from the specified file in the UTF-8 charset
+     * @return a list of all lines read from the specified file in the specified charset
      * @throws IOException if an I/O error occurs
      */
     public static List<String> readLines(final Path path, final Charset charset) throws IOException {

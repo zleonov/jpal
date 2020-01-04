@@ -17,6 +17,7 @@ package software.leonov.common.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static software.leonov.common.util.Try.eval;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -30,14 +31,16 @@ import com.google.common.math.DoubleMath;
  * <a target="_blank" href="https://en.wikipedia.org/wiki/JEDEC_memory_standards#JEDEC_Standard_100B.01">JEDEC Standard
  * 100B.01</a> to represent the <i>power of 2</i> byte sizes of the file system and memory.
  * <p>
- * This {@code Enum} is a poor attempt to deal with the surprisingly
- * <a target="_blank" href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Quantities_of_bytes_and_bits"
- * >difficult issue</a> of representing the size of digital quantities.
+ * This {@code Enum} is a poor attempt to deal with the surprisingly <a target="_blank" href=
+ * "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Quantities_of_bytes_and_bits" >difficult
+ * issue</a> of representing the size of digital quantities.
  * <p>
  * For example:
  * 
  * <pre>
- * System.out.println(BinaryByteUnit.MEGABYTES.convert(2.5, BinaryByteUnit.KILOBYTES)); // prints 2560
+ * System.out.println(BinaryByteUnit.MEGABYTES.convert(2.5, BinaryByteUnit.KILOBYTES)); // prints 2560.0
+ *
+ * System.out.println(BinaryByteUnit.format(2560.0, BinaryByteUnit.KILOBYTES)); // prints 2.5MB
  * </pre>
  * 
  * @author Zhenya Leonov
@@ -77,7 +80,22 @@ public enum BinaryByteUnit {
     /**
      * A petabyte (PT) consists of 1024 terabytes.
      */
-    PETABYTES(TERABYTES.base * 1024, "PT");
+    PETABYTES(TERABYTES.base * 1024, "PB"),
+
+    /**
+     * An exabyte (PT) consists of 1024 petabytes.
+     */
+    EXABYTES(PETABYTES.base * 1024, "EB"),
+
+    /**
+     * A zettabyte (PT) consists of 1024 exabytes.
+     */
+    ZETTABYTES(EXABYTES.base * 1024, "ZB"),
+
+    /**
+     * A yottabyte (PT) consists of 1024 zettabytes.
+     */
+    YOTTABYTES(ZETTABYTES.base * 1024, "YB");
 
     private static final ConcurrentMap<Locale, NumberFormat> formats = new ConcurrentHashMap<>();
 
@@ -97,23 +115,25 @@ public enum BinaryByteUnit {
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@code BinaryByteUnit}
      * @throws ArithmeticException if the result is not finite
      */
-    public Number convert(final double value, final BinaryByteUnit unit) {
+    public double convert(final double value, final BinaryByteUnit unit) {
         checkNotNull(unit, "unit == null");
-        checkArgument(Double.isFinite(value), value);
-        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0");
-        checkArgument(this != BinaryByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value);
+        checkArgument(Double.isFinite(value), value); // check that the value is not infinite or NaN
+        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0"); // check that the value is positive
+        checkArgument(this != BinaryByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value); // BinaryByteUnit.BITS cannot be fractional
 
         final double f = (value * base) / unit.base;
 
-        if (Double.isInfinite(f))
+        if (Double.isInfinite(f)) // can this happen at this point?
             throw new ArithmeticException();
 
-        final Double n = unit == BinaryByteUnit.BITS ? Math.ceil(f) : f;
+//        final Double n = unit == BinaryByteUnit.BITS ? Math.ceil(f) : f;
+//
+//        if (DoubleMath.isMathematicalInteger(n))
+//            return n.longValue();
+//        else
+//            return n;
 
-        if (DoubleMath.isMathematicalInteger(n))
-            return n.longValue();
-        else
-            return n;
+        return unit == BinaryByteUnit.BITS ? Math.ceil(f) : f;
     }
 
     /**
@@ -122,7 +142,7 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#BITS}
      */
-    public Number toBits(final double value) {
+    public double toBits(final double value) {
         return convert(value, BinaryByteUnit.BITS);
     }
 
@@ -132,7 +152,7 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#BYTES}
      */
-    public Number toBytes(final double value) {
+    public double toBytes(final double value) {
         return convert(value, BinaryByteUnit.BYTES);
     }
 
@@ -142,7 +162,7 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#KILOBYTES}
      */
-    public Number toKillobytes(final double value) {
+    public double toKillobytes(final double value) {
         return convert(value, BinaryByteUnit.KILOBYTES);
     }
 
@@ -152,7 +172,7 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#MEGABYTES}
      */
-    public Number toMegabytes(final double value) {
+    public double toMegabytes(final double value) {
         return convert(value, BinaryByteUnit.MEGABYTES);
     }
 
@@ -162,7 +182,7 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#GIGABYTES}
      */
-    public Number toGigabytes(final double value) {
+    public double toGigabytes(final double value) {
         return convert(value, BinaryByteUnit.GIGABYTES);
     }
 
@@ -172,7 +192,7 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#TERABYTES}
      */
-    public Number toTerabytes(final double value) {
+    public double toTerabytes(final double value) {
         return convert(value, BinaryByteUnit.TERABYTES);
     }
 
@@ -182,8 +202,38 @@ public enum BinaryByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#PETABYTES}
      */
-    public Number toPetabytes(final double value) {
+    public double toPetabytes(final double value) {
         return convert(value, BinaryByteUnit.PETABYTES);
+    }
+
+    /**
+     * Shorthand for {@link #convert(double, BinaryByteUnit) convert(value, BinaryByteUnit.EXABYTES)}
+     * 
+     * @param value the value to convert
+     * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#EXABYTES}
+     */
+    public double toExabytes(final double value) {
+        return convert(value, BinaryByteUnit.EXABYTES);
+    }
+
+    /**
+     * Shorthand for {@link #convert(double, BinaryByteUnit) convert(value, BinaryByteUnit.ZETTABYTES)}
+     * 
+     * @param value the value to convert
+     * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#ZETTABYTES}
+     */
+    public double toZettabytes(final double value) {
+        return convert(value, BinaryByteUnit.ZETTABYTES);
+    }
+
+    /**
+     * Shorthand for {@link #convert(double, BinaryByteUnit) convert(value, BinaryByteUnit.YOTTABYTES)}
+     * 
+     * @param value the value to convert
+     * @return the given value converted from this {@code BinaryByteUnit} to the specified {@link BinaryByteUnit#YOTTABYTES}
+     */
+    public double toYottabytes(final double value) {
+        return convert(value, BinaryByteUnit.YOTTABYTES);
     }
 
     /**
@@ -238,22 +288,46 @@ public enum BinaryByteUnit {
     public static String format(double value, final BinaryByteUnit unit, final NumberFormat format) {
         checkNotNull(unit, "unit == null");
         checkNotNull(format, "format == null");
-        checkArgument(Double.isFinite(value), value);
-        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0");
-        checkArgument(unit != BinaryByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value);
+        checkArgument(Double.isFinite(value), value); // check that the value is not infinite or NaN
+        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0"); // check that the value is positive
+        checkArgument(unit != BinaryByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value); // BinaryByteUnit.BITS cannot be fractional
 
         int index = unit.ordinal();
-        final int length = values().length;
         final int base = value >= 1 ? unit == BinaryByteUnit.BITS ? 8 : 1024 : unit == BinaryByteUnit.BYTES ? 8 : 1024;
 
         if (value >= 1)
-            while (value >= base && index++ < length - 1)
+            while (value >= base && index++ < values().length - 1)
                 value /= base;
         else
-            while (value != 0 && value < 1 && index-- < length)
+            while (value != 0 && value < 1 && index-- < values().length)
                 value *= base;
 
-        return format.format(value) + values()[index > length - 1 ? length - 1 : index];
+        final String size = format.format(value);
+
+        /*
+         * We have to check if the formatted value has been rounded to 1024, in which case it needs to become "1" and the unit
+         * needs to be incremented. The most naive and strait forward way to accomplish this is to parse the string using the
+         * same NumberFormat that produced it.
+         * 
+         * We can use intValue() to compare the result since we ensure it is not negative, we know it can never be more than
+         * 1024, and intValue() just casts it to a primitive int which effectively performs the Math.floor function on positive
+         * numbers.
+         */
+        if (index < values().length && eval(() -> format.parse(size).intValue()).get() == 1024)
+            return "1" + prefix(++index);
+
+        return size + prefix(index);
     }
-    
+
+    private static BinaryByteUnit prefix(final int index) {
+        return values()[Math.min(index, values().length - 1)];
+    }
+
+    public static void main(String[] args) {
+        System.out.println(BinaryByteUnit.MEGABYTES.convert(2.5, BinaryByteUnit.KILOBYTES));
+        System.out.println(BinaryByteUnit.format(2560.0, BinaryByteUnit.KILOBYTES));
+
+        // TimeUnit.DAYS.to
+    }
+
 }

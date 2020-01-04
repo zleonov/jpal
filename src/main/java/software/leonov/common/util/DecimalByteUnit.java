@@ -17,9 +17,9 @@ package software.leonov.common.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static software.leonov.common.util.Try.eval;
 
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,7 +37,9 @@ import com.google.common.math.DoubleMath;
  * For example:
  * 
  * <pre>
- * System.out.println(DecimalByteUnit.MEGABYTES.convert(2.5, DecimalByteUnit.KILOBYTES)); // prints 2500
+ * System.out.println(DecimalByteUnit.MEGABYTES.convert(2.5, DecimalByteUnit.KILOBYTES)); // prints 2500.0
+ *
+ * System.out.println(DecimalByteUnit.format(2500.0, DecimalByteUnit.KILOBYTES)); // prints 2.5MB
  * </pre>
  * 
  * @author Zhenya Leonov
@@ -112,23 +114,25 @@ public enum DecimalByteUnit {
      * @return the given value converted from this {@code DecimalByteUnit} to the specified {@code DecimalByteUnit}
      * @throws ArithmeticException if the result is not finite
      */
-    public Number convert(final double value, final DecimalByteUnit unit) {
+    public double convert(final double value, final DecimalByteUnit unit) {
         checkNotNull(unit, "unit == null");
-        checkArgument(Double.isFinite(value), value);
-        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0");
-        checkArgument(this != DecimalByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value);
+        checkArgument(Double.isFinite(value), value); // check that the value is not infinite or NaN
+        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0"); // check that the value is positive
+        checkArgument(this != DecimalByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value); // DecimalByteUnit.BITS cannot be fractional
 
         final double f = (value * base) / unit.base;
-
-        if (Double.isInfinite(f))
+        
+        if (Double.isInfinite(f)) // can this happen at this point?
             throw new ArithmeticException();
 
-        final Double n = unit == DecimalByteUnit.BITS ? Math.ceil(f) : f;
+//        final Double n = unit == DecimalByteUnit.BITS ? Math.ceil(f) : f;
+//
+//        if (DoubleMath.isMathematicalInteger(n))
+//            return n.longValue();
+//        else
+//            return n;
 
-        if (DoubleMath.isMathematicalInteger(n))
-            return n.longValue();
-        else
-            return n;
+        return unit == DecimalByteUnit.BITS ? Math.ceil(f) : f;
     }
 
     /**
@@ -137,7 +141,7 @@ public enum DecimalByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code DecimalByteUnit} to the specified {@link DecimalByteUnit#BITS}
      */
-    public Number toBits(final double value) {
+    public double toBits(final double value) {
         return convert(value, DecimalByteUnit.BITS);
     }
 
@@ -147,7 +151,7 @@ public enum DecimalByteUnit {
      * @param value the value to convert
      * @return the given value converted from this {@code DecimalByteUnit} to the specified {@link DecimalByteUnit#BYTES}
      */
-    public Number toBytes(final double value) {
+    public double toBytes(final double value) {
         return convert(value, DecimalByteUnit.BYTES);
     }
 
@@ -158,7 +162,7 @@ public enum DecimalByteUnit {
      * @return the given value converted from this {@code DecimalByteUnit} to the specified
      *         {@link DecimalByteUnit#KILOBYTES}
      */
-    public Number toKillobytes(final double value) {
+    public double toKillobytes(final double value) {
         return convert(value, DecimalByteUnit.KILOBYTES);
     }
 
@@ -169,7 +173,7 @@ public enum DecimalByteUnit {
      * @return the given value converted from this {@code DecimalByteUnit} to the specified
      *         {@link DecimalByteUnit#MEGABYTES}
      */
-    public Number toMegabytes(final double value) {
+    public double toMegabytes(final double value) {
         return convert(value, DecimalByteUnit.MEGABYTES);
     }
 
@@ -180,7 +184,7 @@ public enum DecimalByteUnit {
      * @return the given value converted from this {@code DecimalByteUnit} to the specified
      *         {@link DecimalByteUnit#GIGABYTES}
      */
-    public Number toGigabytes(final double value) {
+    public double toGigabytes(final double value) {
         return convert(value, DecimalByteUnit.GIGABYTES);
     }
 
@@ -191,7 +195,7 @@ public enum DecimalByteUnit {
      * @return the given value converted from this {@code DecimalByteUnit} to the specified
      *         {@link DecimalByteUnit#TERABYTES}
      */
-    public Number toTerabytes(final double value) {
+    public double toTerabytes(final double value) {
         return convert(value, DecimalByteUnit.TERABYTES);
     }
 
@@ -202,8 +206,40 @@ public enum DecimalByteUnit {
      * @return the given value converted from this {@code DecimalByteUnit} to the specified
      *         {@link DecimalByteUnit#PETABYTES}
      */
-    public Number toPetabytes(final double value) {
+    public double toPetabytes(final double value) {
         return convert(value, DecimalByteUnit.PETABYTES);
+    }
+
+    /**
+     * Shorthand for {@link #convert(double, DecimalByteUnit) convert(value, DecimalByteUnit.EXABYTES)}
+     * 
+     * @param value the value to convert
+     * @return the given value converted from this {@code DecimalByteUnit} to the specified {@link DecimalByteUnit#EXABYTES}
+     */
+    public double toExabytes(final double value) {
+        return convert(value, DecimalByteUnit.EXABYTES);
+    }
+
+    /**
+     * Shorthand for {@link #convert(double, DecimalByteUnit) convert(value, DecimalByteUnit.ZETTABYTES)}
+     * 
+     * @param value the value to convert
+     * @return the given value converted from this {@code DecimalByteUnit} to the specified
+     *         {@link DecimalByteUnit#ZETTABYTES}
+     */
+    public double toZettabytes(final double value) {
+        return convert(value, DecimalByteUnit.ZETTABYTES);
+    }
+
+    /**
+     * Shorthand for {@link #convert(double, DecimalByteUnit) convert(value, DecimalByteUnit.YOTTABYTES)}
+     * 
+     * @param value the value to convert
+     * @return the given value converted from this {@code DecimalByteUnit} to the specified
+     *         {@link DecimalByteUnit#YOTTABYTES}
+     */
+    public double toYottabytes(final double value) {
+        return convert(value, DecimalByteUnit.YOTTABYTES);
     }
 
     /**
@@ -257,9 +293,9 @@ public enum DecimalByteUnit {
     public static String format(double value, final DecimalByteUnit unit, final NumberFormat format) {
         checkNotNull(unit, "unit == null");
         checkNotNull(format, "format == null");
-        checkArgument(Double.isFinite(value), value);
-        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0");
-        checkArgument(unit != DecimalByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value);
+        checkArgument(Double.isFinite(value), value); // check that the value is not infinite or NaN
+        checkArgument(Double.doubleToRawLongBits(value) >= 0, "value < 0"); // check that the value is positive
+        checkArgument(unit != DecimalByteUnit.BITS || DoubleMath.isMathematicalInteger(value), "invalid value: %s bits", value); // DecimalByteUnit.BITS cannot be fractional
 
         int index = unit.ordinal();
         final int base = value >= 1 ? unit == DecimalByteUnit.BITS ? 8 : 1000 : unit == DecimalByteUnit.BYTES ? 8 : 1000;
@@ -273,23 +309,30 @@ public enum DecimalByteUnit {
 
         final String size = format.format(value);
 
-        return index < values().length && parse(format, size) == 1000 ? 1 + prefix(++index) : size + prefix(index);
+        /*
+         * We have to check if the formatted value has been rounded to 1000, in which case it needs to become "1" and the unit
+         * needs to be incremented. The most naive and strait forward way to accomplish this is to parse the string using the
+         * same NumberFormat that produced it.
+         * 
+         * We can use intValue() to compare the result since we ensure it is not negative, we know it can never be more than
+         * 1000, and intValue() just casts it to a primitive int which effectively performs the Math.floor function on positive
+         * numbers.
+         */
+        if (index < values().length && eval(() -> format.parse(size).intValue()).get() == 1000)
+            return "1" + prefix(++index);
+
+        return size + prefix(index);
     }
 
-    private static String prefix(final int index) {
-        return values()[Math.min(index, values().length - 1)].toString();
-    }
-
-    private static int parse(final NumberFormat format, final String value) {
-        try {
-            return format.parse(value).intValue();
-        } catch (ParseException e) {
-            throw new AssertionError(); // cannot happen
-        }
+    private static DecimalByteUnit prefix(final int index) {
+        return values()[Math.min(index, values().length - 1)];
     }
 
     public static void main(String[] args) {
-        System.out.println(format(999950, DecimalByteUnit.BYTES));
+        System.out.println(DecimalByteUnit.YOTTABYTES.convert(Double.MAX_VALUE, DecimalByteUnit.BITS));
+        System.out.println(DecimalByteUnit.format(999.999, DecimalByteUnit.KILOBYTES));
+
+        // TimeUnit.DAYS.to
     }
 
 }

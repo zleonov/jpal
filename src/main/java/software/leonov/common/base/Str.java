@@ -220,7 +220,7 @@ final public class Str {
      * Returns {@code true} if the specified character sequence is empty or contains only white space characters according
      * to {@link CharMatcher#whitespace()}.
      * <p>
-     * <b>Java 11 equivalent:</b> {@link String#isBlank()}
+     * <b>Java 11 equivalent:</b> {@link String#isBlank() String.isBlank()}
      *
      * @param chars the specified character sequence
      * @return {@code true} if the specified character sequence is empty or contains only white space characters;

@@ -15,17 +15,23 @@ import java.util.Set;
 import com.google.common.base.Equivalence;
 import com.google.common.base.Equivalence.Wrapper;
 
-final public class EquivalenceLinkedHashMap<K, V> extends AbstractMap<K, V> {
+/**
+ * 
+ * @author Zhenya Leonov
+ * @param <K> the type of keys maintained by this map
+ * @param <V> the type of mapped values
+ */
+public class EquivalenceLinkedHashMap<K, V> extends AbstractMap<K, V> {
 
     private final Map<Equivalence.Wrapper<? super K>, V> delegate;
     private final Equivalence<? super K> equivalence;
 
     private Set<Map.Entry<K, V>> entrySet;
 
-    private final class LinkedHashedMap extends LinkedHashMap<Wrapper<? super K>, V> {
+    private final class DelegateMap extends java.util.LinkedHashMap<Wrapper<? super K>, V> {
         private static final long serialVersionUID = 1L;
 
-        public LinkedHashedMap(final int initialCapacity, final float loadFactor, final boolean accessOrder) {
+        public DelegateMap(final int initialCapacity, final float loadFactor, final boolean accessOrder) {
             super(initialCapacity, loadFactor, accessOrder);
         }
 
@@ -49,7 +55,7 @@ final public class EquivalenceLinkedHashMap<K, V> extends AbstractMap<K, V> {
 
     public EquivalenceLinkedHashMap(final Equivalence<? super K> equivalence, final int initialCapacity, final float loadFactor, final boolean accessOrder) {
         checkNotNull(equivalence, "equivalence == null");
-        delegate = new LinkedHashedMap(initialCapacity, loadFactor, accessOrder);
+        delegate = new DelegateMap(initialCapacity, loadFactor, accessOrder);
         this.equivalence = equivalence;
     }
 
@@ -91,7 +97,7 @@ final public class EquivalenceLinkedHashMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V put(final K key, final V value) {
-        return delegate.put(equivalence.wrap(key), value);
+        return delegate.put(createKey(key), value);
     }
 
     @Override
@@ -223,6 +229,7 @@ final public class EquivalenceLinkedHashMap<K, V> extends AbstractMap<K, V> {
                     final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
                     return equivalence.equivalent(getKey(), (K) e.getKey()) && Objects.equals(getValue(), e.getValue());
                 }
+
                 return false;
             }
         };
@@ -233,14 +240,13 @@ final public class EquivalenceLinkedHashMap<K, V> extends AbstractMap<K, V> {
     private K get(final Wrapper<? super K> key) {
         return (K) key.get();
     }
-    
+
     public static void main(String[] args) {
         Map<String, Integer> map = new EquivalenceLinkedHashMap<>(Equivalence.equals());
-        map.put("one", 1);
+        map.put(null,null);
         System.out.println(map.keySet());
         System.out.println(map.entrySet());
-        
-        
+
     }
 
 }

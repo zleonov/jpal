@@ -177,18 +177,8 @@ final public class ByteStream {
             }
         } while (n != -1);
 
-        if (size != total)
-            bytes = Arrays.copyOf(bytes, total);
-
-        return bytes;
+        return bytes.length == total ? bytes : Arrays.copyOf(bytes, total);
     }
-    
-//    public static void main(String[] args) {
-//        long l = Long.MAX_VALUE;
-//        System.out.println(l);
-//        System.out.println((int)l);
-//        System.out.println(Long.valueOf(l).intValue());
-//        System.out.println(Ints.saturatedCast(l));
-//    }
+
 }
 

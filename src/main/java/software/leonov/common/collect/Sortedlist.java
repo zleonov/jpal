@@ -25,7 +25,7 @@ import java.util.ListIterator;
  * This is the <i>list</i> analog of sorted set.
  * 
  * @author Zhenya Leonov
- * @param <E> the type of elements held in this list
+ * @param <E> the type of elements held in this sorted-list
  */
 public interface Sortedlist<E> extends SortedCollection<E> {
 

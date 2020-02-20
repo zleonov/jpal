@@ -30,6 +30,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -48,10 +49,10 @@ import com.google.common.collect.Ordering;
 
 /**
  * A {@link Sortedlist} implementation, based on a modified
- * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. Elements are sorted from <i>least</i> to
- * <i>greatest</i> according to their <i>natural ordering</i>, or by an explicit {@link Comparator} provided at
- * creation. Attempting to insert {@code null} elements is prohibited. Querying for {@code null} elements is allowed.
- * Inserting non-comparable elements will result in a {@code ClassCastException}.
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. Elements are sorted from
+ * <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by an explicit {@link Comparator}
+ * provided at creation. Attempting to insert {@code null} elements will succeed if the {@code Comparator} supports
+ * {@code null} values. Inserting non-comparable elements will result in a {@code ClassCastException}.
  * <p>
  * The iterators obtained from the {@link #iterator()} and {@link #listIterator()} methods are <i>fail-fast</i>.
  * Attempts to modify the elements in this sorted-list at any time after an iterator is created, in any way except
@@ -63,8 +64,8 @@ import com.google.common.collect.Ordering;
  * <p>
  * This implementation uses a comparator ({@link Ordering#natural() whether or not one is explicitly provided}) to
  * perform all element comparisons. Two elements which are deemed equal by the comparator's {@code compare(E, E)} method
- * are, from the standpoint of this list, equal. Further, no guarantee is made as to the final order of <i>equal</i>
- * elements. Ties may be broken arbitrarily.
+ * are, from the standpoint of this sorted-list, equal. Further, no guarantee is made as to the final order of
+ * <i>equal</i> elements. Ties may be broken arbitrarily.
  * <p>
  * The underlying Red-Black Tree provides the following amortized running time (where <i>n</i> is the size of this
  * sorted-list and <i>m</i> is the size of the specified collection which is iterable in linear time):
@@ -98,7 +99,7 @@ import com.google.common.collect.Ordering;
  * which runs in linear time proportional to the size of the view.
  * 
  * @author Zhenya Leonov
- * @param <E> the type of elements maintained by this list
+ * @param <E> the type of elements maintained by this sorted-list
  * @see Skiplist
  */
 public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>, Cloneable, Serializable {
@@ -130,21 +131,22 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
 
     /**
      * Creates a new {@code Treelist} containing the specified initial elements. If {@code elements} is an instance of
-     * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this list will be
-     * ordered according to the same ordering. Otherwise, this list will be ordered according to the <i>natural ordering</i>
-     * of its elements.
+     * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this sorted-list
+     * will be ordered according to the same ordering. Otherwise, this sorted-list will be ordered according to the
+     * <i>natural ordering</i> of its elements.
      * 
-     * @param elements the collection whose elements are to be placed into the list
+     * @param elements the collection whose elements are to be placed into the sorted-list
      * @return a new {@code Treelist} containing the elements of the specified collection
      * @throws ClassCastException   if elements of the specified collection cannot be compared to one another according to
-     *                              this list's ordering
+     *                              this sorted-list's ordering
      * @throws NullPointerException if any of the elements of the specified collection or the collection itself is
      *                              {@code null}
      */
     @SuppressWarnings({ "unchecked" })
-    public static <E> Treelist<E> from(final Collection<? extends E> elements) {
+    public static <E> Treelist<E> create(final Iterable<? extends E> elements) {
         checkNotNull(elements, "elements == null");
-        final Comparator<? super E> comparator;
+
+        Comparator<? super E> comparator = null;
         if (elements instanceof SortedSet<?>)
             comparator = ((SortedSet<? super E>) elements).comparator();
         else if (elements instanceof PriorityQueue<?>)
@@ -153,8 +155,10 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             comparator = ((SortedCollection<? super E>) elements).comparator();
         else if (elements instanceof MinMaxPriorityQueue<?>)
             comparator = ((MinMaxPriorityQueue<? super E>) elements).comparator();
-        else
+
+        if (comparator == null)
             comparator = (Comparator<? super E>) Ordering.natural();
+
         return orderedBy(comparator).create(elements);
     }
 
@@ -174,8 +178,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * {@link Treelist#orderedBy(Comparator)}.
      * 
      * @author Zhenya Leonov
-     * @param <B> the upper bound of the type of queues this builder can produce (for example a {@code Builder<Number>} can
-     *        produce a {@code Treelist<Float>} or a {@code Treelist<Integer>}
+     * @param <B> the upper bound of the type of {@code Treelist}s this builder can produce (for example a
+     *            {@code Builder<Number>} can produce a {@code Treelist<Float>} or a {@code Treelist<Integer>}
      */
     public static final class Builder<B> {
 
@@ -197,7 +201,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         /**
          * Builds a new {@code Treelist} using the previously specified comparator, and having the given initial elements.
          * 
-         * @param elements the initial elements to be placed in this queue
+         * @param elements the initial elements to be placed in this {@code Treelist}
          * @return a new {@code Treelist} using the previously specified comparator, and having the given initial elements
          */
         public <T extends B> Treelist<T> create(final Iterable<? extends T> elements) {
@@ -222,10 +226,10 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     /**
-     * Returns the comparator used to order the elements in this list. If one was not explicitly provided a <i>natural
-     * order</i> comparator is returned.
+     * Returns the comparator used to order the elements in this sorted-list. If one was not explicitly provided a
+     * <i>natural order</i> comparator is returned.
      * 
-     * @return the comparator used to order this list
+     * @return the comparator used to order this sorted-list
      */
     @Override
     public Comparator<? super E> comparator() {
@@ -233,11 +237,11 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     /**
-     * Inserts the specified element into this list in sorted order.
+     * Inserts the specified element into this sorted-list in sorted order.
      */
     @Override
     public boolean add(E e) {
-        checkNotNull(e, "e == null");
+//        checkNotNull(e, "e == null");
         Node newNode = new Node(e);
         insert(newNode);
         return true;
@@ -246,7 +250,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @SuppressWarnings("unchecked")
     @Override
     public boolean contains(Object o) {
-        return o != null && search((E) o) != null;
+//        return o != null && search((E) o) != null;
+        return search((E) o) != null;
     }
 
     @Override
@@ -389,8 +394,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @SuppressWarnings("unchecked")
     @Override
     public boolean remove(Object o) {
-        if (o == null)
-            return false;
+//        if (o == null)
+//            return false;
         Node node = search((E) o);
         if (node == null)
             return false;
@@ -458,8 +463,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     /**
      * Returns a shallow copy of this {@code Treelist}. The elements themselves are not cloned.
      * 
-     * @return a shallow copy of this tree list
-     * @throws CloneNotSupportedException if an attempt is made to clone is a sub-list view of this sorted-list
+     * @return a shallow copy of this {@code Treelist}
+     * @throws CloneNotSupportedException if an attempt is made to clone a sub-list view of this sorted-list
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -511,7 +516,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
                 throw new ConcurrentModificationException();
         }
 
-        public Sublist(Treelist<E> list, int fromIndex, int toIndex) {
+        public Sublist(final Treelist<E> list, int fromIndex, int toIndex) {
             super(list.comparator);
             this.list = list;
             from = list.min;
@@ -1172,4 +1177,11 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         x.color = BLACK;
     }
 
+    public static void main(String[] args) {
+        Treelist<String> tl = Treelist.create();
+
+        Iterables.addAll(tl, Arrays.asList("a", "b", "c"));
+
+        tl.asList().replaceAll(i -> new Character((char) ((int) i.charAt(0) + 1)).toString());
+    }
 }

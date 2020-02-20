@@ -29,23 +29,21 @@ import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.SortedSet;
+import java.util.concurrent.ThreadLocalRandom;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
 
 /**
- * <b>Note: This class should only be used for testing. It provides no practical benefit when compared to
- * {@link java.util.TreeSet java.util.TreeSet} and lacks navigation methods defined in the {@link NavigableSet}
- * interface.</b>
- * <p>
  * A {@code Set} implementation based on a modified <a href="http://en.wikipedia.org/wiki/Skip_list">skip list</a>.
  * Elements are sorted from <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by an
- * explicit {@link Comparator} provided at creation. Attempting to remove or insert {@code null} elements is prohibited.
- * Querying for {@code null} elements is allowed. Inserting non-comparable elements will result in a
+ * explicit {@link Comparator} provided at creation. Attempting to insert {@code null} elements will succeed if the
+ * {@code Comparator} supports {@code null} values. Inserting non-comparable elements will result in a
  * {@code ClassCastException}.
  * <p>
  * The iterators obtained from the {@link #iterator()} method are <i>fail-fast</i>. Attempts to modify the elements in
- * this list at any time after an iterator is created, in any way except through the iterator's own remove method, will
+ * this set at any time after an iterator is created, in any way except through the iterator's own remove method, will
  * result in a {@code ConcurrentModificationException}.
  * <p>
  * This set is not <i>thread-safe</i>. If multiple threads modify this set concurrently it must be synchronized
@@ -58,7 +56,7 @@ import com.google.common.collect.Ordering;
  * Invented by <a href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
  * structure for maintaining items in sorted order. Strictly speaking it is impossible to make any hard guarantees
  * regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be logarithmic with
- * an extremely high degree of probability as the list grows.
+ * an extremely high degree of probability as the skip list grows.
  * <p>
  * The underlying array-based skip list provides the following expected case running time (where <i>n</i> is the size of
  * this set and <i>m</i> is the size of the specified collection which is iterable in linear time):
@@ -84,8 +82,12 @@ import com.google.common.collect.Ordering;
  * </table>
  * </pre>
  * 
+ * @deprecated <b>This class should only be used for testing. It provides no practical benefit when compared to
+ *             {@link java.util.TreeSet java.util.TreeSet} and lacks navigation methods defined in the
+ *             {@link NavigableSet} interface.</b>
+ * 
  * @author Zhenya Leonov
- * @param <E> the type of elements maintained by this list
+ * @param <E> the type of elements maintained by this set
  * @see Skiplist
  */
 final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollection<E>, Serializable, Cloneable {
@@ -95,10 +97,9 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
     private static final int MAX_LEVEL = 32;
     transient int size = 0;
     private transient int level = 1;
-    private transient Random random = new Random();
+    private transient Random random = ThreadLocalRandom.current();
     private transient Node<E> head = new Node<E>(null, MAX_LEVEL);
     private final Comparator<? super E> comparator;
-    private transient int[] index = new int[MAX_LEVEL];
     transient int modCount = 0;
 
     private SkiplistSet(final Comparator<? super E> comparator) {
@@ -143,9 +144,10 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
      *                              {@code null}
      */
     @SuppressWarnings({ "unchecked" })
-    public static <E> SkiplistSet<E> create(final Collection<? extends E> elements) {
+    public static <E> SkiplistSet<E> create(final Iterable<? extends E> elements) {
         checkNotNull(elements, "elements == null");
-        final Comparator<? super E> comparator;
+
+        Comparator<? super E> comparator = null;
         if (elements instanceof SortedSet<?>)
             comparator = ((SortedSet<? super E>) elements).comparator();
         else if (elements instanceof PriorityQueue<?>)
@@ -154,18 +156,20 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
             comparator = ((SortedCollection<? super E>) elements).comparator();
         else if (elements instanceof MinMaxPriorityQueue<?>)
             comparator = ((MinMaxPriorityQueue<? super E>) elements).comparator();
-        else
+
+        if (comparator == null)
             comparator = (Comparator<? super E>) Ordering.natural();
+
         final SkiplistSet<E> set = SkiplistSet.create(comparator);
-        set.addAll(elements);
+        Iterables.addAll(set, elements);
         return set;
     }
 
     /**
-     * Returns the comparator used to order the elements in this list. If one was not explicitly provided a <i>natural
+     * Returns the comparator used to order the elements in this set. If one was not explicitly provided a <i>natural
      * order</i> comparator is returned.
      * 
-     * @return the comparator used to order this list
+     * @return the comparator used to order this set
      */
     @Override
     public Comparator<? super E> comparator() {
@@ -173,31 +177,29 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
     }
 
     /**
-     * Inserts the specified element into this list in sorted order.
+     * Inserts the specified element into this set in sorted order.
      */
     @Override
     public boolean add(E e) {
-        checkNotNull(e, "e == null");
+//        checkNotNull(e, "e == null");
         @SuppressWarnings("unchecked")
         final Node<E>[] update = new Node[MAX_LEVEL];
         final int newLevel = randomLevel();
         Node<E> x = head;
         Node<E> y = head;
         int i;
-        int idx = 0;
         for (i = level - 1; i >= 0; i--) {
             while (x.next[i] != y && comparator.compare(x.next[i].element, e) < 0)
                 x = x.next[i];
             y = x.next[i];
             update[i] = x;
-            index[i] = idx;
         }
         if (newLevel > level) {
             for (i = level; i < newLevel; i++)
                 update[i] = head;
             level = newLevel;
         }
-        if (x.next().element != null && comparator.compare(x.next().element, e) == 0)
+        if (x.next() != this.head && comparator.compare(x.next().element, e) == 0)
             return false;
         x = new Node<E>(e, newLevel);
         for (i = 0; i < level; i++) {
@@ -214,7 +216,8 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
     @Override
     @SuppressWarnings("unchecked")
     public boolean contains(Object o) {
-        return o != null && search((E) o) != null;
+//        return o != null && search((E) o) != null;
+        return search((E) o) != null;
     }
 
     @Override
@@ -276,8 +279,8 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
     @SuppressWarnings("unchecked")
     @Override
     public boolean remove(Object o) {
-        if (o == null)
-            return false;
+//        if (o == null)
+//            return false;
         final Node<E>[] update = new Node[MAX_LEVEL];
         final E element = (E) o;
         Node<E> curr = head;
@@ -310,7 +313,7 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
     /**
      * Returns a shallow copy of this {@code SkiplistSet}. The elements themselves are not cloned.
      * 
-     * @return a shallow copy of this skip list
+     * @return a shallow copy of this skip set
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -324,7 +327,7 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
         for (int i = 0; i < MAX_LEVEL; i++) {
             clone.head.next[i] = clone.head;
         }
-        clone.random = new Random();
+        clone.random = ThreadLocalRandom.current();
         clone.level = 1;
         clone.modCount = 0;
         clone.size = 0;
@@ -346,9 +349,7 @@ final public class SkiplistSet<E> extends AbstractSet<E> implements SortedCollec
         for (int i = 0; i < MAX_LEVEL; i++) {
             head.next[i] = head;
         }
-        // update = new Node[MAX_LEVEL];
-        index = new int[MAX_LEVEL];
-        random = new Random();
+        random = ThreadLocalRandom.current();
         level = 1;
         int size = ois.readInt();
         for (int i = 0; i < size; i++)

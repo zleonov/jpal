@@ -28,9 +28,9 @@ import java.util.function.Function;
  * iteration order is the order in which its entries were last accessed, from least-recently to most-recently.
  * <p>
  * This map can be treated as a simple
- * <a target="_blank" href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)">LRU</a> cache. Invoking
- * the {@link Map#put(Object, Object)}, {@link Map#putIfAbsent(Object, Object)}, {@link Map#get(Object)},
- * {@link Map#getOrDefault(Object, Object)}, {@link Map#compute(Object, BiFunction)} ,
+ * <a target="_blank" href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)">LRU</a>
+ * cache. Invoking the {@link Map#put(Object, Object)}, {@link Map#putIfAbsent(Object, Object)},
+ * {@link Map#get(Object)}, {@link Map#getOrDefault(Object, Object)}, {@link Map#compute(Object, BiFunction)},
  * {@link Map#computeIfAbsent(Object, Function)}, {@link Map#computeIfPresent(Object, BiFunction)}, or
  * {@link Map#merge(Object, Object, BiFunction)} methods results in an access to the corresponding entry (assuming it
  * exists after the invocation completes). The {@link Map#replace(Object, Object)} and

@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -49,8 +50,8 @@ import com.google.common.collect.Iterables;
  * Attempts to modify the elements in this list at any time after an iterator is created, in any way except through the
  * iterator's own remove method, will result in a {@code ConcurrentModificationException}.
  * <p>
- * This list is not <i>thread-safe</i>. If multiple threads modify this list concurrently it must be synchronized
- * externally.
+ * This list is not <i>thread-safe</i>. If multiple threads modify this list concurrently it must be
+ * {@link Collections#synchronizedList(List) synchronized} externally.
  * <p>
  * This class implements an array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a>
  * modified to provide logarithmic running time for linear list operations (e.g. insert an element at the i<i>th</i>
@@ -137,7 +138,7 @@ import com.google.common.collect.Iterables;
  */
 public final class RankList<E> extends AbstractList<E> implements List<E>, RandomAccess, Serializable, Cloneable {
 
-    private static final long serialVersionUID = -8518776166489425758L;
+    private static final long serialVersionUID = 1L;
     private static final double P = .5;
     private static final int MAX_LEVEL = 32;
     private transient int size = 0;

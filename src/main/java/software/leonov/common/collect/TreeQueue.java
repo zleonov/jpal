@@ -37,17 +37,19 @@ import java.util.SortedSet;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
 
+import software.leonov.common.base.Compare;
+
 /**
  * An optionally bounded priority {@link Queue} based on a modified
- * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. The elements of this queue are sorted
- * according to their <i>natural ordering</i>, or by an explicit {@link Comparator} provided at creation. Attempting to
- * remove or insert {@code null} elements is prohibited. Querying for {@code null} elements is allowed. Inserting
- * non-comparable elements will result in a {@code ClassCastException}. This queue uses the same general ordering rules
- * as a {@link PriorityQueue PriorityQueue}. The first element (the head) of this queue is considered to be the
- * <i>least</i> element with respect to the specified ordering. A comparator is used ({@link Ordering#natural() whether
- * or not one is explicitly provided}) to perform all element comparisons. Two elements which are deemed equal by the
- * comparator's {@code compare(E, E)} method have equal priority from the standpoint of this queue. Elements with equal
- * priority are sorted according to their insertion order.
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. The elements of this queue
+ * are sorted according to their <i>natural ordering</i>, or by an explicit {@link Comparator} provided at creation.
+ * Attempting to insert {@code null} elements will succeed if the {@code Comparator} supports {@code null} values.
+ * Inserting non-comparable elements will result in a {@code ClassCastException}. This queue uses the same general
+ * ordering rules as a {@link PriorityQueue PriorityQueue}. The first element (the head) of this queue is considered to
+ * be the <i>least</i> element with respect to the specified ordering. A comparator is used ({@link Ordering#natural()
+ * whether or not one is explicitly provided}) to perform all element comparisons. Two elements which are deemed equal
+ * by the comparator's {@code compare(E, E)} method have equal priority from the standpoint of this queue. Elements with
+ * equal priority are sorted according to their insertion order.
  * <p>
  * Besides the regular {@link #peek() peek()}, {@link #poll() poll()}, {@link #remove() remove()} operations specified
  * in the {@code Queue} interface, this implementation provides additional {@link #peekLast() peekLast()},
@@ -158,17 +160,18 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      * queue will be ordered according to the same ordering. Otherwise, this queue will be ordered according to the
      * <i>natural ordering</i> of its elements.
      * 
-     * @param elements the collection whose elements are to be placed into the list
+     * @param elements the collection whose elements are to be placed into the queue
      * @return a new unbounded {@code TreeQueue} containing the elements of the specified collection
      * @throws ClassCastException   if elements of the specified collection cannot be compared to one another according to
-     *                              this list's ordering
+     *                              this queue's ordering
      * @throws NullPointerException if any of the elements of the specified collection or the collection itself is
      *                              {@code null}
      */
     @SuppressWarnings({ "unchecked" })
-    public static <E> TreeQueue<E> from(final Collection<? extends E> elements) {
+    public static <E> TreeQueue<E> create(final Iterable<? extends E> elements) {
         checkNotNull(elements, "elements == null");
-        final Comparator<? super E> comparator;
+
+        Comparator<? super E> comparator = null;
         if (elements instanceof SortedSet<?>)
             comparator = ((SortedSet<? super E>) elements).comparator();
         else if (elements instanceof PriorityQueue<?>)
@@ -177,8 +180,10 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
             comparator = ((SortedCollection<? super E>) elements).comparator();
         else if (elements instanceof MinMaxPriorityQueue<?>)
             comparator = ((MinMaxPriorityQueue<? super E>) elements).comparator();
-        else
+
+        if (comparator == null)
             comparator = (Comparator<? super E>) Ordering.natural();
+
         return orderedBy(comparator).create(elements);
     }
 
@@ -212,7 +217,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
      * 
      * @author Zhenya Leonov
      * @param <B> the upper bound of the type of queues this builder can produce (for example a {@code Builder<Number>} can
-     *        produce a {@code TreeQueue<Float>} or a {@code TreeQueue<Integer>}
+     *            produce a {@code TreeQueue<Float>} or a {@code TreeQueue<Integer>}
      */
     public static final class Builder<B> {
 
@@ -273,7 +278,7 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
     }
 
     /**
-     * Returns the comparator used to order the elements in this deque. If one was not explicitly provided a <i>natural
+     * Returns the comparator used to order the elements in this queue. If one was not explicitly provided a <i>natural
      * order</i> comparator is returned.
      * 
      * @return the comparator used to order this queue
@@ -285,8 +290,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
 
     @Override
     public boolean remove(Object o) {
-        if (o == null)
-            return false;
+//        if (o == null)
+//            return false;
         @SuppressWarnings("unchecked")
         final Node node = search((E) o);
         if (node == null)
@@ -334,13 +339,9 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
         return max.element;
     }
 
-    // @Override add(E e){
-    // super.add(e);
-    // }
-
     @Override
     public boolean offer(E e) {
-        checkNotNull(e, "e == null");
+//        checkNotNull(e, "e == null");
         if (size() == capacity)
             if (comparator().compare(e, peekLast()) < 0)
                 pollLast();
@@ -385,7 +386,8 @@ final public class TreeQueue<E> extends AbstractQueue<E> implements SortedCollec
     @SuppressWarnings("unchecked")
     @Override
     public boolean contains(Object o) {
-        return o != null && search((E) o) != null;
+//        return o != null && search((E) o) != null;
+        return search((E) o) != null;
     }
 
     /**

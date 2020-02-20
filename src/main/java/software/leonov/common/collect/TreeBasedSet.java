@@ -17,8 +17,8 @@ package software.leonov.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static software.leonov.common.collect.TreeSet.Color.BLACK;
-import static software.leonov.common.collect.TreeSet.Color.RED;
+import static software.leonov.common.collect.TreeBasedSet.Color.BLACK;
+import static software.leonov.common.collect.TreeBasedSet.Color.RED;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -39,15 +39,11 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
 
 /**
- * <b>Note: This class should only be used for testing. It provides no practical benefit when compared to
- * {@link java.util.TreeSet java.util.TreeSet} and lacks navigation methods defined in the {@link NavigableSet}
- * interface.</b>
- * <p>
- * A {@code Set} implementation based on a modified <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black
- * Tree</a>. Elements are sorted from <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by
- * an explicit {@link Comparator} provided at creation. Attempting to remove or insert {@code null} elements is
- * prohibited. Querying for {@code null} elements is allowed. Inserting non-comparable elements will result in a
- * {@code ClassCastException}.
+ * A {@code Set} implementation based on a modified
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. Elements are sorted from
+ * <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by an explicit {@link Comparator}
+ * provided at creation. Attempting to insert {@code null} elements will succeed if the {@code Comparator} supports
+ * {@code null} values. Inserting non-comparable elements will result in a {@code ClassCastException}.
  * <p>
  * The iterators obtained from the {@link #iterator()} method are <i>fail-fast</i>. Attempts to modify the elements in
  * this set at any time after an iterator is created, in any way except through the iterator's own remove method, will
@@ -84,10 +80,14 @@ import com.google.common.collect.Ordering;
  * </table>
  * </pre>
  * 
+ * @deprecated <b>This class should only be used for testing. It provides no practical benefit when compared to
+ *             {@link java.util.TreeSet java.util.TreeSet} and lacks navigation methods defined in the
+ *             {@link NavigableSet} interface.</b>
+ * 
  * @author Zhenya Leonov
  * @param <E> the type of elements maintained by this set
  */
-final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection<E>, Cloneable, Serializable {
+final public class TreeBasedSet<E> extends AbstractSet<E> implements SortedCollection<E>, Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
     private transient int size = 0;
@@ -97,49 +97,50 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     private transient int modCount = 0;
     private final Comparator<? super E> comparator;
 
-    private TreeSet(final Comparator<? super E> comparator) {
+    private TreeBasedSet(final Comparator<? super E> comparator) {
         this.comparator = comparator;
     }
 
     /**
-     * Creates a new {@code TreeSet} that orders its elements according to their <i>natural ordering</i>.
+     * Creates a new {@code TreeBasedSet} that orders its elements according to their <i>natural ordering</i>.
      * 
-     * @return a new {@code TreeSet} that orders its elements according to their <i>natural ordering</i>
+     * @return a new {@code TreeBasedSet} that orders its elements according to their <i>natural ordering</i>
      */
     // @SuppressWarnings("rawtypes")
     // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
-    public static <E extends Comparable<? super E>> TreeSet<E> create() {
-        return new TreeSet<E>(Ordering.natural());
+    public static <E extends Comparable<? super E>> TreeBasedSet<E> create() {
+        return new TreeBasedSet<E>(Ordering.natural());
     }
 
     /**
-     * Creates a new {@code TreeSet} that uses the specified comparator to order its elements.
+     * Creates a new {@code TreeBasedSet} that uses the specified comparator to order its elements.
      * 
      * @param comparator the specified comparator
-     * @return a new {@code TreeSet} that uses the specified comparator to order its elements
+     * @return a new {@code TreeBasedSet} that uses the specified comparator to order its elements
      * 
      */
-    public static <E> TreeSet<E> create(final Comparator<? super E> comparator) {
+    public static <E> TreeBasedSet<E> create(final Comparator<? super E> comparator) {
         checkNotNull(comparator, "comparator == null");
-        return new TreeSet<E>(comparator);
+        return new TreeBasedSet<E>(comparator);
     }
 
     /**
-     * Creates a new {@code TreeSet} containing the specified initial elements. If {@code elements} is an instance of
+     * Creates a new {@code TreeBasedSet} containing the specified initial elements. If {@code elements} is an instance of
      * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this set will be
      * ordered according to the same ordering. Otherwise, this set will be ordered according to the <i>natural ordering</i>
      * of its elements.
      * 
      * @param elements the initial elements to be placed into the set
-     * @return a new {@code TreeSet} containing the specified initial elements
+     * @return a new {@code TreeBasedSet} containing the specified initial elements
      * @throws ClassCastException   if any of the initial elements cannot be compared to one another according to this set's
      *                              ordering
      * @throws NullPointerException if any of the initial elements or {@code elements} itself is {@code null}
      */
     @SuppressWarnings({ "unchecked" })
-    public static <E> TreeSet<E> create(final Iterable<? extends E> elements) {
+    public static <E> TreeBasedSet<E> create(final Iterable<? extends E> elements) {
         checkNotNull(elements, "elements == null");
-        final Comparator<? super E> comparator;
+
+        Comparator<? super E> comparator = null;
         if (elements instanceof SortedSet<?>)
             comparator = ((SortedSet<? super E>) elements).comparator();
         else if (elements instanceof PriorityQueue<?>)
@@ -148,18 +149,20 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
             comparator = ((SortedCollection<? super E>) elements).comparator();
         else if (elements instanceof MinMaxPriorityQueue<?>)
             comparator = ((MinMaxPriorityQueue<? super E>) elements).comparator();
-        else
+
+        if (comparator == null)
             comparator = (Comparator<? super E>) Ordering.natural();
-        final TreeSet<E> set = TreeSet.create(comparator);
+
+        final TreeBasedSet<E> set = TreeBasedSet.create(comparator);
         Iterables.addAll(set, elements);
         return set;
     }
 
     /**
-     * Returns the comparator used to order the elements in this deque. If one was not explicitly provided a <i>natural
-     * order</i> comparator is returned.
+     * Returns the comparator used to order the elements in this {@code TreeBasedSet}. If one was not explicitly provided a
+     * <i>natural order</i> comparator is returned.
      * 
-     * @return the comparator used to order this queue
+     * @return the comparator used to order this {@code TreeBasedSet}
      */
     @Override
     public Comparator<? super E> comparator() {
@@ -171,14 +174,14 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
      */
     @Override
     public boolean add(E e) {
-        checkNotNull(e, "e == null");
+//        checkNotNull(e, "e == null");
         return insert(new Node(e));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean contains(Object o) {
-        return o != null && search((E) o) != null;
+        return search((E) o) != null;
     }
 
     @Override
@@ -224,7 +227,7 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     @SuppressWarnings("unchecked")
     @Override
     public boolean remove(Object o) {
-        checkNotNull(o, "o == null");
+//        checkNotNull(o, "o == null");
         final Node node = search((E) o);
         if (node == null)
             return false;
@@ -245,16 +248,16 @@ final public class TreeSet<E> extends AbstractSet<E> implements SortedCollection
     }
 
     /**
-     * Returns a shallow copy of this {@code TreeSet}. The elements themselves are not cloned.
+     * Returns a shallow copy of this {@code TreeBasedSet}. The elements themselves are not cloned.
      * 
-     * @return a shallow copy of this queue
+     * @return a shallow copy of this {@code TreeBasedSet}
      */
     @SuppressWarnings("unchecked")
     @Override
-    public TreeSet<E> clone() {
-        TreeSet<E> clone;
+    public TreeBasedSet<E> clone() {
+        TreeBasedSet<E> clone;
         try {
-            clone = (TreeSet<E>) super.clone();
+            clone = (TreeBasedSet<E>) super.clone();
         } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }

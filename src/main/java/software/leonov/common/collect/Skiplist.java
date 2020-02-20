@@ -48,15 +48,16 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
 
 /**
- * A {@link Sortedlist} implementation based on a modified <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip
- * list</a>. Elements are sorted from <i>least</i> to <i>greatest</i> according to their <i>natural ordering</i>, or by
- * an explicit {@link Comparator} provided at creation. Attempting to insert {@code null} elements is prohibited.
- * Querying for {@code null} elements is allowed. Inserting non-comparable elements will result in a
- * {@code ClassCastException}.
+ * A {@link Sortedlist} implementation based on a modified
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a>. Elements are sorted from <i>least</i>
+ * to <i>greatest</i> according to their <i>natural ordering</i>, or by an explicit {@link Comparator} provided at
+ * creation. Attempting to insert {@code null} elements will succeed if the {@code Comparator} supports {@code null}
+ * values. Inserting non-comparable elements will result in a {@code ClassCastException}.
  * <p>
- * The underlying array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> is modified to provide
- * logarithmic running time for insertion, removal, and <a target="_blank" href="http://en.wikipedia.org/wiki/Random_access">random
- * access</a> lookup operations (e.g. get the element at the i<i>th</i> index).
+ * The underlying array-based <a target="_blank" href="http://en.wikipedia.org/wiki/Skip_list">skip list</a> is modified
+ * to provide logarithmic running time for insertion, removal, and
+ * <a target="_blank" href="http://en.wikipedia.org/wiki/Random_access">random access</a> lookup operations (e.g. get
+ * the element at the i<i>th</i> index).
  * <p>
  * The iterators obtained from the {@link #iterator()} and {@link #listIterator()} methods are <i>fail-fast</i>.
  * Attempts to modify the elements in this sorted-list at any time after an iterator is created, in any way except
@@ -68,13 +69,13 @@ import com.google.common.collect.Ordering;
  * <p>
  * This implementation uses a comparator ({@link Ordering#natural() whether or not one is explicitly provided}) to
  * perform all element comparisons. Two elements which are deemed equal by the comparator's {@code compare(E, E)} method
- * are, from the standpoint of this list, equal. Further, no guarantee is made as to the final order of <i>equal</i>
- * elements. Ties may be broken arbitrarily.
+ * are, from the standpoint of this sorted-list, equal. Further, no guarantee is made as to the final order of
+ * <i>equal</i> elements. Ties may be broken arbitrarily.
  * <p>
- * Invented by <a target="_blank" href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a probabilistic data
- * structure for maintaining items in sorted order. Strictly speaking it is impossible to make any hard guarantees
- * regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be logarithmic with
- * an extremely high degree of probability as the list grows.
+ * Invented by <a target="_blank" href="http://www.cs.umd.edu/~pugh/">Bill Pugh</a> in 1990, A skip list is a
+ * probabilistic data structure for maintaining items in sorted order. Strictly speaking it is impossible to make any
+ * hard guarantees regarding the worst-case performance of this class. Practical performance is <i>expected</i> to be
+ * logarithmic with an extremely high degree of probability as the skip list grows.
  * <p>
  * The following table summarizes the performance of this class compared to a {@link Treelist} (where n is the size of
  * this sorted-list and <i>m</i> is the size of the specified collection which is iterable in linear time):
@@ -118,12 +119,12 @@ import com.google.common.collect.Ordering;
  * which runs in linear time proportional to the size of the view.
  * 
  * @author Zhenya Leonov
- * @param <E> the type of elements maintained by this list
+ * @param <E> the type of elements maintained by this sorted-list
  * @see Treelist
  */
 public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>, Serializable, Cloneable {
 
-    private static final long serialVersionUID = -2116113073710983813L;
+    private static final long serialVersionUID = 1L;
     private static final double P = .5;
     private static final int MAX_LEVEL = 32;
     transient int size = 0;
@@ -157,21 +158,22 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
 
     /**
      * Creates a new {@code Skiplist} containing the specified initial elements. If {@code elements} is an instance of
-     * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this list will be
-     * ordered according to the same ordering. Otherwise, this list will be ordered according to the <i>natural ordering</i>
-     * of its elements.
+     * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this sorted-list
+     * will be ordered according to the same ordering. Otherwise, this sorted-list will be ordered according to the
+     * <i>natural ordering</i> of its elements.
      * 
-     * @param elements the collection whose elements are to be placed into the list
+     * @param elements the collection whose elements are to be placed into the sorted-list
      * @return a new {@code Skiplist} containing the elements of the specified collection
      * @throws ClassCastException   if elements of the specified collection cannot be compared to one another according to
-     *                              this list's ordering
+     *                              this sorted-list's ordering
      * @throws NullPointerException if any of the elements of the specified collection or the collection itself is
      *                              {@code null}
      */
     @SuppressWarnings({ "unchecked" })
-    public static <E> Skiplist<E> from(final Collection<? extends E> elements) {
+    public static <E> Skiplist<E> create(final Iterable<? extends E> elements) {
         checkNotNull(elements, "elements == null");
-        final Comparator<? super E> comparator;
+
+        Comparator<? super E> comparator = null;
         if (elements instanceof SortedSet<?>)
             comparator = ((SortedSet<? super E>) elements).comparator();
         else if (elements instanceof PriorityQueue<?>)
@@ -180,8 +182,10 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             comparator = ((SortedCollection<? super E>) elements).comparator();
         else if (elements instanceof MinMaxPriorityQueue<?>)
             comparator = ((MinMaxPriorityQueue<? super E>) elements).comparator();
-        else
+
+        if (comparator == null)
             comparator = (Comparator<? super E>) Ordering.natural();
+
         return orderedBy(comparator).create(elements);
     }
 
@@ -203,7 +207,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * 
      * @author Zhenya Leonov
      * @param <B> the upper bound of the type of queues this builder can produce (for example a {@code Builder<Number>} can
-     *        produce a {@code Skiplist<Float>} or a {@code Skiplist<Integer>}
+     *            produce a {@code Skiplist<Float>} or a {@code Skiplist<Integer>}
      */
     public static final class Builder<B> {
 
@@ -250,10 +254,10 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     /**
-     * Returns the comparator used to order the elements in this list. If one was not explicitly provided a <i>natural
-     * order</i> comparator is returned.
+     * Returns the comparator used to order the elements in this sorted-list. If one was not explicitly provided a
+     * <i>natural order</i> comparator is returned.
      * 
-     * @return the comparator used to order this list
+     * @return the comparator used to order this sorted-list
      */
     @Override
     public Comparator<? super E> comparator() {
@@ -261,11 +265,11 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     /**
-     * Inserts the specified element into this list in sorted order.
+     * Inserts the specified element into this sorted-list in sorted order.
      */
     @Override
     public boolean add(E e) {
-        checkNotNull(e, "e == null");
+//        checkNotNull(e, "e == null");
         @SuppressWarnings("unchecked")
         final Node<E>[] update = new Node[MAX_LEVEL];
         final int newLevel = randomLevel();
@@ -311,7 +315,8 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @Override
     @SuppressWarnings("unchecked")
     public boolean contains(Object o) {
-        return o != null && search((E) o) != null;
+        // return o != null && search((E) o) != null;
+        return search((E) o) != null;
     }
 
     @Override
@@ -451,8 +456,8 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @SuppressWarnings("unchecked")
     @Override
     public boolean remove(Object o) {
-        if (o == null)
-            return false;
+//        if (o == null)
+//            return false;
         final Node<E>[] update = new Node[MAX_LEVEL];
         final E element = (E) o;
         Node<E> curr = head;
@@ -540,7 +545,7 @@ public class Skiplist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     /**
      * Returns a shallow copy of this {@code Skiplist}. The elements themselves are not cloned.
      * 
-     * @return a shallow copy of this skip list
+     * @return a shallow copy of this {@code Skiplist}
      */
     @SuppressWarnings("unchecked")
     @Override

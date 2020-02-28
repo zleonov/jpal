@@ -14,10 +14,11 @@ import com.google.common.collect.testing.ListTestSuiteBuilder;
 import com.google.common.collect.testing.SampleElements;
 import com.google.common.collect.testing.TestStringCollectionGenerator;
 import com.google.common.collect.testing.TestStringListGenerator;
-import com.google.common.collect.testing.SampleElements.Strings;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.ListFeature;
+import com.google.common.collect.testing.testers.ListRemoveTester;
+import com.google.common.collect.testing.testers.ListRetainAllTester;
 
 import junit.framework.TestSuite;
 
@@ -39,7 +40,7 @@ public class TreelistTest {
     void tearDown() throws Exception {
     }
 
-    public static junit.framework.Test suite() {
+    public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
         final TestSuite suite = new TestSuite();
 
         // suite.addTestSuite(TreeQueueTest.class);
@@ -67,6 +68,27 @@ public class TreelistTest {
                     )
                 .createTestSuite());
 
+        suite.addTest(
+                CollectionTestSuiteBuilder
+                .using(
+                    new TestStringCollectionGenerator() {
+                    
+                        @Override
+                        protected Sortedlist<String> create(final String[] elements) {
+                            return Treelist.orderedBy(Ordering.natural().nullsFirst()).create(Arrays.asList(elements));
+                        }
+                    })
+                .named("Treelist -> Ordering.natural[].nullsFirst[]")
+                .withFeatures(
+                        CollectionSize.ANY,
+                        CollectionFeature.ALLOWS_NULL_VALUES,
+                        CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
+                        CollectionFeature.GENERAL_PURPOSE,
+                        CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
+                        CollectionFeature.SERIALIZABLE
+                    )
+                .createTestSuite());
+        
         suite.addTest(        
                 ListTestSuiteBuilder
                 .using(
@@ -74,7 +96,7 @@ public class TreelistTest {
                         
                         @Override
                         public SampleElements<String> samples() {
-                          return new Strings();
+                          return new OrderedSamples();
                         }
                     
                         @Override
@@ -82,59 +104,29 @@ public class TreelistTest {
                             return Treelist.orderedBy(Ordering.natural().nullsLast()).create(Arrays.asList(elements)).asList();
                         }
                     })
-                .named("Treelist.asList[] -> Ordering.natural[].nullsLast[]")
+                .named("Treelist.asList[]")
                 .withFeatures(
                         CollectionSize.ANY,
                         CollectionFeature.ALLOWS_NULL_QUERIES,
-                        ListFeature.REMOVE_OPERATIONS
-
-                        //CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
-                        //CollectionFeature.GENERAL_PURPOSE,
-                        //CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
-                        //CollectionFeature.SERIALIZABLE
+                        ListFeature.REMOVE_OPERATIONS,
+                        CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
+                        ListFeature.SUPPORTS_REMOVE_WITH_INDEX
                     )
-                .createTestSuite());        
-        
-        
-//        suite.addTest(
-//                QueueTestSuiteBuilder
-//                .using(
-//                    new TestStringQueueGenerator() {
-//                    
-//                        @Override
-//                        protected Queue<String> create(final String[] elements) {
-//                            return TreeQueue.orderedBy(Ordering.natural().nullsFirst()).create(Arrays.asList(elements));
-//                        }
-//                    })
-//                .named("TreeQueue -> Ordering.natural[].nullsFirst[]")
-//                .withFeatures(
-//                        CollectionSize.ANY,
-//                        CollectionFeature.ALLOWS_NULL_VALUES,
-//                        CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
-//                        CollectionFeature.GENERAL_PURPOSE,
-//                        CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
-//                        CollectionFeature.SERIALIZABLE
-//                    )
-//                .createTestSuite());          
+                .suppressing( // we have to suppress these tests because they depend on a different order
+                        ListRemoveTester.class.getMethod("testRemove_duplicate"),
+                        ListRetainAllTester.class.getMethod("testRetainAll_countIgnored")
+                    )
+                .createTestSuite());    
 
         // @formatter:on
 
         return suite;
     }
-    
-    public static class Strings extends SampleElements<String> {
-        public Strings() {
-          // elements aren't sorted, to better test SortedSet iteration ordering
-          //super("b", "a", "c", "d", "e");
+
+    public static class OrderedSamples extends SampleElements<String> {
+        public OrderedSamples() {
             super("a", "b", "c", "d", "e");
         }
-
-        // for testing SortedSet and SortedMap methods
-        public static final String BEFORE_FIRST = "\0";
-        public static final String BEFORE_FIRST_2 = "\0\0";
-        public static final String MIN_ELEMENT = "a";
-        public static final String AFTER_LAST = "z";
-        public static final String AFTER_LAST_2 = "zz";
-      }
+    }
 
 }

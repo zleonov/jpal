@@ -40,7 +40,7 @@ import com.google.common.base.Throwables;
  * 
  * @author Zhenya Leonov
  */
-public final class Try {
+public final class Unchecked {
 
     /**
      * Mirror of the {@code BiConsumer} interface whose {@code accept(T, U)} method can throw a checked exception.
@@ -176,7 +176,7 @@ public final class Try {
         T get() throws Exception;
     }
 
-    private Try() {
+    private Unchecked() {
     }
 
     /**
@@ -384,25 +384,5 @@ public final class Try {
     public static <T extends Throwable> RuntimeException unchecked(final Throwable t) throws T {
         throw (T) t;
     }
-
-//    public static void main(String[] args) {
-//
-//        List<Integer> integers = Arrays.asList(3, 9, 7, 0, 10, 20);
-//        integers.forEach(i -> {
-//            System.out.println(50 / i);
-//        });
-//    }
-
-//    public static void main(String[] str) throws InterruptedException, ExecutionException {
-//        ExecutorService executorService = Executors.newSingleThreadExecutor();
-//        Future future = executorService.submit(() -> {
-//            new ByteArrayInputStream(new byte[] {}).close();
-//            return "abc";
-//        });
-//
-//        System.out.println(future.get());
-//
-//        executorService.shutdown();
-//    }
 
 }

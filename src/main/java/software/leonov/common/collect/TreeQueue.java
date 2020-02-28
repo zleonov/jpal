@@ -37,8 +37,6 @@ import java.util.SortedSet;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Ordering;
 
-import software.leonov.common.base.Compare;
-
 /**
  * An optionally bounded priority {@link Queue} based on a modified
  * <a target="_blank" href="http://en.wikipedia.org/wiki/Red-black_tree">Red-Black Tree</a>. The elements of this queue

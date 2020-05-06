@@ -1166,9 +1166,9 @@ final public class Fs {
      * Files.createDirectories(Path, FileAttribute...)} method bizarrely fails if the path already exists, but is a symlink
      * to a directory. While in the strict sense this does not violate the API Documentation which states a
      * {@code FileAlreadyExistsException} will be thrown if the path <i>exists but is not a directory</i>, it is completely
-     * counterintuitive, since {@link java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)
-     * Files.isDirectory(Path)} will return {@code true} when a symlink references a directory. This method provides the same
-     * functionality but will not fail if the path is a symlink to the target directory.
+     * counter intuitive, since {@link java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)
+     * Files.isDirectory(Path)} will return {@code true} when a symlink references a directory. This method provides the
+     * same functionality but will not fail if the path is a symlink to the target directory.
      * <p>
      * <b>Note:</b> If the target directory and all its parent directories exist calling this method is a no-op. If this
      * operation fails because of an I/O error or other problems it may have succeeded in creating some (but not all) of the

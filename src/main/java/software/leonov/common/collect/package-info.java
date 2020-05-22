@@ -15,7 +15,8 @@
  */
 
 /**
- * Static utilities useful for working with {@link java.util.Collection Collection}s, {@link java.lang.Iterable
- * Iterable}s, and {@link java.util.Iterator Iterator}s.
+ * 
+ * Interfaces, implementations, and utilities for working with {@link java.util.Collection Collection}s,
+ * {@link java.lang.Iterable Iterable}s, and {@link java.util.Iterator Iterator}s.
  */
 package software.leonov.common.collect;

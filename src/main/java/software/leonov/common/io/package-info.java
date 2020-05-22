@@ -15,7 +15,7 @@
  */
 
 /**
- * Static utilities useful for working with {@link java.io.File File}s, {@link java.io.Writer Writer}s,
+ * Utility methods and classes for working with {@link java.io.File File}s, {@link java.io.Writer Writer}s,
  * {@link java.io.Reader Reader}s, Streams, and {@link java.util.zip.ZipFile ZipFile}s.
  */
 package software.leonov.common.io;

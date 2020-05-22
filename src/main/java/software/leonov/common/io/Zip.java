@@ -125,7 +125,8 @@ final public class Zip {
     /**
      * Returns all the entries in the specified ZIP file.
      * 
-     * @deprecated Java 8+ users should call {@link ZipFile#stream()}.
+     * @deprecated Java 8+ users should prefer {@link ZipFile#stream()}. If an {@code Iterator} is required users can call
+     *             {@link Stream#iterator()}.
      * 
      * @param zip the specified ZIP file
      * @return all the entries in the specified ZIP file
@@ -138,7 +139,8 @@ final public class Zip {
     /**
      * Returns all the entries in the specified ZIP file that match the given predicate.
      * 
-     * @deprecated Java 8+ users should call {@link ZipFile#stream()}{@link Stream#filter(Predicate) .filter(Predicate)}.
+     * @deprecated Java 8+ users should prefer {@link ZipFile#stream()}{@link Stream#filter(Predicate) .filter(Predicate)}.
+     *             If an {@code Iterator} is required users can call {@link Stream#iterator()}.
      * 
      * @param zip    the specified ZIP file
      * @param filter the given predicate

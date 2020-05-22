@@ -1135,9 +1135,9 @@ final public class Fs {
      * <b>Note:</b> If all parent directories exist calling this method is a no-op. If this operation fails because of an
      * I/O error or other problems it may have succeeded in creating some (but not all) of the parent directories.
      * 
-     * @param path  the directory to create
+     * @param path  the path whose parent directories will be created
      * @param attrs an optional list of file attributes to set atomically when creating the directories
-     * @return the specified directory
+     * @return the the path whose parent directories have been created
      * @throws IOException if an I/O error occurs
      */
     public static Path createParentDirectories(final Path path, final FileAttribute<?>... attrs) throws IOException {
@@ -1176,7 +1176,7 @@ final public class Fs {
      *
      * @param path  the directory to create
      * @param attrs an optional list of file attributes to set atomically when creating the directory
-     * @return the specified directory
+     * @return the created directory
      * @throws IOException if an I/O error occurs
      */
     public static Path createDirectories(final Path path, final FileAttribute<?>... attrs) throws IOException {

@@ -15,6 +15,7 @@
  */
 
 /**
- * Static utilities relating to Java reflection.
+ * Static utilities for working with Java Swing.
  */
-package software.leonov.common.reflect;
+package software.leonov.common.swing;
+

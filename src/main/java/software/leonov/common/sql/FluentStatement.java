@@ -38,7 +38,7 @@ import java.util.Calendar;
  * <li>The ability to register a callback function via the {@link #onAddBatch(Runnable)} method which will be executed
  * after each call to {@code addBatch}.</li>
  * <li>The ability to retrieve the current batch size since the last call to {@link #executeBatch()} via the
- * {@link #batchSize()} method.</li>
+ * {@link #getBatchSize()} method.</li>
  * <li>The ability to retrieve the the original SQL used to create this {@code FluentStatement} via {@link #sql()}.</li>
  * </ul>
  * <p>
@@ -104,7 +104,7 @@ public final class FluentStatement extends ForwardingPreparedStatement {
      * @return the current batch size
      * @return this {@code FluentStatement} instance
      */
-    public int batchSize() {
+    public int getBatchSize() {
         return batchSz;
     }
 

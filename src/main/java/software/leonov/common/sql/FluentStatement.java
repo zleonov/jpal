@@ -42,7 +42,7 @@ import java.util.Calendar;
  * <li>The ability to retrieve the the original SQL used to create this {@code FluentStatement} via {@link #sql()}.</li>
  * </ul>
  * <p>
- * <b>Note:</b> While some driver implementations allow users to call:
+ * <b>Note:</b> While some driver implementations allow users to call the following {@link Statement} methods:
  * <ul>
  * <li>{@link #executeQuery(String)}</li>
  * <li>{@link #executeUpdate(String)}</li>
@@ -56,9 +56,9 @@ import java.util.Calendar;
  * <li>{@link #execute(String, String[])}</li>
  * <li>{@link #execute(String)}</li>
  * </ul>
- * methods which are reserved specifically for {@link Statement} implementations, this class strictly adheres to the API
- * specification which states that these <i>methods cannot be called on a {@code PreparedStatement}s</i> and will throw
- * in {@link SQLException}s.
+ * this class strictly adheres to the API specification which states that these <i>methods cannot be called on a
+ * {@code PreparedStatement}s</i>. Calling methods reserved for {@code Statement} implementations will result in
+ * {@link SQLException}s.
  * 
  * @author Zhenya Leonov
  */

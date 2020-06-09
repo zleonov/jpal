@@ -148,8 +148,8 @@ final public class Connections {
      * Attempts to rollback the specified {@code Connection}. If an {@code SQLException} is thrown it will be
      * {@link Throwable#addSuppressed(Throwable) appended} to the previously thrown exception.
      * <p>
-     * This method is primarily useful when cleaning up resources in a try or try-with-resources statement because of an
-     * exception that occurred earlier.
+     * This method is primarily useful when cleaning up resources in a try block because of an exception that occurred
+     * earlier.
      * 
      * @param conn the specified {@code Connection}
      * @param e    the exception thrown earlier
@@ -166,8 +166,8 @@ final public class Connections {
      * Closes the specified {@code Connection} if it is not {@code null}. If an {@code SQLException} is thrown it will be
      * {@link Throwable#addSuppressed(Throwable) appended} to the previously thrown exception.
      * <p>
-     * This method is primarily useful when cleaning up resources in a try or try-with-resources statement because of an
-     * exception that occurred earlier.
+     * This method is primarily useful when cleaning up resources in a try block because of an exception that occurred
+     * earlier.
      * 
      * @param conn the specified {@code Connection}
      * @param e    the exception thrown earlier

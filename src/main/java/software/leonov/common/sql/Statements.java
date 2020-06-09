@@ -17,8 +17,8 @@ final public class Statements {
      * Closes the specified {@code Statement} if it is not {@code null}. If an {@code SQLException} is thrown it will be
      * {@link Throwable#addSuppressed(Throwable) appended} to the previously thrown exception.
      * <p>
-     * This method is primarily useful when cleaning up resources in a try or try-with-resources statement because of an
-     * exception that occurred earlier.
+     * This method is primarily useful when cleaning up resources in a try block because of an exception that occurred
+     * earlier.
      * 
      * @param stmt the specified {@code Statement}
      * @param e    the exception thrown earlier

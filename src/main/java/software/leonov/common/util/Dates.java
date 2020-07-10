@@ -24,9 +24,10 @@ import java.util.Date;
 
 /**
  * Static utility methods for working with dates.
- * <p>
- * <b>Note:</b> Java 8+ users should consider switching to the new
- * <a target="_blank" href="https://docs.oracle.com/javase/tutorial/datetime/index.html">Date and Time API</a>.
+ * 
+ * @deprecated Java 8+ users should switch to the new
+ *             <a target="_blank" href="https://docs.oracle.com/javase/tutorial/datetime/index.html">Date and Time
+ *             API</a>.
  * 
  * @author Zhenya Leonov
  */
@@ -43,7 +44,6 @@ public final class Dates {
      * Exampe: {@code getFormattedTimestamp("YYYY-MM-DD")}
      * 
      * @param pattern the pattern to use when formatting the {@code Timestamp}
-     * 
      * @return the current {@code Timestamp} as a string
      */
     public static String getFormattedTimestamp(final String pattern) {

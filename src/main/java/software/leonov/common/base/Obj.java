@@ -127,6 +127,18 @@ public final class Obj {
     }
 
     /**
+     * Returns the first non-{@code null} value between {@code first} and {@code second}. If both are {@code null} then
+     * {@code null} will be returned.
+     * 
+     * @param first  the first value
+     * @param second the second value
+     * @return the first non-{@code null} value between {@code first} and {@code second}
+     */
+    public static <T> T coalesce(final T first, final T second) {
+        return first == null ? second : first;
+    }
+
+    /**
      * Returns the first non-{@code null} value from the specified values. If all the values are {@code null} or if
      * {@code first} and {@code rest} parameters are {@code null} then {@code null} will be returned.
      * 

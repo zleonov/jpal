@@ -124,8 +124,7 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
     public boolean pause() {
         lock.lock();
         try {
-            if (isShutdown() && getQueue().isEmpty())
-                return paused = false;
+            paused = !isShutdown() || !getQueue().isEmpty();
             return paused;
         } finally {
             lock.unlock();
@@ -149,16 +148,6 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
     protected void terminated() {
         super.terminated();
         terminate.run();
-    }
-
-    /**
-     * Throws {@link UnsupportedOperationException} always.
-     * 
-     * @throw {@link UnsupportedOperationException} always
-     */
-    @Override
-    public void allowCoreThreadTimeOut(boolean allow) {
-        throw new UnsupportedOperationException();
     }
 
     /**

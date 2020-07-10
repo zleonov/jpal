@@ -416,4 +416,32 @@ final public class Iteration {
         };
     }
 
+    /**
+     * Returns an {@link Iterables#unmodifiableIterable unmodifiable} iterable which combines a single element with the
+     * specified iterable. The returned iterable produces iterators that lazily traverse the {@code first} element followed
+     * by the {@code rest} of the elements.
+     * 
+     * @param first the first element
+     * @param rest  the rest of the elements
+     * @return an iterable which combines a single element with the specified iterable
+     */
+    public static <E> Iterable<E> concat(final E first, final Iterable<? extends E> rest) {
+        checkNotNull(rest, "rest == null");
+        return Iterables.unmodifiableIterable(Iterables.concat(Collections.singleton(first), rest));
+    }
+
+    /**
+     * Returns an {@link Iterables#unmodifiableIterable unmodifiable} iterable which combines the specified iterable with a
+     * single element. The returned iterable produces iterators that lazily traverse all the {@code first} elements followed
+     * by {@code last}.
+     * 
+     * @param first the first elements
+     * @param last  the last element
+     * @return an iterable which combines the specified iterable with a single element
+     */
+    public static <E> Iterable<E> concat(final Iterable<? extends E> first, final E last) {
+        checkNotNull(first, "rest == null");
+        return Iterables.unmodifiableIterable(Iterables.concat(first, Collections.singleton(last)));
+    }
+
 }

@@ -2,19 +2,18 @@ package software.leonov.common.util.concurrent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import com.google.common.util.concurrent.FutureCallback;
 
 /**
- * Static utility methods pertaining to {@link Future}s.
+ * Static utility methods pertaining to {@link FutureCallback}s.
  * 
  * @author Zhenya Leonov
  */
-public final class MoreFutures {
+public final class FutureCallbacks {
 
-    private MoreFutures() {
+    private FutureCallbacks() {
     }
 
     /**
@@ -38,6 +37,23 @@ public final class MoreFutures {
             @Override
             public void onFailure(final Throwable t) {
                 consumer.accept(t);
+            }
+        };
+    }
+
+    public static <V> FutureCallback<V> create(final Consumer<V> succeeded, final Consumer<Throwable> failed) {
+        checkNotNull(succeeded, "succeeded == null");
+        checkNotNull(failed, "failed == null");
+        return new FutureCallback<V>() {
+
+            @Override
+            public void onSuccess(final V result) {
+                succeeded.accept(result);
+            }
+
+            @Override
+            public void onFailure(final Throwable t) {
+                failed.accept(t);
             }
         };
     }

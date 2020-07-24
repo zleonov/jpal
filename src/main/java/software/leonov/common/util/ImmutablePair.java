@@ -36,7 +36,7 @@ final public class ImmutablePair<T, U> extends Pair<T, U> implements Serializabl
 
     private static final long serialVersionUID = 1L;
 
-    public ImmutablePair(final T first, final U second) {
+    private ImmutablePair(final T first, final U second) {
         super(first, second);
     }
 

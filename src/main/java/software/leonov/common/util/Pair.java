@@ -43,7 +43,7 @@ public abstract class Pair<T, U> {
      * @param first  the first object
      * @param second the second object
      */
-    public Pair(final T first, final U second) {
+    protected Pair(final T first, final U second) {
         this.first = first;
         this.second = second;
     }

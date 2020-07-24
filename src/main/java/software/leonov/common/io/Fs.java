@@ -63,9 +63,9 @@ import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 
-import software.leonov.common.io.FileWalker.VisitResult;
 import software.leonov.common.base.MessageDigests;
 import software.leonov.common.base.Str;
+import software.leonov.common.io.FileWalker.VisitResult;
 
 /**
  * Static utility methods for working with {@link File}s and {@link Path}s.
@@ -492,7 +492,7 @@ final public class Fs {
     }
 
     /**
-     * Returns the last name in the path's name sequence. If the path is empty and empty string is returned.
+     * Returns the last name in the path's name sequence. This method does not validate the specified path.
      * <p>
      * This method handles both Windows and Unix path separator characters.
      * 
@@ -505,10 +505,6 @@ final public class Fs {
      */
     public static String getName(final String path) {
         checkNotNull(path, "path == null");
-
-        if (path.isEmpty())
-            return "";
-
         final int lastIndexOf = SEPARATORS.lastIndexIn(path);
         return path.substring(lastIndexOf + 1);
     }
@@ -523,11 +519,7 @@ final public class Fs {
     public static String getNameWithoutExtension(final String path) {
         checkNotNull(path, "path == null");
         final String name = getName(path);
-
-        if (name.isEmpty())
-            return "";
-
-        int lastIndexOf = name.lastIndexOf('.');
+        final int lastIndexOf = name.lastIndexOf('.');
         return lastIndexOf == -1 ? name : name.substring(0, lastIndexOf);
     }
 

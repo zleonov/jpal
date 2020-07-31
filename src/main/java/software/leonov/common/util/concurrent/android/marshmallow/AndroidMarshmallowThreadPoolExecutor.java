@@ -1129,7 +1129,7 @@ public class AndroidMarshmallowThreadPoolExecutor extends AbstractExecutorServic
         mainLock.lock();
         try {
             checkShutdownAccess();
-            advanceRunState(SHUTDOWN);
+            advanceRunState(STOP);
             interruptIdleWorkers();
             tasks = drainQueue();
             onShutdown(); // hook for ScheduledThreadPoolExecutor

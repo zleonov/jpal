@@ -1,4 +1,4 @@
-package software.leonov.common.util.concurrent;
+package software.leonov.common.concurrent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

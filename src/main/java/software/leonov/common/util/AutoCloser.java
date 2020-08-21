@@ -17,7 +17,7 @@ import com.google.common.io.Closer;
  * <p>
  * This class has two main use cases:
  * <ul>
- * <li>When the number of {@code AutoCloseable} resources it not known until runtime (e.g. the resources are user
+ * <li>When the number of {@code AutoCloseable} resources is not known until runtime (e.g. the resources are user
  * supplied).</li>
  * <li>When properly closing all {@code AutoCloseable} resources requires nested
  * <a href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html" target=

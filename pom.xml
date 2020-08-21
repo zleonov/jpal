@@ -9,7 +9,7 @@
     <!-- default packaging is a jar <packaging>jar</packaging> -->
 
     <name>jpal</name>
-    <description>Core utilities for Java-based projects: string processing, new collection types, I/O, and so forth.</description>
+    <description>Core utilities for Java-based projects: string processing, new collection types, concurrency utilities, I/O, and so forth.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -73,7 +73,7 @@
                 <version>${maven-javadoc-plugin.version}</version>
 
                 <configuration>
-                    <sourcepath>${project.build.sourceDirectory}</sourcepath>
+                    <sourcepath>${project.build.sourceDirectory}:${java.sourceDirectory}:${guava.sourceDirectory}</sourcepath>
                     <subpackages>software.leonov</subpackages>
                     <quiet>false</quiet>
                     <notimestamp>true</notimestamp>

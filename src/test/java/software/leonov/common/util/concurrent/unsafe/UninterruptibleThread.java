@@ -1,12 +1,28 @@
-package software.leonov.common.util.concurrent;
+package software.leonov.common.util.concurrent.unsafe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.concurrent.Callable;
 
 /**
- * A {@code Thread} which cannot be interrupted. The {@link Thread#interrupt()} is a no-op.
+ * A {@code Thread} with control over whether or not it can be interrupted.
  * 
  * @author Zhenya Leonov
  */
+
+//* <p>
+//* When interruption is {@link #enableInterruption() enabled} this thread will behave identically to a regular thread.
+//* When interruption is {@link #disableInterruption() disabled} calls to {@link Thread#interrupt()} are effectively a
+//* no-op. Subsequent calls to {@link Thread#interrupted()} and
+//* {@link Thread#isInterrupted()} will return false, unless this thread was interrupted prior to calling {@link #disableInterruption()}.
+//* <p>
+//* This thread keeps track of attempts to interrupt it while interruption is disabled. If such attempts are made calling
+//* {@link #enableInterruption()} will in turn cause the thread to be interrupted.
+//* <p>
+//* <b>Warning:</b> care should be taken when using thread facility.
 public class UninterruptibleThread extends Thread {
 
+    private boolean interrupted = true;
     private boolean interruptible = false;
 
     /**
@@ -93,28 +109,77 @@ public class UninterruptibleThread extends Thread {
     }
 
     /**
-     * <b>Does nothing.</b> This thread cannot be interrupted.
+     * <b>Does nothing if interruption is {@link #disableInterruption() disabled}.</b> Otherwise interrupts this thread.
      */
     @Override
     public void interrupt() {
         if (interruptible)
             super.interrupt();
+        else
+            interrupted = true;
     }
 
-    public static abstract class UninterruptableRunnable implements Runnable {
+    /**
+     * Disabled {@link Thread#interrupt()}. Requests to interrupt this thread will be delayed until interruption is
+     * {@link #enableInterruption() enabled}.
+     */
+    public void disableInterruption() {
+        interruptible = false;
+    }
 
-        @Override
-        final public void run() {
+    /**
+     * Enables {@link Thread#interrupt()}. If this thread was previously {@link Thread#interrupted() interrupted} while
+     * interruption was {@link #disableInterruption() disabled} it will be interrupted after this call returns.
+     */
+    public void enableInterruption() {
+        interruptible = true;
+        if (interrupted)
+            super.interrupt();
+    }
+
+    /**
+     * Returns whether or not this thread is currently interruptable.
+     * 
+     * @return whether or not this thread is currently interruptable
+     */
+    public boolean isInterruptable() {
+        return interruptible;
+    }
+
+    public static Runnable runUninterruptibly(final Runnable runnable) {
+        checkNotNull(runnable, "runnable == null");
+
+        return () -> {
+            final Thread t = Thread.currentThread();
+            final UninterruptibleThread ut = t instanceof UninterruptibleThread ? (UninterruptibleThread) t : null;
+
+            if (ut != null)
+                ut.disableInterruption();
             try {
-                runUninterruptibly();
+                runnable.run();
             } finally {
-                final Thread t = Thread.currentThread();
-                if (t instanceof UninterruptibleThread)
-                    ((UninterruptibleThread) t).interruptible = true;
+                if (ut != null)
+                    ut.enableInterruption();
             }
-        }
+        };
+    }
 
-        public abstract void runUninterruptibly();
+    public static <T> Callable<T> callUninterruptibly(final Callable<T> callable) {
+        checkNotNull(callable, "callable == null");
+
+        return () -> {
+            final Thread t = Thread.currentThread();
+            final UninterruptibleThread ut = t instanceof UninterruptibleThread ? (UninterruptibleThread) t : null;
+
+            if (ut != null)
+                ut.disableInterruption();
+            try {
+                return callable.call();
+            } finally {
+                if (ut != null)
+                    ut.enableInterruption();
+            }
+        };
     }
 
 }

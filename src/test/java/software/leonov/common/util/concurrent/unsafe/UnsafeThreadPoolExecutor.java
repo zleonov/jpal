@@ -1,4 +1,4 @@
-package software.leonov.common.util.concurrent;
+package software.leonov.common.util.concurrent.unsafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

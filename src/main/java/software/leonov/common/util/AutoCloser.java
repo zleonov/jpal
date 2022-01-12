@@ -20,13 +20,21 @@ import com.google.common.io.Closer;
  * <li>When the number of {@code AutoCloseable} resources is not known until runtime (e.g. the resources are user
  * supplied).</li>
  * <li>When properly closing all {@code AutoCloseable} resources requires nested
- * <a href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html" target=
+ * <a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html" target=
  * "_blank">try-with-resources</a> blocks which make the code too cumbersome.</li>
  * </ul>
  * <p>
- * This class is intended to be used in the following pattern:
- * <p>
- * Java 6 style:
+ * This class is intended to be used in a <i>try-with-resources</i> statement introduced in Java 7:
+ * 
+ * <pre>
+ * try (final AutoCloser closer = new AutoCloser()) {
+ *     final InputStream in = closer.register(...);
+ *     final OutputStream out = closer.register(...);
+ *     ...
+ * }
+ * </pre>
+ * 
+ * Users of legacy code may use this class in a typical <i>try-catch</i> block:
  * 
  * <pre>
  * final AutoCloser closer = new AutoCloser();
@@ -40,16 +48,7 @@ import com.google.common.io.Closer;
  *     closer.close();
  * }
  * </pre>
- * 
- * Java 7+ try-with-resources style:
- * 
- * <pre>
- * try (final AutoCloser closer = new AutoCloser()) {
- *     final InputStream in = closer.register(...);
- *     final OutputStream out = closer.register(...);
- *     ...
- * }
- * </pre>
+ * <p>
  *
  * @author Zhenya Leonov
  */
@@ -58,6 +57,12 @@ public final class AutoCloser implements AutoCloseable {
     private final Deque<AutoCloseable> stack = new ArrayDeque<>(4);
     private Throwable thrown;
 
+    /**
+     * Registers the given {@code AutoCloseable} resource to be closed when this {@code AutoCloser} is {@link #close
+     * closed}.
+     *
+     * @return the given {@code AutoCloseable} resource
+     */
     public <C extends AutoCloseable> C register(final C resource) {
         if (resource != null)
             stack.push(resource);
@@ -72,7 +77,8 @@ public final class AutoCloser implements AutoCloseable {
      * This method always throws and as such should be called as {@code throw closer.rethrow(e)} to ensure the compiler
      * knows that it will throw.
      *
-     * @param th the given throwable
+     * @param th
+     *           the given throwable
      * @return his method always throws and as such should be called as {@code throw closer.rethrow(e)}
      * @throws Exception
      */

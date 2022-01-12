@@ -30,7 +30,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -99,7 +98,8 @@ import com.google.common.collect.Ordering;
  * which runs in linear time proportional to the size of the view.
  * 
  * @author Zhenya Leonov
- * @param <E> the type of elements maintained by this sorted-list
+ * @param <E>
+ *            the type of elements maintained by this sorted-list
  * @see Skiplist
  */
 public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>, Cloneable, Serializable {
@@ -124,22 +124,26 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * @return a new {@code Treelist} that orders its elements according to their <i>natural ordering</i>
      */
     // @SuppressWarnings("rawtypes")
-    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java 6.
+    // Use <T extends Comparable<?>> instead of the technically correct <T extends Comparable<? super T>> if using Java
+    // 6.
     public static <E extends Comparable<? super E>> Treelist<E> create() {
         return new Treelist<E>(Ordering.natural());
     }
 
     /**
      * Creates a new {@code Treelist} containing the specified initial elements. If {@code elements} is an instance of
-     * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this sorted-list
-     * will be ordered according to the same ordering. Otherwise, this sorted-list will be ordered according to the
-     * <i>natural ordering</i> of its elements.
+     * {@link SortedSet}, {@link PriorityQueue}, {@link MinMaxPriorityQueue}, or {@code SortedCollection}, this
+     * sorted-list will be ordered according to the same ordering. Otherwise, this sorted-list will be ordered according
+     * to the <i>natural ordering</i> of its elements.
      * 
-     * @param elements the collection whose elements are to be placed into the sorted-list
+     * @param elements
+     *                 the collection whose elements are to be placed into the sorted-list
      * @return a new {@code Treelist} containing the elements of the specified collection
-     * @throws ClassCastException   if elements of the specified collection cannot be compared to one another according to
-     *                              this sorted-list's ordering
-     * @throws NullPointerException if any of the elements of the specified collection or the collection itself is
+     * @throws ClassCastException
+     *                              if elements of the specified collection cannot be compared to one another according
+     *                              to this sorted-list's ordering
+     * @throws NullPointerException
+     *                              if any of the elements of the specified collection or the collection itself is
      *                              {@code null}
      */
     @SuppressWarnings({ "unchecked" })
@@ -163,10 +167,13 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     /**
-     * Returns a new builder configured to build {@code Treelist} instances that use the specified comparator for ordering.
+     * Returns a new builder configured to build {@code Treelist} instances that use the specified comparator for
+     * ordering.
      * 
-     * @param comparator the specified comparator
-     * @return a new builder configured to build {@code Treelist} instances that use the specified comparator for ordering
+     * @param comparator
+     *                   the specified comparator
+     * @return a new builder configured to build {@code Treelist} instances that use the specified comparator for
+     *         ordering
      */
     public static <B> Builder<B> orderedBy(final Comparator<B> comparator) {
         checkNotNull(comparator, "comparator == null");
@@ -178,7 +185,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * {@link Treelist#orderedBy(Comparator)}.
      * 
      * @author Zhenya Leonov
-     * @param <B> the upper bound of the type of {@code Treelist}s this builder can produce (for example a
+     * @param <B>
+     *            the upper bound of the type of {@code Treelist}s this builder can produce (for example a
      *            {@code Builder<Number>} can produce a {@code Treelist<Float>} or a {@code Treelist<Integer>}
      */
     public static final class Builder<B> {
@@ -199,10 +207,13 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         }
 
         /**
-         * Builds a new {@code Treelist} using the previously specified comparator, and having the given initial elements.
+         * Builds a new {@code Treelist} using the previously specified comparator, and having the given initial
+         * elements.
          * 
-         * @param elements the initial elements to be placed in this {@code Treelist}
-         * @return a new {@code Treelist} using the previously specified comparator, and having the given initial elements
+         * @param elements
+         *                 the initial elements to be placed in this {@code Treelist}
+         * @return a new {@code Treelist} using the previously specified comparator, and having the given initial
+         *         elements
          */
         public <T extends B> Treelist<T> create(final Iterable<? extends T> elements) {
             checkNotNull(elements, "elements == null");
@@ -464,7 +475,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
      * Returns a shallow copy of this {@code Treelist}. The elements themselves are not cloned.
      * 
      * @return a shallow copy of this {@code Treelist}
-     * @throws CloneNotSupportedException if an attempt is made to clone a sub-list view of this sorted-list
+     * @throws CloneNotSupportedException
+     *                                    if an attempt is made to clone a sub-list view of this sorted-list
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -1177,11 +1189,4 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         x.color = BLACK;
     }
 
-    public static void main(String[] args) {
-        Treelist<String> tl = Treelist.create();
-
-        Iterables.addAll(tl, Arrays.asList("a", "b", "c"));
-
-        tl.asList().replaceAll(i -> new Character((char) ((int) i.charAt(0) + 1)).toString());
-    }
 }

@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 /**
  * Static utility methods pertaining to {@link Consumer}s.
  * 
- * @authoer Zhenya Leonov
+ * @author Zhenya Leonov
  */
 public final class Consumers {
 

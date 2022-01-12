@@ -18,8 +18,10 @@ package software.leonov.common.collect;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -31,14 +33,19 @@ import java.util.function.Function;
  * <a target="_blank" href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)">LRU</a>
  * cache. Invoking the {@link Map#put(Object, Object)}, {@link Map#putIfAbsent(Object, Object)},
  * {@link Map#get(Object)}, {@link Map#getOrDefault(Object, Object)}, {@link Map#compute(Object, BiFunction)},
- * {@link Map#computeIfAbsent(Object, Function)}, {@link Map#computeIfPresent(Object, BiFunction)}, or
- * {@link Map#merge(Object, Object, BiFunction)} methods results in an access to the corresponding entry (assuming it
- * exists after the invocation completes). The {@link Map#replace(Object, Object)} and
+ * {@link Map#computeIfAbsent(Object, Function)}, {@link Map#computeIfPresent(Object, BiFunction)},
+ * {@link Map#merge(Object, Object, BiFunction)}, and {@link #containsKey(Object)} methods results in an access to the
+ * corresponding entry (assuming it exists after the invocation completes). The {@link Map#replace(Object, Object)} and
  * {@link Map#replace(Object, Object, Object)} methods only result in an access of the entry if the value is replaced.
  * The {@link Map#putAll(Map)} method generates one entry access for each mapping in the specified map, in the order
  * that key-value mappings are provided by the specified map's entry set iterator. <i>No other methods generate entry
- * accesses.</i> In particular, operations on collection-views do <i>not</i> affect the order of iteration of the
- * backing map.
+ * accesses.</i>
+ * <p>
+ * <b>Warning:</b> Unlike the ubiquitous <i>access-order</i> {@code LinkedHashMap} the {@link #containsKey(Object)}
+ * method in this class <b>does trigger</b> an entry access. Accordingly, this map's {@link #keySet()
+ * Map.keySet()}.{@link Set#contains(Object) contains(Object)} method will also modify the iteration order of the map.
+ * The motivation for this behavior is to allow the user to create a <i>Least-Recently-Used Set</i> using
+ * {@link Collections#newSetFromMap(Map)}.
  * <p>
  * <b>Note:</b> This class is provided as a convenience to developers who are making casual use of caching idioms.
  * Production projects should consider using Guava's
@@ -115,6 +122,20 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
         final LRUCache<K, V> map = new LRUCache<K, V>(m.size(), DEFAULT_LOAD_FACTOR, m.size());
         map.putAll(m);
         return map;
+    }
+
+    /**
+     * Returns {@code true} if this map contains a mapping for the specified key.
+     * <p>
+     * <b>Warning:</b> Unlike the ubiquitous <i>access-order</i> {@code LinkedHashMap} the {@code containsKey} method in
+     * this class <b>does trigger</b> an entry access. See the description of this class for more information.
+     * 
+     * @param key specified key
+     * @return {@code true} if this map contains a mapping for the specified key
+     */
+    @Override
+    public boolean containsKey(final Object key) {
+        return get(key) != null || containsKey(key);
     }
 
     protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {

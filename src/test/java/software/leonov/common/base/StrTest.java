@@ -1,9 +1,9 @@
 package software.leonov.common.base;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -11,13 +11,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.google.common.collect.Lists;
-
-import software.leonov.common.base.Str;
+import com.google.common.collect.Iterators;
 
 class StrTest {
 
-    private final static List<File> TEMP_FILES = Lists.newLinkedList();
+    // private final static List<File> TEMP_FILES = Lists.newLinkedList();
 
     @BeforeAll
     static void setUpBeforeClass() throws Exception {
@@ -125,12 +123,246 @@ class StrTest {
 
         assertEquals(str, Str.replaceIgnoreCase(str, target.toUpperCase(), replacement));
     }
-    
+
     @Test
     void testEscapeEOLCharacters() {
         final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog";
         final String expected = "The quick brown fox\\njumped over\\rthe lazy\\r\\ndog";
-        assertEquals(Str.escapeEOLCharacters(str), expected);
+        assertEquals(expected, Str.escapeEOLCharacters(str));
+    }
+
+    @Test
+    void testIndentEmpty() {
+        final String str = "";
+        final String expected = "";
+        assertEquals(expected, Str.indent(str, 5));
+    }
+
+    @Test
+    void testIndentZero() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog";
+        assertEquals(str, Str.indent(str, 0));
+    }
+
+    @Test
+    void testIndent() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog";
+        final String actual = Str.indent(str, 3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndInNewline() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n";
+        final String actual = Str.indent(str, 3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_LF_LF() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\n\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n   \n";
+        final String actual = Str.indent(str, 3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CR_CR() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r\r";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n   \n";
+        final String actual = Str.indent(str, 3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CRLF() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n";
+        final String actual = Str.indent(str, 3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CRLF_CRLF() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r\n\r\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n   \n";
+        final String actual = Str.indent(str, 3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndent_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_LF_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CR_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_LF_LF_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\n\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n   \n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CR_CR_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r\r";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n   \n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CRLF_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentEndsIn_CRLF_CRLF_JDK() {
+        final String str = "The quick brown fox\njumped over\rthe lazy\r\ndog\r\n\r\n";
+        final String expected = "   The quick brown fox\n   jumped over\n   the lazy\n   dog\n   \n";
+        final String actual = str.indent(3);
+        System.out.println(Str.showWhitespace(str));
+        System.out.println(Str.showWhitespace(actual));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndentZero_JDK() {
+        final String str = "The quick brown fox\njumped over\nthe lazy\ndog\n";
+        assertEquals(str, str.indent(0));
+    }
+
+    @Test
+    void testIndentEmptyJava() {
+        final String str = "";
+        assertEquals("", str.indent(1));
+    }
+
+    @Test
+    void testIndentWhitespaceJava() {
+        final String str = " ";
+        assertEquals("  \n", str.indent(1));
+    }
+
+    @Test
+    void testIndentWhitespace() {
+        final String str = " ";
+        assertEquals("    ", Str.indent(str, 3));
+    }
+
+    @Test
+    void testVisualizeWhitespace() {
+        final String str = "\tThe quick brown\t fox\njumped over\r   the lazy\r\ndog\r\n\r\n";
+        final String expected = "»   The·quick·brown»   ·fox↓\n" + "jumped·over←\n" + "···the·lazy←↓\n" + "dog←↓\n" + "←↓\n";
+        final String actual = Str.showWhitespace(str);
+        System.out.println(expected);
+        System.out.println(actual);
+        assertEquals(actual, expected);
+    }
+    
+    @Test
+    void testLinesEmpty() {
+        final String str = "";
+        final Stream<String> stream = Str.lines(str);
+        assertTrue(stream.findFirst().isEmpty());        
+    }
+    
+    @Test
+    void testLinesEmpty_JDK() {
+        final String str = "";
+        assertTrue(str.lines().findFirst().isEmpty());        
+    }
+    
+    @Test
+    void testReadLinesEmpty() {
+        final String str = "";
+        assertTrue(Str.readLines(str).isEmpty());        
+    }
+    
+    @Test
+    void testLinesNewLine() {
+        final String str = "\n";
+        final Stream<String> stream = Str.lines(str);
+        assertTrue(stream.findFirst().get().isEmpty());        
+    }
+    
+    @Test
+    void testLinesNewLine_JDK() {
+        final String str = "\n";
+        assertTrue(str.lines().findFirst().get().isEmpty());            
+    }
+    
+    @Test
+    void testReadLinesNewLine() {
+        final String str = "\n";
+        assertTrue(Str.readLines(str).get(0).isEmpty());
+    }
+    
+    @Test
+    void testLines() {
+        final String str = "\tThe quick brown\t fox\njumped over\r   the lazy\r\ndog\r\n\r\n";
+        final Stream<String> stream = Str.lines(str);
+        assertEquals(5, Iterators.size(stream.iterator()));        
+    }
+    
+    @Test
+    void testLines_JDK() {
+        final String str = "\tThe quick brown\t fox\njumped over\r   the lazy\r\ndog\r\n\r\n";
+        assertEquals(5, Iterators.size(str.lines().iterator()));     
+    }
+    
+    @Test
+    void testReadLines() {
+        final String str = "\tThe quick brown\t fox\njumped over\r   the lazy\r\ndog\r\n\r\n";
+        assertEquals(5, Iterators.size(Str.readLines(str).iterator()));     
     }
 
 }

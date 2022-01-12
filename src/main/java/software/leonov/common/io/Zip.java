@@ -17,11 +17,14 @@ package software.leonov.common.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.nullToEmpty;
+import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.logging.Level.WARNING;
+import static software.leonov.common.io.ByteStream.DEFAULT_BUFFER_SIZE;
 import static software.leonov.common.io.Fs.createDirectories;
 import static software.leonov.common.io.Fs.createParentDirectories;
+import static software.leonov.common.util.Numbers.tryParse;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -44,6 +47,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
 import com.google.common.io.Closeables;
+import com.google.common.io.CountingOutputStream;
 
 /**
  * Static utility methods useful for working with {@link ZipFile}s and {@link ZipOutputStream}s.
@@ -391,10 +395,16 @@ final public class Zip {
      * charset is ignored if the <a target="_blank" href="package-summary.html#lang_encoding">language encoding bit</a> of
      * the ZIP entry's general purpose bit flag is set.
      * <p>
-     * Password protected ZIP files are not supported. If the destination directory does not exist this call will result in
-     * an {@code IllegalArgumentException}. If the ZIP file contains entries outside the destination directory a
-     * {@code ZipException} will be thrown. If the destination directory is a symbolic link it will be resolved to its final
-     * target. ZIP entries representing symbolic links are not supported. Existing files will be overwritten.
+     * Password protected ZIP files and ZIP files containing symbolic links are not supported. If the destination directory
+     * does not exist this call will result in an {@code IllegalArgumentException}. If the destination directory is a
+     * symbolic link it will be resolved to its final target. Existing files will be overwritten.
+     * <p>
+     * This method attempts to protect the user from malicious archives. If the ZIP file contains entries outside the
+     * destination directory, if any individual entry is more than 1GB, or if the number of entries exceeds 25000, a
+     * {@code ZipException} will be thrown.
+     * <p>
+     * The default {@code MAX_SIZE} and {@code MAX_ENTRIES} values can be changed by setting the Java System Properties
+     * {@code software.leonov.common.io.Zip.MAX_SIZE} and {@code software.leonov.common.io.Zip.MAX_ENTRIES} respectively.
      * <p>
      * <b>Note:</b> If this operation fails because of an I/O error or other problems it may have succeeded in extracting
      * some (but not all) of the files and/or directories.
@@ -402,7 +412,10 @@ final public class Zip {
      * @param zip  the given ZIP file
      * @param dest the destination directory
      * @return the destination directory
-     * @throws IOException if an I/O error occurs
+     * @throws IOException  if an I/O error occurs
+     * @throws ZipException if a ZIP entry falls outside the destination directory (for example if the ZIP file is created
+     *                      using absolute pathnames), if any individual entry is more than {@link #MAX_SIZE}, or if the
+     *                      number of entries exceeds {@link #MAX_ENTRIES}
      */
     public static Path unzip(final Path zip, final Path dest) throws IOException {
         return unzip(zip, Predicates.alwaysTrue(), dest, UTF_8);
@@ -413,10 +426,16 @@ final public class Zip {
      * charset is ignored if the <a target="_blank" href="package-summary.html#lang_encoding">language encoding bit</a> of
      * the ZIP entry's general purpose bit flag is set.
      * <p>
-     * Password protected ZIP files are not supported. If the destination directory does not exist this call will result in
-     * an {@code IllegalArgumentException}. If the ZIP file contains entries outside the destination directory a
-     * {@code ZipException} will be thrown. If the destination directory is a symbolic link it will be resolved to its final
-     * target. ZIP entries representing symbolic links are not supported. Existing files will be overwritten.
+     * Password protected ZIP files and ZIP files containing symbolic links are not supported. If the destination directory
+     * does not exist this call will result in an {@code IllegalArgumentException}. If the destination directory is a
+     * symbolic link it will be resolved to its final target. Existing files will be overwritten.
+     * <p>
+     * This method attempts to protect the user from malicious archives. If the ZIP file contains entries outside the
+     * destination directory, if any individual entry is more than 1GB, or if the number of entries exceeds 25000, a
+     * {@code ZipException} will be thrown.
+     * <p>
+     * The default {@code MAX_SIZE} and {@code MAX_ENTRIES} values can be changed by setting the Java System Properties
+     * {@code software.leonov.common.io.Zip.MAX_SIZE} and {@code software.leonov.common.io.Zip.MAX_ENTRIES} respectively.
      * <p>
      * <b>Note:</b> If this operation fails because of an I/O error or other problems it may have succeeded in extracting
      * some (but not all) of the files and/or directories.
@@ -428,7 +447,8 @@ final public class Zip {
      * @return the destination directory
      * @throws IOException  if an I/O error occurs
      * @throws ZipException if a ZIP entry falls outside the destination directory (for example if the ZIP file is created
-     *                      using absolute pathnames)
+     *                      using absolute pathnames), if any individual entry is more than {@link #MAX_SIZE}, or if the
+     *                      number of entries exceeds {@link #MAX_ENTRIES}
      */
     public static Path unzip(final Path zip, final Path dest, final Charset charset) throws IOException {
         return unzip(zip, Predicates.alwaysTrue(), dest, charset);
@@ -440,10 +460,16 @@ final public class Zip {
      * <a target="_blank" href="package-summary.html#lang_encoding">language encoding bit</a> of the ZIP entry's general
      * purpose bit flag is set.
      * <p>
-     * Password protected ZIP files are not supported. If the destination directory does not exist this call will result in
-     * an {@code IllegalArgumentException}. If the ZIP file contains entries outside the destination directory a
-     * {@code ZipException} will be thrown. If the destination directory is a symbolic link it will be resolved to its final
-     * target. ZIP entries representing symbolic links are not supported. Existing files will be overwritten.
+     * Password protected ZIP files and ZIP files containing symbolic links are not supported. If the destination directory
+     * does not exist this call will result in an {@code IllegalArgumentException}. If the destination directory is a
+     * symbolic link it will be resolved to its final target. Existing files will be overwritten.
+     * <p>
+     * This method attempts to protect the user from malicious archives. If the ZIP file contains entries outside the
+     * destination directory, if any individual entry is more than 1GB, or if the number of entries exceeds 25000, a
+     * {@code ZipException} will be thrown.
+     * <p>
+     * The default {@code MAX_SIZE} and {@code MAX_ENTRIES} values can be changed by setting the Java System Properties
+     * {@code software.leonov.common.io.Zip.MAX_SIZE} and {@code software.leonov.common.io.Zip.MAX_ENTRIES} respectively.
      * <p>
      * <b>Note:</b> If this operation fails because of an I/O error or other problems it may have succeeded in extracting
      * some (but not all) of the files and/or directories.
@@ -456,7 +482,8 @@ final public class Zip {
      * @return the destination directory
      * @throws IOException  if an I/O error occurs
      * @throws ZipException if a ZIP entry falls outside the destination directory (for example if the ZIP file is created
-     *                      using absolute pathnames)
+     *                      using absolute pathnames), if any individual entry is more than {@link #MAX_SIZE}, or if the
+     *                      number of entries exceeds {@link #MAX_ENTRIES}
      */
     public static Path unzip(final Path zip, final java.util.function.Predicate<ZipEntry> filter, final Path dest, final Charset charset) throws IOException {
         checkNotNull(zip, "zip == null");
@@ -467,11 +494,16 @@ final public class Zip {
 
         final Path target = dest.toRealPath();
 
+        final byte[] bytes = new byte[DEFAULT_BUFFER_SIZE];
+        int entries = 0;
+
         try (final ZipInputStream zis = newZipInputStream(zip, charset)) {
 
             ZipEntry ze;
             while ((ze = zis.getNextEntry()) != null)
-                if (filter.test(ze)) {
+                if (++entries > MAX_ENTRIES)
+                    throw new ZipException("maximum number of entries exceeded: " + MAX_ENTRIES);
+                else if (filter.test(ze)) {
                     final Path path = target.resolve(ze.getName());
 
                     if (!path.startsWith(target))
@@ -480,11 +512,28 @@ final public class Zip {
                     if (ze.isDirectory())
                         createDirectories(path);
                     else
-                        Files.copy(zis, createParentDirectories(path), REPLACE_EXISTING);
+                        try (final CountingOutputStream out = new CountingOutputStream(Files.newOutputStream(createParentDirectories(path)))) {
+                            int count;
+                            while ((count = zis.read(bytes, 0, DEFAULT_BUFFER_SIZE)) != -1)
+                                if (count + out.getCount() > MAX_SIZE)
+                                    throw new ZipException(ze.getName() + " exceeds the maximum allowed file size: " + MAX_SIZE + " bytes");
+                                else
+                                    out.write(bytes, 0, count);
+                        }
                 }
         }
 
         return dest;
     }
+
+    /**
+     * The maximum allowed size of a {@code ZipEntry}
+     */
+    private static final long MAX_SIZE = tryParse(nullToEmpty(getProperty("software.leonov.common.io.Zip.MAX_SIZE")), 1073741824); // 1GB
+
+    /**
+     * The maximum number of allowed entries in a ZIP file.
+     */
+    private static final int MAX_ENTRIES = tryParse(nullToEmpty(getProperty("software.leonov.common.io.Zip.MAX_ENTRIES")), 25000);
 
 }

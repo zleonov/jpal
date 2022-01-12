@@ -307,7 +307,7 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
      * @return this {@code PausableThreadPoolExecutor} instance
      */
     public PausableThreadPoolExecutor afterTerminated(final Runnable callback) {
-        checkNotNull(callback, "callback = null");
+        checkNotNull(callback, "callback == null");
         this.afterTerminated = callback;
         return this;
 
@@ -325,7 +325,7 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
      * @return this {@code PausableThreadPoolExecutor} instance
      */
     public PausableThreadPoolExecutor beforeExecute(final BiConsumer<Thread, Runnable> callback) {
-        checkNotNull(callback, "callback = null");
+        checkNotNull(callback, "callback == null");
         this.beforeExecute = callback;
         return this;
     }
@@ -343,7 +343,7 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
      * @return this {@code PausableThreadPoolExecutor} instance
      */
     public PausableThreadPoolExecutor afterExecute(final BiConsumer<Thread, Runnable> callback) {
-        checkNotNull(callback, "callback = null");
+        checkNotNull(callback, "callback == null");
         this.beforeExecute = callback;
         return this;
     }
@@ -356,7 +356,7 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
      * @return this {@code PausableThreadPoolExecutor} instance
      */
     public PausableThreadPoolExecutor beforePause(final Runnable callback) {
-        checkNotNull(callback, "callback = null");
+        checkNotNull(callback, "callback == null");
         this.beforePause = callback;
         return this;
     }
@@ -369,7 +369,7 @@ public final class PausableThreadPoolExecutor extends ThreadPoolExecutor impleme
      * @return this {@code PausableThreadPoolExecutor} instance
      */
     public PausableThreadPoolExecutor afterPause(final Runnable callback) {
-        checkNotNull(callback, "callback = null");
+        checkNotNull(callback, "callback == null");
         this.afterPause = callback;
         return this;
     }

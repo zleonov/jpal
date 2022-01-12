@@ -37,7 +37,6 @@ final public class ByteBufferSource extends ByteSource {
      * Returns a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer.
      * 
      * @param buff the specified byte buffer
-     * @return a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer
      */
     public ByteBufferSource(final ByteBuffer buff) {
         checkNotNull(buff, "buff == null");

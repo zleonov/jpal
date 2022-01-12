@@ -56,8 +56,6 @@ final public class MappedFileInputStream extends InputStream {
      * {@code Integer.MAX_VALUE}.
      * 
      * @deprecated Use {@link #remaining()} instead.
-     *             <p>
-     * @return the number of remaining bytes that can be read (or skipped over) from this input stream
      */
     @Deprecated
     @Override

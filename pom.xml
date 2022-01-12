@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.1.0</version>
+            <version>5.7.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -73,15 +73,15 @@
                 <version>${maven-javadoc-plugin.version}</version>
 
                 <configuration>
-                    <sourcepath>${project.build.sourceDirectory}:${java.sourceDirectory}:${guava.sourceDirectory}</sourcepath>
+                    <sourcepath>${project.build.sourceDirectory}:${java.src}:${guava.src}</sourcepath>
                     <subpackages>software.leonov</subpackages>
                     <quiet>false</quiet>
                     <notimestamp>true</notimestamp>
                     <encoding>UTF-8</encoding>
                     <docencoding>UTF-8</docencoding>
                     <charset>UTF-8</charset>
-                    <show>protected</show>
-                    <doclint>-html</doclint>
+                    <show>public</show>
+                    <doclint>none</doclint>
                     <linksource>true</linksource>
                     <doctitle>
                         <![CDATA[
@@ -92,7 +92,7 @@
                     </doctitle>
                     <detectJavaApiLink>true</detectJavaApiLink>
                     <links>
-                        <link>https://google.github.io/guava/releases/26.0-jre/api/docs/</link>
+                        <link>https://guava.dev/releases/26.0-jre/api/docs/</link>
                     </links>
                 </configuration>
                 <executions>
@@ -123,5 +123,12 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>intenral</id>
+            <url>http://vm2:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

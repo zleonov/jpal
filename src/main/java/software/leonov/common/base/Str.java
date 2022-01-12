@@ -21,19 +21,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.google.common.base.Ascii;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharSource;
 import com.google.common.io.CharStreams;
 
 /**
- * Static utility methods that operate on or return {@link String}s.
+ * Static utility methods that operate on or return {@link CharSequence}s and {@link String}s.
  * <p>
  * All methods in this class are expected to throw {@code NullPointerException}s when given {@code null} arguments
  * unless they are specifically documented as being {@code null} safe.
@@ -55,14 +60,37 @@ final public class Str {
     private static final Pattern SUPPLEMENTARY_CHARACTERS = Pattern.compile("[^\\u0000-\\uFFFF]");
     private static final Pattern WHITESPACE_NEWLINE = Pattern.compile("^\\s*[\n|\r]");
 
+    // U+0009 \t - Tab
+    // U+000D \r - Carriage return
+    // U+000A \n - Line feed
+
+    // U+00A4 ¤ - Possible carriage return replacement
+    // U+00B6 ¶ - Possible line feed replacement
+    // U+2190 ← - Possible carriage return replacement
+    // U+2193 ↓ - Possible line feed replacement
+    // U+00BB » - Tab replacement
+    // U+00B7 · - Space replacement
+
+    private static final String TAB = "\t";
+
+    private static final String CR_REPLACEMENT = "←";
+    private static final String LF_REPLACEMENT = "↓";
+    private static final String TAB_REPLACEMENT = "»   ";
+    private static final String SPACE_REPLACEMENT = "·";
+    private static final Pattern ESCAPED_NEWLINE = Pattern.compile("(" + CR_REPLACEMENT + "?" + LF_REPLACEMENT + "|" + CR_REPLACEMENT + ")");
+    private static final CharMatcher NON_WHITESPACE = CharMatcher.whitespace().negate();
+    private static final CharMatcher WHITESPACE_NOT_TAB = CharMatcher.isNot('\t').and(CharMatcher.whitespace());
+
     private Str() {
     }
 
     /**
      * Returns all possible string combinations of length {@code k} from the set of characters in {@code alphabet}.
      * 
-     * @param alphabet the set of characters to use
-     * @param k        the length
+     * @param alphabet
+     *                 the set of characters to use
+     * @param k
+     *                 the length
      * @return all possible string combinations of length {@code k} from the set of characters in {@code alphabet}
      */
     public static List<String> combinations(final CharSequence alphabet, int k) {
@@ -87,12 +115,18 @@ final public class Str {
     /**
      * Returns {@code true} if {@code str} contains {@code substr}, ignoring case differences, else {@code false}.
      * <p>
-     * <b>Note:</b> This method uses the rules of the default locale.
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when comparing non-ascii characters.
+     * Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive comparison.
      *
-     * @param str    the specified string
-     * @param substr the string to search for
-     * @return {@code true} if {@code str} contains the {@code substr}, ignoring case differences, {@code false} otherwise
-     * @throws NullPointerException if either {@code str} or {@code substr} is {@code null}
+     * @param str
+     *               the specified string
+     * @param substr
+     *               the string to search for
+     * @return {@code true} if {@code str} contains the {@code substr}, ignoring case differences, {@code false}
+     *         otherwise
+     * @throws NullPointerException
+     *                              if either {@code str} or {@code substr} is {@code null}
      */
     public static boolean containsIgnoreCase(final String str, final String substr) {
         return indexOfIgnoreCase(str, substr) != -1;
@@ -101,8 +135,10 @@ final public class Str {
     /**
      * Returns the number of occurrences of {@code substr} in {@code str}.
      * 
-     * @param str    the string to search in
-     * @param substr the string to search for
+     * @param str
+     *               the string to search in
+     * @param substr
+     *               the string to search for
      * @return the number of occurrences of {@code substr} in {@code str}
      */
     public static int count(final String str, final String substr) {
@@ -125,9 +161,16 @@ final public class Str {
 
     /**
      * Returns {@code true} if {@code str} ends with {@code suffix}, ignoring case differences, else {@code false}.
+     * <p>
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when certain combinations of characters
+     * and locales are used. Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive
+     * comparison.
      * 
-     * @param str    the specified string
-     * @param suffix the suffix
+     * @param str
+     *               the specified string
+     * @param suffix
+     *               the suffix
      * @return {@code true} if {@code str} ends with {@code suffix}, ignoring case differences, else {@code false}
      */
     public static boolean endsWithIgnoreCase(final String str, final String suffix) {
@@ -137,43 +180,115 @@ final public class Str {
     }
 
     /**
-     * Returns the specified string with line feed (LF): {@code \n} and carriage return (CR): {@code \r} characters escaped.
+     * Returns the specified string with line feed {@code \n} (U+000A) and carriage return {@code \r} (U+000D)
+     * characters escaped.
      * 
-     * @param str the specified string
-     * @return the specified string with line feed (LF): {@code \n} and carriage return (CR): {@code \r} characters escaped
+     * @param str
+     *            the specified string
+     * @return the specified string with line feed {@code \n} (U+000A) and carriage return {@code \r} (U+000D)
+     *         characters escaped
      */
     public static String escapeEOLCharacters(final String str) {
+        return escapeEOLCharacters(str, "\\r", "\\n");
+    }
+
+    private static String escapeEOLCharacters(final String str, final String cr, final String lf) {
         checkNotNull(str, "str == null");
-        return replace(replace(str, "\r", "\\r"), "\n", "\\n");
+        return replace(replace(str, "\r", cr), "\n", lf);
+    }
+
+    /**
+     * Returns a string with the indentation of each line in the specified character sequence adjusted.
+     * <p>
+     * If {@code count > 0} then the specified number of spaces (U+0020) are inserted at the start of each line.<br/>
+     * If {@code count < 0} then up to specified number of {@link CharMatcher#whitespace()} characters are removed from
+     * the start of each line.<br/>
+     * If {@code count == 0} then no changes are made.
+     * <p>
+     * If any changes are made all line terminators will be normalized to the {@code \n} (U+000A) character.
+     * <p>
+     * <b>Note:</b> This method has subtle differences from its <b>Java 11 counterpart</b> {@link String#indent(int)
+     * String.indent(int)}:
+     * <p>
+     * <ul>
+     * <li>This method does not normalize line terminators if {@code count} is 0, while {@code String.indent(int)}
+     * always normalizes all line terminators.</li>
+     * <li>This method uses {@link CharMatcher#whitespace()} to recognize whitespace characters, while
+     * {@code String.indent(int)} uses {@link Character#isWhitespace(int)}.</li>
+     * <li>This method does not append the {@code \n} (U+000A) character to the last line in the character sequence,
+     * while {@code String.indent(int)} does.</li>
+     * </ul>
+     * 
+     * @param chars
+     *              the specified character sequence
+     * @param count
+     *              number of leading whitespace characters to add {@code (n > 0)} or remove {@code (n < 0)}
+     * @return a string with adjusted indentation of every line
+     */
+    public static String indent(final CharSequence chars, final int count) {
+        checkNotNull(chars, "chars == null");
+        if (chars.length() == 0)
+            return "";
+
+        if (count == 0)
+            return chars.toString();
+
+        Stream<String> stream = lines(chars);
+
+        if (count > 0) {
+            final String spaces = Strings.repeat(" ", count);
+            stream = stream.map(s -> spaces + s);
+        } else if (count < 0)
+            stream = stream.map(s -> s.substring(Math.min(-count, NON_WHITESPACE.indexIn(s))));
+
+        final char lastChar = chars.charAt(chars.length() - 1);
+        final Collector<CharSequence, ?, String> joiner = (lastChar == '\n' || lastChar == '\r' ? Collectors.joining("\n", "", "\n") : Collectors.joining("\n"));
+
+        return stream.collect(joiner);
     }
 
     /**
      * Returns the index within {@code str} of the first occurrence of {@code substr}, ignoring case differences.
      * <p>
-     * <b>Note:</b> This method uses the rules of the default locale.
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when certain combinations of characters
+     * and locales are used. Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive
+     * comparison.
      *
-     * @param str    the specified string
-     * @param substr the string to search for
+     * @param str
+     *               the specified string
+     * @param substr
+     *               the string to search for
      * @return the index within {@code str} of the first occurrence of {@code substr}, ignoring case differences
-     * @throws NullPointerException if either {@code str} or {@code substr} is {@code null}
+     * @throws NullPointerException
+     *                              if either {@code str} or {@code substr} is {@code null}
      */
     public static int indexOfIgnoreCase(final String str, final String substr) {
         return indexOfIgnoreCase(str, substr, 0);
     }
 
     /**
-     * Returns the index within {@code str} of the first occurrence of {@code substr}, starting at the specified index and
-     * ignoring case differences.
+     * Returns the index within {@code str} of the first occurrence of {@code substr}, starting at the specified index
+     * and ignoring case differences.
      * <p>
-     * <b>Note:</b> This method uses the rules of the default locale.
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when certain combinations of characters
+     * and locales are used. Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive
+     * comparison.
      *
-     * @param str       the specified string
-     * @param substr    the string to search for
-     * @param fromIndex the index from which to start the search
+     * @param str
+     *                  the specified string
+     * @param substr
+     *                  the string to search for
+     * @param fromIndex
+     *                  the index from which to start the search
      * @return the index within {@code str} of the first occurrence of {@code substr}, ignoring case differences
-     * @throws IllegalArgumentException        if {@code fromIndex} < 0
-     * @throws StringIndexOutOfBoundsException if {@code fromIndex} > the length of {@code str}
-     * @throws NullPointerException            if either {@code str} or {@code substr} is {@code null}
+     * @throws IllegalArgumentException
+     *                                         if {@code fromIndex} < 0
+     * @throws StringIndexOutOfBoundsException
+     *                                         if {@code fromIndex} > the length of {@code str}
+     * @throws NullPointerException
+     *                                         if either {@code str} or {@code substr} is {@code null}
      */
     public static int indexOfIgnoreCase(final String str, final String substr, final int fromIndex) {
         checkNotNull(str, "str == null");
@@ -199,36 +314,40 @@ final public class Str {
     }
 
     /**
-     * Returns {@code true} if the specified character sequence is {@code null}, empty, or contains only white space
-     * characters according to {@link CharMatcher#whitespace()}.
+     * Returns {@code true} if the specified character sequence is {@code null}, empty, or contains only
+     * {@link CharMatcher#whitespace() whitespace} characters.
      * <p>
      * This method is {@code null} safe.
      *
-     * @param chars the specified character sequence or {@code null}
-     * @return {@code true} if the specified character sequence is {@code null}, empty, or contains only white space
-     *         characters, {@code false} otherwise
+     * @param chars
+     *              the specified character sequence or {@code null}
+     * @return {@code true} if the specified character sequence is {@code null}, empty, or contains only
+     *         {@link CharMatcher#whitespace() whitespace} characters, {@code false} otherwise
      * @see CharMatcher#whitespace()
      * @see Strings#isNullOrEmpty(String)
      * @see Strings#nullToEmpty(String)
-     * @see Objects#toString()
+     * @see Objects#toString(Object)
+     * @see Objects#toString(Object, String)
      */
     public static boolean isNullOrWhitespace(final CharSequence chars) {
         return chars == null || isWhitespace(chars);
     }
 
     /**
-     * Returns {@code true} if the specified character sequence is empty or contains only white space characters according
-     * to {@link CharMatcher#whitespace()}.
+     * Returns {@code true} if the specified character sequence is empty or contains only
+     * {@link CharMatcher#whitespace() whitespace} characters.
      * <p>
-     * <b>Java 11 equivalent:</b> {@link String#isBlank() String.isBlank()}
+     * <b>Java 11 counterpart:</b> {@link String#isBlank() String.isBlank()}
      *
-     * @param chars the specified character sequence
-     * @return {@code true} if the specified character sequence is empty or contains only white space characters;
-     *         {@code false} otherwise
+     * @param chars
+     *              the specified character sequence
+     * @return {@code true} if the specified character sequence is empty or contains only
+     *         {@link CharMatcher#whitespace() whitespace} characters, {@code false} otherwise
      * @see CharMatcher#whitespace()
      * @see Strings#isNullOrEmpty(String)
      * @see Strings#nullToEmpty(String)
-     * @see Objects#toString()
+     * @see Objects#toString(Object)
+     * @see Objects#toString(Object, String)
      */
     public static boolean isWhitespace(final CharSequence chars) {
         checkNotNull(chars, "chars == null");
@@ -236,12 +355,11 @@ final public class Str {
     }
 
     /**
-     * Returns all the lines read from a character sequence. The lines do not include line-termination characters, but do
-     * include other leading and trailing whitespace.
-     * <p>
-     * <b>Java 11 equivalent:</b> {@link String#lines() String.lines()}
+     * Returns all the lines read from a character sequence. The lines do not include line-termination characters, but
+     * do include other leading and trailing whitespace.
      * 
-     * @param chars the character sequence to read from
+     * @param chars
+     *              the character sequence to read from
      * @return a mutable {@code List} containing all the lines read from a character sequence
      */
     public static List<String> readLines(final CharSequence chars) {
@@ -255,18 +373,39 @@ final public class Str {
     }
 
     /**
+     * Returns a stream of lines read from a character sequenc. The lines do not include line-termination characters,
+     * but do include other leading and trailing whitespace.
+     * <p>
+     * <b>Java 11 equivalent:</b> {@link String#lines() String.lines()}
+     * 
+     * @param chars
+     *              the character sequence to read from
+     * @return a stream of lines read from a character sequence
+     */
+    public static Stream<String> lines(final CharSequence chars) {
+        checkNotNull(chars, "chars == null");
+
+        try {
+            return CharSource.wrap(chars).openBufferedStream().lines();
+        } catch (final IOException e) {
+            throw new AssertionError(); // cannot happen
+        }
+    }
+
+    /**
      * Removes all instances of the specified substring from the given string.
      * <p>
      * <b>Note:</b> Users of Java 6, Java 7, and Java 8 should prefer this method to
-     * {@link String#replace(CharSequence, CharSequence) String.replace(CharSequence, "")} because it avoids the expensive
-     * cost of using the {@code java.util.regex} facility. Java 9+ users can call
-     * {@link String#replace(CharSequence, CharSequence) String.replace(CharSequence, "")} which now has a faster
-     * implementation and no longer uses {@code java.util.regex}. See
+     * {@link String#replace(CharSequence, CharSequence) String.replace} because it avoids the expensive cost of using
+     * the {@code java.util.regex} facility. Java 9+ users can call {@link String#replace(CharSequence, CharSequence)
+     * String.replace} which has a faster implementation that avoids using {@code java.util.regex}. See
      * <a target="_blank" href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more
      * information.
      * 
-     * @param str    the specified string
-     * @param substr the substring to remove
+     * @param str
+     *               the specified string
+     * @param substr
+     *               the substring to remove
      * @return the given string with all instances of the specified substring removed
      */
     public static String remove(final String str, final String substr) {
@@ -277,9 +416,16 @@ final public class Str {
 
     /**
      * Removes all instances of the specified substring from the given string, ignoring case differences.
+     * <p>
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when certain combinations of characters
+     * and locales are used. Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive
+     * comparison.
      * 
-     * @param str    the specified string
-     * @param substr the substring to remove
+     * @param str
+     *               the specified string
+     * @param substr
+     *               the substring to remove
      * @return the given string with all instances of the specified substring removed, ignoring case differences
      */
     public static String removeIgnoreCase(final String str, final String substr) {
@@ -293,14 +439,17 @@ final public class Str {
      * <p>
      * <b>Note:</b> Users of Java 6, Java 7, and Java 8 should prefer this method to
      * {@link String#replace(CharSequence, CharSequence)} because it avoids the expensive cost of using the
-     * {@code java.util.regex} facility. Java 9+ users should prefer {@link String#replace(CharSequence, CharSequence)}
-     * which now has a faster implementation and no longer uses {@code java.util.regex}. See
+     * {@code java.util.regex} facility. Java 9+ users can call {@link String#replace(CharSequence, CharSequence)} which
+     * has a faster implementation that avoids using {@code java.util.regex}. See
      * <a target="_blank" href="https://bugs.openjdk.java.net/browse/JDK-8058779">JDK-8058779 Issue</a> for more
      * information.
      * 
-     * @param str         the specified string
-     * @param substr      the substring to replace
-     * @param replacement the replacement string
+     * @param str
+     *                    the specified string
+     * @param substr
+     *                    the substring to replace
+     * @param replacement
+     *                    the replacement string
      * @return the given string with all instances of the specified substring replaced with the replacement string
      */
     public static String replace(final String str, final String substr, final String replacement) {
@@ -313,12 +462,20 @@ final public class Str {
     /**
      * Replaces all instances of the specified substring in the given string with the replacement string, ignoring case
      * differences.
+     * <p>
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when certain combinations of characters
+     * and locales are used. Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive
+     * comparison.
      * 
-     * @param str         the specified string
-     * @param substr      the substring to replace
-     * @param replacement the replacement string
-     * @return the given string with all instances of the specified substring replaced with the replacement string, ignoring
-     *         case differences
+     * @param str
+     *                    the specified string
+     * @param substr
+     *                    the substring to replace
+     * @param replacement
+     *                    the replacement string
+     * @return the given string with all instances of the specified substring replaced with the replacement string,
+     *         ignoring case differences
      */
     public static String replaceIgnoreCase(final String str, final String substr, final String replacement) {
         checkNotNull(str, "str == null");
@@ -328,30 +485,40 @@ final public class Str {
     }
 
     /**
-     * Returns the given character sequence with the set of characters from U+0000 to U+FFFF (outside the <i>Basic
-     * Multilingual Plane (BMP)</i> characters) replaced with the U+FFFD (� ) character.
+     * Returns the given character sequence with the set of characters from (U+0000) to (U+FFFF) (outside the <i>Basic
+     * Multilingual Plane (BMP)</i> characters) replaced with the (U+FFFD) � character.
      * <p>
-     * This method is useful when you need to pass a UTF-8 encoded string to a consumer that only supports one to three
-     * bytes per character.
+     * This method is useful when you need to pass a unicode string to a consumer that does not support supplementary
+     * characters.
+     * <p>
+     * <b>Note:</b> This method uses the {@code java.util.regex} facility and may perform subpar on large strings or in
+     * performance sensitive applications.
      * 
-     * @param chars the given character sequence
-     * @return the given character sequence with the set of characters from U+0000 to U+FFFF (outside the <i>Basic
-     *         Multilingual Plane (BMP)</i> characters) replaced with the U+FFFD (� ) character
+     * @param chars
+     *              the given character sequence
+     * @return the given character sequence with the set of characters from (U+0000) to (U+FFFF) (outside the <i>Basic
+     *         Multilingual Plane (BMP)</i> characters) replaced with the (U+FFFD) � character
      */
     public static String replaceSupplementaryCharacters(final CharSequence chars) {
         return replaceSupplementaryCharacters(chars, '\uFFFD');
     }
 
     /**
-     * Returns the given character sequence with the set of characters from U+0000 to U+FFFF (outside the <i>Basic
+     * Returns the given character sequence with the set of characters from (U+0000) to (U+FFFF) (outside the <i>Basic
      * Multilingual Plane (BMP)</i> characters) replaced with the specified character.
      * <p>
-     * This method is useful when you need to pass a UTF-8 encoded string to a consumer that only supports one to three
-     * bytes per character.
+     * This method is useful when you need to pass a unicode string to a consumer that does not support supplementary
+     * characters.
+     * <p>
+     * <b>Note:</b> This method uses the {@code java.util.regex} facility and may perform subpar on large strings or in
+     * performance sensitive applications.
      * 
-     * @param chars       the given character sequence
-     * @param replacement the character to use when replacing characters outside the <i>Basic Multilingual Plane (BMP)</i>
-     * @return the given character sequence with the set of characters from U+0000 to U+FFFF (outside the <i>Basic
+     * @param chars
+     *                    the given character sequence
+     * @param replacement
+     *                    the character to use when replacing characters outside the <i>Basic Multilingual Plane
+     *                    (BMP)</i>
+     * @return the given character sequence with the set of characters from (U+0000) to (U+FFFF) (outside the <i>Basic
      *         Multilingual Plane (BMP)</i> characters) replaced with the specified character
      */
     public static String replaceSupplementaryCharacters(final CharSequence chars, final char replacement) {
@@ -360,10 +527,43 @@ final public class Str {
     }
 
     /**
-     * Returns {@code true} if {@code str} starts with {@code prefix}, ignoring case differences, else {@code false}.
+     * Returns a string with {@link CharMatcher#whitespace() whitespace} characters replaced with their symbolic
+     * counterparts.
+     * <p>
+     * The line feed {@code \n} (U+000A) character is replaced with the <b>↓</b> (U+2193) character.</br>
+     * The carriage return {@code \r} (U+000D) is replaced with the <b>←</b> (U+2190) character.</br>
+     * The tab \t (U+0009) character is replaced with the <b>»</b> (U+00BB) character.</br>
+     * Other {@link CharMatcher#whitespace() whitespace} characters replaced with the <b>·</b> (U+00B7) character.
+     * <p>
+     * <b>Note:</b> This method uses the {@code java.util.regex} facility and may perform subpar on large strings or in
+     * performance sensitive applications.
      * 
-     * @param str    the specified string
-     * @param prefix the prefix
+     * @param str
+     *            the specified string
+     * @return a string with {@link CharMatcher#whitespace() whitespace} characters replaced with their symbolic
+     *         counterparts
+     */
+    public static String showWhitespace(String str) {
+        checkNotNull(str, "str == null");
+        str = escapeEOLCharacters(str, CR_REPLACEMENT, LF_REPLACEMENT);
+        str = WHITESPACE_NOT_TAB.replaceFrom(str, SPACE_REPLACEMENT);
+        str = replace(str, TAB, TAB_REPLACEMENT);
+        // Obviously we can make this more perfomant by not using a regular expressions.
+        return ESCAPED_NEWLINE.matcher(str).replaceAll("$1\n");
+    }
+
+    /**
+     * Returns {@code true} if {@code str} starts with {@code prefix}, ignoring case differences, else {@code false}.
+     * <p>
+     * <b>Note:</b> This method does <i>not</i> take locale into account, and like other locale-insensitive operations,
+     * it may result in subtle, sometimes surprising, or unsatisfactory results, when certain combinations of characters
+     * and locales are used. Consider using {@link java.text.Collator java.text.Collator} for locale-sensitive
+     * comparison.
+     * 
+     * @param str
+     *               the specified string
+     * @param prefix
+     *               the prefix
      * @return {@code true} if {@code str} starts with {@code prefix}, ignoring case differences, else {@code false}
      */
     public static boolean startsWithIgnoreCase(final String str, final String prefix) {
@@ -371,30 +571,40 @@ final public class Str {
     }
 
     /**
-     * Returns a copy of the specified character sequence, with trailing and leading whitespace according to
-     * {@link CharMatcher#whitespace()} omitted.
+     * Returns a copy of the specified character sequence, with trailing and leading {@link CharMatcher#whitespace()
+     * whitespace} omitted.
      * <p>
      * This method is {@code null} safe.
      * <p>
-     * <b>Java 11 equivalent:</b> {@link String#strip() String.strip()}
+     * <b>Java 11 counterpart:</b> {@link String#strip() String.strip()}
      *
-     * @param chars the specified character sequence or {@code null}
-     * @return a copy of the specified character sequence, with trailing and leading whitespace omitted
+     * @param chars
+     *              the specified character sequence or {@code null}
+     * @return a copy of the specified character sequence, with trailing and leading {@link CharMatcher#whitespace()
+     *         whitespace} omitted or {@code null}
+     * @see #trimStart(CharSequence)
+     * @see #trimEnd(CharSequence)
+     * @see #trimLines(CharSequence)
      */
     public static String trim(final CharSequence chars) {
         return chars == null ? null : CharMatcher.whitespace().trimFrom(chars);
     }
 
     /**
-     * Returns a copy of the specified character sequence, with trailing whitespace according to
-     * {@link CharMatcher#whitespace()} omitted.
+     * Returns a copy of the specified character sequence, with trailing {@link CharMatcher#whitespace() whitespace}
+     * omitted.
      * <p>
      * This method is {@code null} safe.
      * <p>
      * <b>Java 11 equivalent:</b> {@link String#stripTrailing() String.stripTrailing()}
      * 
-     * @param chars the specified character sequence or {@code null}
-     * @return a copy of the specified character sequence, with trailing whitespace omitted
+     * @param chars
+     *              the specified character sequence or {@code null}
+     * @return a copy of the specified character sequence, with trailing {@link CharMatcher#whitespace() whitespace}
+     *         omitted or {@code null}
+     * @see #trim(CharSequence)
+     * @see #trimStart(CharSequence)
+     * @see #trimLines(CharSequence)
      */
     public static String trimEnd(final CharSequence chars) {
         return chars == null ? null : CharMatcher.whitespace().trimTrailingFrom(chars);
@@ -402,13 +612,20 @@ final public class Str {
 
     /**
      * Returns a copy of the specified character sequence, with leading and trailing <i>blank</i> lines omitted. A blank
-     * line is defined as containing only whitespace characters according to the predefined character class {@code \s} which
-     * matches [ \t\n\x0B\f\r] in the Java regex facility.
+     * line is defined as containing only whitespace characters according to the predefined character class {@code \s}
+     * which matches [ \t\n\x0B\f\r] in the {@code java.util.regex} facility.
      * <p>
      * This method is {@code null} safe.
-     *
-     * @param chars the specified character sequence or {@code null}
-     * @return a copy of the specified character sequence, with leading and trailing blank lines omitted
+     * <p>
+     * <b>Note:</b> This method uses the {@code java.util.regex} facility and may perform subpar on large inputs or in
+     * performance sensitive applications.
+     * 
+     * @param chars
+     *              the specified character sequence or {@code null}
+     * @return a copy of the specified character sequence, with leading and trailing blank lines omitted or {@code null}
+     * @see #trim(CharSequence)
+     * @see #trimStart(CharSequence)
+     * @see #trimEnd(CharSequence)
      */
     public static String trimLines(final CharSequence chars) {
         if (chars == null)
@@ -418,15 +635,20 @@ final public class Str {
     }
 
     /**
-     * Returns a copy of the specified character sequence, with leading whitespace according to
-     * {@link CharMatcher#whitespace()} omitted.
+     * Returns a copy of the specified character sequence, with leading {@link CharMatcher#whitespace() whitespace}
+     * omitted.
      * <p>
      * This method is {@code null} safe.
      * <p>
      * <b>Java 11 equivalent:</b> {@link String#stripLeading() String.stripLeading()}
      *
-     * @param chars the specified character sequence or {@code null}
-     * @return a copy of the specified character sequence, with leading whitespace omitted or {@code null}
+     * @param chars
+     *              the specified character sequence or {@code null}
+     * @return a copy of the specified character sequence, with leading whitespace {@link CharMatcher#whitespace()
+     *         whitespace} or {@code null}
+     * @see #trim(CharSequence)
+     * @see #trimEnd(CharSequence)
+     * @see #trimLines(CharSequence)
      */
     public static String trimStart(final CharSequence chars) {
         return chars == null ? null : CharMatcher.whitespace().trimLeadingFrom(chars);
@@ -538,11 +760,17 @@ final public class Str {
      * {@code maxLength} in length. Otherwise the sequence will be returned as a {@code String} with no changes.
      * <p>
      * This method is {@code null} safe.
+     * <p>
+     * <b>Guava 16+ counterpart:</b> {@link Ascii#truncate(CharSequence, int, String) Ascii.truncate(CharSequence, int,
+     * String)}
      * 
-     * @param chars     the given character sequence or {@code null}
-     * @param maxLength the specified maximum length
+     * @param chars
+     *                  the given character sequence or {@code null}
+     * @param maxLength
+     *                  the specified maximum length
      * @return the given character sequence truncated to the specified maximum length or {@code null}
-     * @throws IllegalArgumentException if {@code maxLength} < 1
+     * @throws IllegalArgumentException
+     *                                  if {@code maxLength} < 1
      */
     public static String truncate(final CharSequence chars, final int maxLength) {
         return truncate(chars, maxLength, null);
@@ -552,17 +780,25 @@ final public class Str {
      * Returns the given character sequence truncated to the specified maximum length.
      * <p>
      * If the length of the given sequence is greater than {@code maxLength}, the returned string will be exactly
-     * {@code maxLength} in length and will end with {@code suffix} (if it is not {@code null}). Otherwise the sequence will
-     * be returned as a {@code String} with no changes.
+     * {@code maxLength} in length and will end with {@code suffix} (if it is not {@code null}). Otherwise the sequence
+     * will be returned as a {@code String} with no changes.
      * <p>
      * This method is {@code null} safe.
+     * <p>
+     * <b>Guava 16+ counterpart:</b> {@link Ascii#truncate(CharSequence, int, String) Ascii.truncate(CharSequence, int,
+     * String)}
      * 
-     * @param chars     the given character sequence or {@code null}
-     * @param maxLength the specified maximum length
-     * @param suffix    the string to append to the truncated sequence or {@code null} for no suffix
+     * @param chars
+     *                  the given character sequence or {@code null}
+     * @param maxLength
+     *                  the specified maximum length
+     * @param suffix
+     *                  the string to append to the truncated sequence or {@code null} for no suffix
      * @return the given character sequence truncated to the specified maximum length or {@code null}
-     * @throws IllegalArgumentException if {@code maxLength} < 1
-     * @throws IllegalArgumentException if {@code suffix} is not {@code null} and its length is not less than
+     * @throws IllegalArgumentException
+     *                                  if {@code maxLength} < 1
+     * @throws IllegalArgumentException
+     *                                  if {@code suffix} is not {@code null} and its length is not less than
      *                                  {@code maxLength}
      */
     public static String truncate(final CharSequence chars, final int maxLength, final String suffix) {
@@ -585,14 +821,15 @@ final public class Str {
     }
 
     /**
-     * Returns {@code null} if the given character sequence is {@code null}, empty, or contains only whitespace characters
-     * according to {@link CharMatcher#whitespace()}, otherwise the original character sequence is returned.
+     * Returns {@code null} if the given character sequence is {@code null}, empty, or contains only
+     * {@link CharMatcher#whitespace() whitespace} characters, otherwise the original character sequence is returned.
      * <p>
      * This method is {@code null} safe.
      *
-     * @param chars the specified character sequence or {@code null}
-     * @return {@code null} if the given character sequence is {@code null}, empty, or contains only whitespace characters
-     *         according to {@link CharMatcher#whitespace()}
+     * @param chars
+     *              the specified character sequence or {@code null}
+     * @return {@code null} if the given character sequence is {@code null}, empty, or contains only
+     *         {@link CharMatcher#whitespace() whitespace} characters
      */
     public static <T extends CharSequence> T whitespaceToNull(final T chars) {
         if (isNullOrWhitespace(chars))

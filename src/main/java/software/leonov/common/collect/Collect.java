@@ -22,10 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.DelayQueue;
@@ -39,8 +36,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
 
 /**
  * Static utility methods for working with {@code Collection}s.
@@ -152,9 +147,9 @@ final public class Collect {
     }
 
     /**
-     * Attempts to remove all elements from the specified queue and adds them to the given collection, first by calling
-     * {@link BlockingQueue#drainTo(Collection) drainTo(Collection)}, then, if the queue is still not empty because it is a
-     * {@link DelayQueue} or another kind of queue for which {@link Queue#poll() poll()} or
+     * Attempts to remove all elements from the specified blocking queue and add them to the given collection, first by
+     * calling {@link BlockingQueue#drainTo(Collection) drainTo(Collection)}, then, if the queue is still not empty because
+     * it is a {@link DelayQueue} or another kind of queue for which {@link Queue#poll() poll()} or
      * {@link BlockingQueue#drainTo(Collection) drainTo(Collection)} may fail to remove some elements, this method iterates
      * through {@link Collection#toArray() queue.toArray()} and transfers the remaining elements one by one.
      * 
@@ -166,12 +161,11 @@ final public class Collect {
     public static <T> int drainFully(final BlockingQueue<? extends T> queue, final Collection<? super T> collection) {
         checkNotNull(queue, "queue == null");
         checkNotNull(collection, "collection == null");
-        final List<T> tasks = new ArrayList<>();
-        int count = queue.drainTo(tasks);
+        int count = queue.drainTo(collection);
         if (!queue.isEmpty())
             for (final T r : (T[]) queue.toArray())
                 if (queue.remove(r)) {
-                    tasks.add(r);
+                    collection.add(r);
                     count++;
                 }
         return count;

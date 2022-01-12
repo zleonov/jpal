@@ -103,14 +103,20 @@ public final class Props {
      * The document encoding can be specified in the XML declaration:
      * 
      * <pre>
-     * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-     * </pre>
+     * {@code
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * }
+     * 
+     * <pre>
      * 
      * And the file must contains the following DOCTYPE declaration:
      * 
      * <pre>
-     * &lt;!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd"&gt;
-     * </pre>
+     * {@code
+     * <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+     * }
+     * 
+     * <pre>
      * 
      * Furthermore, the document must satisfy the properties DTD described above.
      * 
@@ -128,14 +134,20 @@ public final class Props {
      * The document encoding can be specified in the XML declaration:
      * 
      * <pre>
-     * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-     * </pre>
+     * {@code
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * }
+     * 
+     * <pre>
      * 
      * And the file must contains the following DOCTYPE declaration:
      * 
      * <pre>
-     * &lt;!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd"&gt;
-     * </pre>
+     * {@code
+     * <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+     * }
+     * 
+     * <pre>
      * 
      * Furthermore, the document must satisfy the properties DTD described above.
      * 
@@ -223,8 +235,11 @@ public final class Props {
      * The XML document will have the following DOCTYPE declaration:
      * 
      * <pre>
-     * &lt;!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd"&gt;
-     * </pre>
+     * {@code
+     * <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+     * }
+     * 
+     * <pre>
      * 
      * @param properties the specified {@code Properties}
      * @param comment    a description of the property list or {@code null} if no comment is desired

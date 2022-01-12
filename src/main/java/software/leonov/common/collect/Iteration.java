@@ -189,8 +189,10 @@ final public class Iteration {
      *             example:
      * 
      *             <pre>
-     * for (final String s : (Iterable&lt;String&gt;)() -> iterator) {
+     * {@code
+     * for (final String s : (Iterable<String>)() -> iterator) {
      *    ...
+     * }
      * }
      *             </pre>
      * 

@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.Callable;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 /**
  * A {@code Thread} with control over whether or not it can be interrupted.
  * 
@@ -23,7 +25,6 @@ import java.util.concurrent.Callable;
 public class UninterruptibleThread extends Thread {
 
     private boolean interrupted = true;
-    private boolean interruptible = false;
 
     /**
      * See {@link Thread#Thread() new Thread()}.

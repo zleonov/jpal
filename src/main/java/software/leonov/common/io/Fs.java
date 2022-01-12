@@ -75,15 +75,13 @@ import software.leonov.common.io.FileWalker.VisitResult;
  * com.google.common.io.Files}. The intent is to provide unified access between various Java and Guava I/O classes to
  * some of the most commonly used I/O operations.
  * <p>
- * <b>Warning:</b> The {@code java.io.File} facility does not scale with large file systems, suffers from race
- * conditions, and provides no platform-independent way to detect symbolic links. As such there is no way to ensure a
- * symbolic link to a directory is not followed when traversing a file tree. In the presence of symbolic links, you may
- * encounter files outside the starting directory, or even end up in an infinite loop.
- * <p>
- * <b>Note:</b> While {@code java.io.File} operations are not deprecated, Java 7+ users are highly encouraged to use
+ * <b>Warning:</b> While {@code java.io.File} operations are not deprecated, Java 7+ users are highly encouraged to use
  * {@code java.nio.file.Path} operations introduced in JDK 7 as part of the
- * <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
- * System</a>.
+ * <a target="_blank" href= "https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
+ * System</a>. The {@code java.io.File} facility does not scale with large file systems, suffers from race conditions,
+ * and provides no platform-independent way to detect symbolic links. As such there is no way to ensure a symbolic link
+ * to a directory is not followed when traversing a file tree. In the presence of symbolic links, you may encounter
+ * files outside the starting directory, or even end up in an infinite loop.
  * <p>
  * The following tables describe common convenience methods provided by this class and their closest Guava and Java
  * equivalents:
@@ -91,7 +89,7 @@ import software.leonov.common.io.FileWalker.VisitResult;
  * <pre>
  * <table border="1" cellpadding="3" cellspacing="1">
  *   <tr>
- *     <th colspan="2" align="center">File I/O</th>     
+ *     <th colspan="2" align="center">Legacy File I/O</th>
  *   </tr>
  *   <tr>
  *     <th align="center">Method</th><th align="center">Guava</th>
@@ -442,7 +440,7 @@ final public class Fs {
      *             }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
      *             {@link #hash(File, HashFunction) hash(File, }{@link Hashing#adler32()
      *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which uses Guava's
-     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *             <a target="_blank" href= "https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param file     the given file
      * @param checksum the specified checksum object
@@ -471,7 +469,7 @@ final public class Fs {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(File, HashFunction)} which uses Guava's
-     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *             <a target="_blank" href= "https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param file   the given file
      * @param digest the specified message digest object
@@ -660,7 +658,8 @@ final public class Fs {
         checkNotNull(file, "file == null");
         checkNotNull(charset, "charset == null");
 
-        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
+        // Reading the contents of the stream into a byte array first is much faster
+        // than using StringBuilder
         return new String(toByteArray(file), charset);
     }
 
@@ -782,8 +781,9 @@ final public class Fs {
      * <p>
      * <b>Warning:</b> While this method is not deprecated users not working with legacy APIs are encouraged to switch to
      * JDK 7+ and use {@link java.nio.file.Files#walkFileTree(Path, java.nio.file.FileVisitor) Files.walkFileTree(Path,
-     * FileVisitor)} in the <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The
-     * Java NIO.2 File System</a>.
+     * FileVisitor)} in the
+     * <a target="_blank" href= "https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
+     * System</a>.
      * <p>
      * The {@code java.io.File} facility provides no platform-independent way to detect symbolic links, as such there is no
      * way to ensure a symbolic link to a directory is not followed when traversing a file tree. In the presence of symbolic
@@ -830,7 +830,7 @@ final public class Fs {
      * <b>Warning:</b> While this method is not deprecated users not working with legacy APIs are encouraged to switch to
      * JDK 7+ and use {@link java.nio.file.Files#walkFileTree(Path, java.util.Set, int, java.nio.file.FileVisitor)
      * Files.walkFileTree(Path, Set, int, FileVisitor)} in the
-     * <a target="_blank" href="https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
+     * <a target="_blank" href= "https://www.oracle.com/technetwork/articles/javase/nio-139333.html">The Java NIO.2 File
      * System</a>.
      * <p>
      * The {@code java.io.File} facility provides no platform-independent way to detect symbolic links, as such there is no
@@ -1209,7 +1209,7 @@ final public class Fs {
      *             }{@link Hashing#crc32() Hashing.crc32())}{@link HashCode#padToLong() .padToLong()} or
      *             {@link #hash(Path, HashFunction) hash(Path, }{@link Hashing#adler32()
      *             Hashing.adler32())}{@link HashCode#padToLong() .padToLong()} which uses Guava's
-     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *             <a target="_blank" href= "https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param path     the given file
      * @param checksum the specified checksum object
@@ -1234,7 +1234,7 @@ final public class Fs {
      * The {@code MessageDigest} is reset when this method returns successfully.
      * 
      * @deprecated Users not working with legacy APIs should prefer {@link #hash(Path, HashFunction)} which uses Guava's
-     *             <a target="_blank" href="https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
+     *             <a target="_blank" href= "https://github.com/google/guava/wiki/HashingExplained">Hashing facility</a>.
      *
      * @param path   the given file
      * @param digest the specified message digest object
@@ -1387,7 +1387,8 @@ final public class Fs {
         checkNotNull(path, "path == null");
         checkNotNull(charset, "charset == null");
 
-        // Reading the contents of the stream into a byte array first is much faster than using StringBuilder
+        // Reading the contents of the stream into a byte array first is much faster
+        // than using StringBuilder
         return new String(toByteArray(path), charset);
     }
 

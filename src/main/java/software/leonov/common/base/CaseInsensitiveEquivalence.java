@@ -13,9 +13,10 @@ import com.google.common.base.Equivalence;
  * This {@code Equivalence} can be used to construct a {@code Map} which compares its keys in a case-insensitive manner:
  * 
  * <pre>
- * final Map&lt;String, ...&gt; m = new EquivalenceMap<>(CaseInsensitiveEquivalence.usingDefaultLocale());
+ * {@code
+ * final Map<String, ...> m = new EquivalenceMap<>(CaseInsensitiveEquivalence.usingDefaultLocale());
+ * }
  * </pre>
- * 
  * 
  * @author Zhenya Leonov
  */
@@ -56,12 +57,15 @@ final public class CaseInsensitiveEquivalence extends Equivalence<CharSequence> 
 
     @Override
     protected boolean doEquivalent(final CharSequence left, final CharSequence right) {
+        checkNotNull(left, "left == null");
+        checkNotNull(right, "right == null");
         return left.toString().toLowerCase(locale).equals(right.toString().toLowerCase(locale));
     }
 
     @Override
-    protected int doHash(final CharSequence s) {
-        return s.toString().toLowerCase(locale).hashCode();
+    protected int doHash(final CharSequence chars) {
+        checkNotNull(chars, "chars == null");
+        return chars.toString().toLowerCase(locale).hashCode();
     }
 
 }

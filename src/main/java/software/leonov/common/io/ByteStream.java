@@ -43,7 +43,7 @@ import software.leonov.common.base.MessageDigests;
 @SuppressWarnings("deprecation")
 final public class ByteStream {
 
-    private final static int DEFAULT_BUFFER_SIZE = 8192;
+    final static int DEFAULT_BUFFER_SIZE = 8192;
 
     private ByteStream() {
     }
@@ -181,4 +181,3 @@ final public class ByteStream {
     }
 
 }
-

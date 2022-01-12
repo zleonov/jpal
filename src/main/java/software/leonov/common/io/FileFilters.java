@@ -67,6 +67,7 @@ final public class FileFilters {
 
         @Override
         public boolean accept(final File file) {
+            checkNotNull(file, "file == null");
             return file.isDirectory();
         }
     };
@@ -108,7 +109,7 @@ final public class FileFilters {
         return new FileFilter() {
 
             @Override
-            public boolean accept(File file) {
+            public boolean accept(final File file) {
                 for (final FileFilter filter : filters) {
                     if (!filter.accept(file))
                         return false;

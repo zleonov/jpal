@@ -43,7 +43,6 @@ public final class ByteBufferInputStream extends InputStream {
      * Creates a new {@code ByteBufferInputStream} which reads bytes from the specified {@code ByteBuffer}.
      * 
      * @param buff the specified {@code ByteBuffer}
-     * @return a new {@code ByteBufferInputStream} which reads bytes from the specified {@code ByteBuffer}
      */
     public ByteBufferInputStream(final ByteBuffer buff) {
         checkNotNull(buff, "buff == null");

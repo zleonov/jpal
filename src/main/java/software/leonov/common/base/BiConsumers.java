@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 /**
  * Static utility methods pertaining to {@link BiConsumer}s.
  * 
- * @authoer Zhenya Leonov
+ * @author Zhenya Leonov
  */
 public final class BiConsumers {
 

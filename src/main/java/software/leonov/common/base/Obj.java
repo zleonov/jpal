@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 
 import software.leonov.common.io.Fs;
 
@@ -126,24 +127,61 @@ public final class Obj {
         return hashCode;
     }
 
+//    /**
+//     * Returns the first non-{@code null} value between {@code first} and {@code second}. If both are {@code null} then
+//     * {@code null} will be returned.
+//     * 
+//     * @param first  the first value
+//     * @param second the second value
+//     * @return the first non-{@code null} value between {@code first} and {@code second}
+//     */
+//    public static <T> T coalesce(final T first, final T second) {
+//        return first == null ? second : first;
+//    }
+
     /**
-     * Returns the first non-{@code null} value from the specified values. If all the values are {@code null} or if
-     * {@code first} and {@code rest} parameters are {@code null} then {@code null} will be returned.
+     * Returns the first non-{@code null} value from the specified values or {@code null} if all values are {@code null}.
      * 
-     * @param first the first value
-     * @param rest  additional values
-     * @return the first non-{@code null} value from the specified values
+     * @param <T>    the type of value
+     * @param first  the first value
+     * @param second the second value
+     * @param rest   additional values
+     * @return the first non-{@code null} value from the specified values or {@code null} if all values are {@code null}
      */
     @SafeVarargs
-    public static <T> T coalesce(final T first, final T... rest) {
+    public static <T> T coalesce(final T first, final T second, final T... rest) {
+        // return Streams.concat(Stream.of(first, second), Stream.of(rest)).filter(Objects::nonNull).findFirst().orElse(null);
+
         if (first != null)
             return first;
-        else if (rest != null)
+
+        if (second != null)
+            return second;
+
+        if (rest != null)
             for (final T value : rest)
                 if (value != null)
                     return value;
 
         return null;
+    }
+
+    /**
+     * Returns an {@code Optional} containing the first non-{@code null} value from the specified values or an
+     * {@link Optional#empty() empty} {@code Optional} if all values are {@code null}.
+     * 
+     * @param <T>    the type of value
+     * @param first  the first value
+     * @param second the second value
+     * @param rest   additional values
+     * @return an {@code Optional} containing the first non-{@code null} value from the specified values or an
+     *         {@link Optional#empty() empty} {@code Optional} if all values are {@code null}
+     */
+    @SafeVarargs
+    public static <T> Optional<T> firstNonNull(final T first, final T second, final T... rest) {
+        // return Streams.concat(Stream.of(first, second), Stream.of(rest)).filter(Objects::nonNull).findFirst();
+
+        return Optional.ofNullable(coalesce(first, second, rest));
     }
 
     /**

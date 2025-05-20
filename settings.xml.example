@@ -1,0 +1,44 @@
+<!--
+ | settings.xml is a configuration file for Maven. It can be specified at two
+ | levels:
+ |
+ |  1. User Level. This settings.xml file provides configuration for a single
+ |                 user, and is normally provided in
+ |                 ${user.home}/.m2/settings.xml.
+ |
+ |                 NOTE: This location can be overridden with the CLI option:
+ |
+ |                 -s /path/to/user/settings.xml
+ |
+ |  2. Global Level. This settings.xml file provides configuration for all
+ |                 Maven users on a machine (assuming they're all using the
+ |                 same Maven installation). It's normally provided in
+ |                 ${maven.home}/conf/settings.xml.
+ |
+ |                 NOTE: This location can be overridden with the CLI option:
+ |
+ |                 -gs /path/to/global/settings.xml
+ |
+ | The example below demonstrates how to add custom properties which will be
+ | accessible during the Maven build process. Specifically the JDK source
+ | files and Guava source files are used by the maven-javadoc-plugin.
+ |-->
+ 
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <profiles>
+        <profile>
+            <id>properties</id>
+            <properties>
+                <java.sourceDirectory>${env.JAVA_HOME}/src</java.sourceDirectory>
+                <guava.sourceDirectory>...</guava.sourceDirectory>                
+            </properties>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>properties</activeProfile>
+    </activeProfiles>
+</settings>

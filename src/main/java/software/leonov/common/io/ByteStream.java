@@ -144,7 +144,7 @@ final public class ByteStream {
      * <p>
      * Does not close the stream.
      * <p>
-     * <b>Note</b>: The underlying input stream must be non-blocking and finite.
+     * <b>Note:</b> The underlying input stream must be non-blocking and finite.
      * 
      * @param in the specified input stream
      * @return a byte array containing all the bytes read from the input stream

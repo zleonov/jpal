@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -26,9 +27,15 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 
 /**
  * Static utility methods which operate on or return arrays.
@@ -105,8 +112,21 @@ import com.google.common.collect.ObjectArrays;
  * </pre>
  * 
  * @author Zhenya Leonov
+ * @see Maps
+ * @see MoreMaps
+ * @see Collections
+ * @see Collections2
+ * @see Lists
+ * @see MoreLists
+ * @see Sets
+ * @see Iterables
+ * @see Iterators
+ * @see Iteration
+ * @see Queues
+ * @see MoreQueues
  * @see Arrays
  * @see ObjectArrays
+ * @see MoreArrays
  * @see Iterators#forArray(Object[])
  * @see Arrays#stream(Object[])
  */

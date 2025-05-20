@@ -60,7 +60,7 @@ public final class BinaryFunctions {
         @Override
         public boolean equals(final Object obj) {
             if (obj instanceof ConstantBinaryFunction) {
-                ConstantBinaryFunction<?> that = (ConstantBinaryFunction<?>) obj;
+                final ConstantBinaryFunction<?> that = (ConstantBinaryFunction<?>) obj;
                 return Objects.equal(value, that.value);
             }
             return false;
@@ -104,7 +104,7 @@ public final class BinaryFunctions {
         @Override
         public boolean equals(final Object obj) {
             if (obj instanceof SupplierBinaryFunction) {
-                SupplierBinaryFunction<?> that = (SupplierBinaryFunction<?>) obj;
+                final SupplierBinaryFunction<?> that = (SupplierBinaryFunction<?>) obj;
                 return this.supplier.equals(that.supplier);
             }
             return false;

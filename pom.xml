@@ -9,7 +9,7 @@
     <!-- default packaging is a jar <packaging>jar</packaging> -->
 
     <name>jpal</name>
-    <description>Core utilities for Java-based projects: string processing, new collection types, I/O, and so forth.</description>
+    <description>Core utilities for Java-based projects: string processing, new collection types, concurrency utilities, I/O, and so forth.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,9 +17,14 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.0.0</maven-source-plugin.version>
-        <java.src.path>3rd-party/java-sources</java.src.path>
-        <guava.src.path>3rd-party/guava-sources</guava.src.path>
     </properties>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
     <dependencies>
         <dependency>
@@ -35,29 +40,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.3.1</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.3.1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <version>1.3.1</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-
     </dependencies>
 
     <build>
@@ -85,7 +73,7 @@
                 <version>${maven-javadoc-plugin.version}</version>
 
                 <configuration>
-                    <sourcepath>${project.build.sourceDirectory}:${java.src.path}:${guava.src.path}</sourcepath>
+                    <sourcepath>${project.build.sourceDirectory}:${java.sourceDirectory}:${guava.sourceDirectory}</sourcepath>
                     <subpackages>software.leonov</subpackages>
                     <quiet>false</quiet>
                     <notimestamp>true</notimestamp>
@@ -93,7 +81,7 @@
                     <docencoding>UTF-8</docencoding>
                     <charset>UTF-8</charset>
                     <show>protected</show>
-                    <doclint>-html</doclint>
+                    <doclint>-syntax</doclint>
                     <linksource>true</linksource>
                     <doctitle>
                         <![CDATA[
@@ -135,5 +123,12 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>intenral</id>
+            <url>http://vm2:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

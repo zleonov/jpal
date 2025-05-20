@@ -20,15 +20,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.Date;
 
 /**
  * Static utility methods for working with dates.
- * <p>
- * <b>Note:</b> Java 8+ users should consider switching to the new
- * <a target="_blank" href="https://docs.oracle.com/javase/tutorial/datetime/index.html">Date and Time API</a>
- * introduced in Java 8.
+ * 
+ * @deprecated Java 8+ users should switch to the new
+ *             <a target="_blank" href="https://docs.oracle.com/javase/tutorial/datetime/index.html">Date and Time
+ *             API</a>.
  * 
  * @author Zhenya Leonov
  */
@@ -45,7 +44,6 @@ public final class Dates {
      * Exampe: {@code getFormattedTimestamp("YYYY-MM-DD")}
      * 
      * @param pattern the pattern to use when formatting the {@code Timestamp}
-     * 
      * @return the current {@code Timestamp} as a string
      */
     public static String getFormattedTimestamp(final String pattern) {
@@ -73,15 +71,6 @@ public final class Dates {
     public static Timestamp getTimestamp(final Date date) {
         checkNotNull(date, "date == null");
         return new Timestamp(date.getTime());
-    }
-
-//    public static String format(final long time, final TimeUnit unit) {
-//        
-//    }
-
-    public static void main(String[] args) {
-
-        System.out.println(Duration.ofDays(32).plus(Duration.ofMillis(65487995)).toString().toLowerCase().substring(2));
     }
 
 }

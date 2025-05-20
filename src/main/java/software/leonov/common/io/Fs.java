@@ -63,9 +63,9 @@ import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 
-import software.leonov.common.io.FileWalker.VisitResult;
 import software.leonov.common.base.MessageDigests;
 import software.leonov.common.base.Str;
+import software.leonov.common.io.FileWalker.VisitResult;
 
 /**
  * Static utility methods for working with {@link File}s and {@link Path}s.
@@ -103,13 +103,13 @@ import software.leonov.common.base.Str;
  *     <td>{@link Fs#append(CharSequence, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
+ *     <td>{@link Fs#append(CharSequence, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#write(CharSequence) .write(CharSequence)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#append(Iterable, File)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, }{@link Charsets#UTF_8 UTF_8, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
+ *     <td>{@link Fs#append(Iterable, File, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#writeLines(Iterable) .writeLines(Iterable)}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#newBufferedInputStream(File)}</td><td>{@link Files#asByteSource(File) Files.asByteSource(File)}{@link ByteSource#openBufferedStream() .openBufferedStream()}</td>
@@ -136,7 +136,7 @@ import software.leonov.common.base.Str;
  *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, false, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
- *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
+ *     <td>{@link Fs#newBufferedWriter(File, boolean, Charset) newBufferedWriter(File, true, Charset)}</td><td>{@link Files#asCharSink(File, Charset, FileWriteMode...) Files.asCharSink(File, Charset, }{@link FileWriteMode#APPEND APPEND)}{@link CharSink#openBufferedStream() .openBufferedStream()}</td>
  *   </tr>
  *   <tr>
  *     <td>{@link Fs#read(File)}</td><td>{@link Files#asCharSource(File, Charset) Files.asCharSource(File, }{@link Charsets#UTF_8 UTF_8)}{@link CharSource#read() .read()}</td>
@@ -492,7 +492,7 @@ final public class Fs {
     }
 
     /**
-     * Returns the last name in the path's name sequence.
+     * Returns the last name in the path's name sequence. This method does not validate the specified path.
      * <p>
      * This method handles both Windows and Unix path separator characters.
      * 
@@ -507,6 +507,20 @@ final public class Fs {
         checkNotNull(path, "path == null");
         final int lastIndexOf = SEPARATORS.lastIndexIn(path);
         return path.substring(lastIndexOf + 1);
+    }
+
+    /**
+     * Returns the filename without its <a href="http://en.wikipedia.org/wiki/Filename_extension" target="_blank">file
+     * extension</a> or path. If the path is empty and empty string is returned.
+     *
+     * @param path path the specified path
+     * @return the filename without its file extension or path
+     */
+    public static String getNameWithoutExtension(final String path) {
+        checkNotNull(path, "path == null");
+        final String name = getName(path);
+        final int lastIndexOf = name.lastIndexOf('.');
+        return lastIndexOf == -1 ? name : name.substring(0, lastIndexOf);
     }
 
     /**

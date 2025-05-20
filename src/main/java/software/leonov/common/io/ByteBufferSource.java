@@ -25,7 +25,7 @@ import com.google.common.io.ByteSource;
 /**
  * A {@link ByteSource readable source of bytes} from a {@link ByteBuffer}.
  * <p>
- * {@code InputStream}s return by this class are thread-safe and can be used to independently read from the same buffer.
+ * {@code InputStream}s return by this class are thread-safe and can be used to independently to read from the same buffer.
  * 
  * @author Zhenya Leonov
  */

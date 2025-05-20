@@ -18,14 +18,22 @@ package software.leonov.common.collect;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.Predicate;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.ObjectArrays;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 
 /**
  * More static utility methods which operate on or return {@link List}s.
@@ -36,7 +44,21 @@ import com.google.common.collect.Lists;
  * more information.
  * 
  * @author Zhenya Leonov
+ * @see Maps
+ * @see MoreMaps
+ * @see Collections
+ * @see Collections2
  * @see Lists
+ * @see MoreLists
+ * @see Sets
+ * @see Iterables
+ * @see Iterators
+ * @see Iteration
+ * @see Queues
+ * @see MoreQueues
+ * @see Arrays
+ * @see ObjectArrays
+ * @see MoreArrays
  */
 public class MoreLists {
 

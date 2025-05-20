@@ -28,7 +28,7 @@ import com.google.common.base.Objects;
  * will throw a {@code  NoSuchElementException}. After a value is set it can be changed at any time by calling the
  * {@link #set(Object) set(T)} method.
  * <p>
- * This class can be used to reference non-{@code final} variables for in anonymous inner classes.
+ * This class can be used to reference non-{@code final} variables in anonymous inner classes.
  * <p>
  * <b>Note:</b> While this class is not deprecated, unless mutability is absolutely required, users are encouraged to
  * use Guava's {@link com.google.common.base.Optional Optional} class or Java 8+ {@link java.util.Optional Optional}

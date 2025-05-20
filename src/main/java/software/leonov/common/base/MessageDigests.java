@@ -88,8 +88,6 @@ public final class MessageDigests {
 
     /**
      * Returns a lowercase hexadecimal string representation of the specified byte array.
-     * <p>
-     * The digest is reset after this call is made.
      * 
      * @param bytes the specified byte array
      * @return a lowercase hexadecimal string representation of the specified byte array

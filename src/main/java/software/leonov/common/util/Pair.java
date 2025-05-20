@@ -30,10 +30,19 @@ import com.google.common.base.Objects;
  */
 public abstract class Pair<T, U> {
 
+    /**
+     * The first object.
+     */
     protected T first;
+
+    /**
+     * The second object.
+     */
     protected U second;
 
-    // no arg constructed is need to deserialize extending classes
+    /**
+     * No argument constructor required for deserialization.
+     */
     protected Pair() {
     }
 
@@ -43,7 +52,7 @@ public abstract class Pair<T, U> {
      * @param first  the first object
      * @param second the second object
      */
-    public Pair(final T first, final U second) {
+    protected Pair(final T first, final U second) {
         this.first = first;
         this.second = second;
     }

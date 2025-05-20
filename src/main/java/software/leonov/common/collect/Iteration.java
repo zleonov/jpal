@@ -18,6 +18,7 @@ package software.leonov.common.collect;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -27,19 +28,37 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ForwardingListIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.PeekingIterator;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableListIterator;
 
 /**
  * Static utility methods for working with {@code Iterable}s and {@code Iterator}s
  * 
  * @author Zhenya Leonov
- * @see Iterators
+ * @see Maps
+ * @see MoreMaps
+ * @see Collections
+ * @see Collections2
+ * @see Lists
+ * @see MoreLists
+ * @see Sets
  * @see Iterables
+ * @see Iterators
+ * @see Iteration
+ * @see Queues
+ * @see MoreQueues
+ * @see Arrays
+ * @see ObjectArrays
+ * @see MoreArrays
  */
 final public class Iteration {
 
@@ -179,7 +198,7 @@ final public class Iteration {
      * A convenience method which adapts an iterator to the {@code Iterable} interface suitable for using in Java 5+
      * <i>for-each</i> loops.
      * <p>
-     * <b>Warning</b>: Although not explicitly stated in the documentation it is generally assumed that an {@code Iterable}
+     * <b>Warning:</b> Although not explicitly stated in the documentation it is generally assumed that an {@code Iterable}
      * object is able to produce multiple independent {@code Iterator}s. Thus the returned {@code Iterable} does not behave
      * like a general purpose {@code Iterable} because it supports only a single call to {@link Iterable#iterator()}.
      * Invoking the {@code iterator()} method to obtain subsequent iterators will result in an
@@ -414,6 +433,34 @@ final public class Iteration {
                 return peekingIterator.peek();
             }
         };
+    }
+
+    /**
+     * Returns an {@link Iterables#unmodifiableIterable unmodifiable} iterable which combines a single element with the
+     * specified iterable. The returned iterable produces iterators that lazily traverse the {@code first} element followed
+     * by the {@code rest} of the elements.
+     * 
+     * @param first the first element
+     * @param rest  the rest of the elements
+     * @return an iterable which combines a single element with the specified iterable
+     */
+    public static <E> Iterable<E> concat(final E first, final Iterable<? extends E> rest) {
+        checkNotNull(rest, "rest == null");
+        return Iterables.unmodifiableIterable(Iterables.concat(Collections.singleton(first), rest));
+    }
+
+    /**
+     * Returns an {@link Iterables#unmodifiableIterable unmodifiable} iterable which combines the specified iterable with a
+     * single element. The returned iterable produces iterators that lazily traverse all the {@code first} elements followed
+     * by {@code last}.
+     * 
+     * @param first the first elements
+     * @param last  the last element
+     * @return an iterable which combines the specified iterable with a single element
+     */
+    public static <E> Iterable<E> concat(final Iterable<? extends E> first, final E last) {
+        checkNotNull(first, "rest == null");
+        return Iterables.unmodifiableIterable(Iterables.concat(first, Collections.singleton(last)));
     }
 
 }

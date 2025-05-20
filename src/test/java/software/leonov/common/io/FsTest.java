@@ -1,15 +1,15 @@
 package software.leonov.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static software.leonov.common.io.FileWalker.VisitResult.CONTINUE;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static software.leonov.common.io.FileWalker.VisitResult.CONTINUE;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
@@ -542,9 +542,9 @@ class FsTest {
     }
 
     private static File getResourceAsFile(final String name) throws URISyntaxException {
-        final URI uri = FsTest.class.getResource(name).toURI();
-        Preconditions.checkArgument(uri != null, "cannot find %s", name);
-        return new File(uri);
+        final URL url = FsTest.class.getResource(name);
+        Preconditions.checkArgument(url != null, "cannot find %s", name);
+        return new File(url.toURI());
     }
 
     private static File createTempFileAndCopy(final File from) throws IOException {

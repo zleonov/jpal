@@ -53,7 +53,7 @@ public abstract class Pair<T, U> {
      * @param second the second object
      */
     protected Pair(final T first, final U second) {
-        this.first = first;
+        this.first  = first;
         this.second = second;
     }
 

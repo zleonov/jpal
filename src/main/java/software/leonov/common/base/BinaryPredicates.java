@@ -122,7 +122,7 @@ public final class BinaryPredicates {
     }
 
     private static class AndPredicate<T, U> implements BinaryPredicate<T, U>, Serializable {
-        
+
         private static final long serialVersionUID = 8801949836401489178L;
 
         private final List<? extends BinaryPredicate<? super T, ? super U>> parts;
@@ -164,6 +164,8 @@ public final class BinaryPredicates {
     /**
      * Returns a {@code BinaryPredicate} that always evaluates to {@code true}.
      * 
+     * @param <T> the type of the first argument
+     * @param <U> the type of the second argument
      * @return a {@code BinaryPredicate} that always evaluates to {@code true}
      */
     public static <T, U> BinaryPredicate<T, U> alwaysTrue() {
@@ -173,6 +175,8 @@ public final class BinaryPredicates {
     /**
      * Returns a {@code BinaryPredicate} that always evaluates to {@code false}.
      * 
+     * @param <T> the type of the first argument
+     * @param <U> the type of the second argument
      * @return a {@code BinaryPredicate} that always evaluates to {@code false}
      */
     public static <T, U> BinaryPredicate<T, U> alwaysFalse() {
@@ -183,7 +187,8 @@ public final class BinaryPredicates {
      * Returns a {@code BinaryPredicate} that evaluates to {@code true} if the objects being tested are both not
      * {@code null}.
      * 
-     * 
+     * @param <T> the type of the first argument
+     * @param <U> the type of the second argument
      * @return a {@code BinaryPredicate} that evaluates to {@code true} if the objects being tested are both not
      *         {@code null}
      */
@@ -194,6 +199,8 @@ public final class BinaryPredicates {
     /**
      * Returns a {@code BinaryPredicate} that evaluates to {@code true} if the objects being tested are both {@code null}.
      * 
+     * @param <T> the type of the first argument
+     * @param <U> the type of the second argument 
      * @return a {@code BinaryPredicate} that evaluates to {@code true} if the objects being tested are both {@code null}
      */
     public static <T, U> BinaryPredicate<T, U> bothNull() {
@@ -209,6 +216,8 @@ public final class BinaryPredicates {
      * 
      * @deprecated Use {@link BiPredicate#or(BiPredicate)} instead.
      * 
+     * @param <T> the type of the first argument
+     * @param <U> the type of the second argument
      * @param first  the first {@code BinaryPredicate}
      * @param second the second {@code BinaryPredicate}
      * @param rest   the rest of the {@code BinaryPredicate}s
@@ -235,6 +244,8 @@ public final class BinaryPredicates {
      * 
      * @deprecated Use {@link BiPredicate#and(BiPredicate)} instead.
      * 
+     * @param <T> the type of the first argument
+     * @param <U> the type of the second argument
      * @param first  the first {@code BinaryPredicate}
      * @param second the second {@code BinaryPredicate}
      * @param rest   the rest of the {@code BinaryPredicate}s

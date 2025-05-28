@@ -19,19 +19,15 @@ import java.util.Collection;
 import java.util.Comparator;
 
 /**
- * A {@link Collection} which maintains its elements in <i>sorted</i> order.
- * This interface is the root of all <i>sorted</i> collection interfaces and
- * implementations.
+ * A {@link Collection} which maintains its elements in <i>sorted</i> order. This interface is the root of all
+ * <i>sorted</i> collection interfaces and implementations.
  * <p>
- * Classes which implement this interface (directly or indirectly) are required
- * to implement the {@code comparator()} method which returns the comparator
- * used to order the elements in this collection. Essentially this allows
- * another sorted collection of a desired type to create a copy of this
- * collection.
+ * Classes which implement this interface (directly or indirectly) are required to implement the {@code comparator()}
+ * method which returns the comparator used to order the elements in this collection. Essentially this allows another
+ * sorted collection of a desired type to create a copy of this collection.
  * 
+ * @param <E> the type of elements held in this collection
  * @author Zhenya Leonov
- * @param <E>
- *            the type of elements held in this collection
  */
 
 //* <p>
@@ -45,11 +41,12 @@ import java.util.Comparator;
 //* Java 5.
 public interface SortedCollection<E> extends Collection<E> {
 
-	/**
-	 * Returns the comparator used to order the elements in this collection.
-	 * Care must be taken when using <i>natural ordering</i>. Implementations
-	 * may choose to return a natural order comparator or {@code null}.
-	 */
-	public Comparator<? super E> comparator();
+    /**
+     * Returns the comparator used to order the elements in this collection. Care must be taken when using <i>natural
+     * ordering</i>. Implementations may choose to return a natural order comparator or {@code null}.
+     * 
+     * @return the comparator used to order the elements in this collection
+     */
+    public Comparator<? super E> comparator();
 
 }

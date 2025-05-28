@@ -52,8 +52,8 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
 
     private static final long serialVersionUID = 1L;
 
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int   DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR      = 0.75f;
 
     private final int maximumSize;
 
@@ -65,6 +65,8 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
     /**
      * Creates a new mutable {@code LRUCache} with the specified maximum size.
      * 
+     * @param <K>         the type of keys maintained by this map
+     * @param <V>         the type of mapped values
      * @param maximumSize the maximum size of this map
      * @return a new mutable {@code LRUCache} with the specified maximum size
      */
@@ -76,6 +78,8 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
     /**
      * Creates a new mutable {@code LRUCache} with the specified initial capacity, load factor, and maximum size.
      * 
+     * @param <K>         the type of keys maintained by this map
+     * @param <V>         the type of mapped values 
      * @param initialCapacity the initial capacity
      * @param loadFactor      the load factor
      * @param maximumSize     the maximum size of this map
@@ -92,6 +96,8 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
     /**
      * Creates a new mutable {@code LRUCache} with the specified initial capacity and maximum size.
      * 
+     * @param <K>         the type of keys maintained by this map
+     * @param <V>         the type of mapped values
      * @param initialCapacity the initial capacity
      * @param maximumSize     the maximum size of this map
      * @return a new mutable {@code LRUCache} with the specified initial capacity and maximum size
@@ -106,6 +112,8 @@ final public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Bounded
      * Creates a new mutable {@code LRUCache} whose maximum size is equal to and containing the same mappings as the
      * specified map.
      * 
+     * @param <K>         the type of keys maintained by this map
+     * @param <V>         the type of mapped values 
      * @param m the specified map
      * @return a new mutable {@code LRUCache} whose maximum size is equal to and containing the same mappings as the
      *         specified map

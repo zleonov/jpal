@@ -25,7 +25,8 @@ import com.google.common.io.ByteSource;
 /**
  * A {@link ByteSource readable source of bytes} from a {@link ByteBuffer}.
  * <p>
- * {@code InputStream}s return by this class are thread-safe and can be used to independently to read from the same buffer.
+ * {@code InputStream}s return by this class are thread-safe and can be used to independently to read from the same
+ * buffer.
  * 
  * @author Zhenya Leonov
  */
@@ -34,10 +35,9 @@ final public class ByteBufferSource extends ByteSource {
     private final ByteBuffer buff;
 
     /**
-     * Returns a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer.
+     * Creates a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer.
      * 
      * @param buff the specified byte buffer
-     * @return a new {@code ByteBufferByteSource} which opens streams to the specified byte buffer
      */
     public ByteBufferSource(final ByteBuffer buff) {
         checkNotNull(buff, "buff == null");

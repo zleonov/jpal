@@ -69,6 +69,7 @@ public class MoreLists {
      * Returns the index of the first occurrence of the specified element in the given list, starting the search at
      * {@code fromIndex}, or -1 if there is no such element.
      * 
+     * @param <E>       the element type
      * @param list      the given list
      * @param element   the element to look for
      * @param fromIndex the index to start the search from
@@ -101,6 +102,7 @@ public class MoreLists {
      * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle
      * {@code null} inputs to avoid a {@code NullPointerException}.
      * 
+     * @param <E>       the element type
      * @param list      the specified list
      * @param predicate the given predicate
      * @param fromIndex the index to start the search from (inclusive)
@@ -131,6 +133,7 @@ public class MoreLists {
      * Returns the index of the last occurrence in the specified element in the given list, searching backward starting at
      * {@code fromIndex}, or -1 if there is no such element.
      * 
+     * @param <E>       the element type
      * @param list      the specified list
      * @param element   the element to look for
      * @param fromIndex the index to start the search from
@@ -164,6 +167,7 @@ public class MoreLists {
      * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle
      * {@code null} inputs as well to avoid a {@code NullPointerException}.
      * 
+     * @param <E>       the element type
      * @param list      the specified list
      * @param predicate the given predicate
      * @return the index of the last occurrence in the specified list of an element which satisfies the given predicate, or
@@ -181,6 +185,7 @@ public class MoreLists {
      * <b>Note:</b> If the specified list allows {@code null} elements the given predicate must be able to handle
      * {@code null} inputs as well to avoid a {@code NullPointerException}.
      * 
+     * @param <E>       the element type
      * @param list      the specified list
      * @param predicate the given predicate
      * @param fromIndex the index to start the search from

@@ -9,10 +9,10 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
-		<maven-source-plugin.version>3.0.0</maven-source-plugin.version>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 	</properties>
 
 	<name>jpal</name>
@@ -98,8 +98,12 @@
 					<docencoding>${project.build.sourceEncoding}</docencoding>
 					<charset>${project.build.sourceEncoding}</charset>
 					<show>protected</show>
-					<doclint>none</doclint>
+                    <doclint>reference,missing,-html</doclint>
 					<linksource>true</linksource>
+					
+                    
+                    <failOnError>true</failOnError>					
+					
 					<doctitle>
                         <![CDATA[
                             ${project.name} ${project.version}

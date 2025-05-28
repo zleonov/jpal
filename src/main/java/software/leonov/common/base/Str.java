@@ -190,7 +190,7 @@ final public class Str {
      * <p>
      * If any changes are made all line terminators will be normalized to the {@code \n} (U+000A) character.
      * <p>
-     * <b>Note:</b> This method has subtle differences from its Java 11 counterpart {@link String#indent(int)
+     * <b>Note:</b> This method has subtle differences from its Java 12 counterpart {@link String#indent(int)
      * String.indent(int)}:
      * <p>
      * <ul>
@@ -704,6 +704,7 @@ final public class Str {
      * <p>
      * This method is {@code null} safe.
      *
+     * @param <T>   the type of CharSequence (typically {@code CharSequence} or a {@code String})
      * @param chars the specified character sequence or {@code null}
      * @return {@code null} if the given character sequence is {@code null}, empty, or contains only
      *         {@link CharMatcher#whitespace() whitespace} characters

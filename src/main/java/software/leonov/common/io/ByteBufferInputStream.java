@@ -36,19 +36,18 @@ public final class ByteBufferInputStream extends InputStream {
     private final ByteBuffer buff;
 
     private int position = 0;
-    private int mark = 0;
+    private int mark     = 0;
     private int capacity;
 
     /**
      * Creates a new {@code ByteBufferInputStream} which reads bytes from the specified {@code ByteBuffer}.
      * 
      * @param buff the specified {@code ByteBuffer}
-     * @return a new {@code ByteBufferInputStream} which reads bytes from the specified {@code ByteBuffer}
      */
     public ByteBufferInputStream(final ByteBuffer buff) {
         checkNotNull(buff, "buff == null");
         this.buff = buff;
-        capacity = buff.capacity();
+        capacity  = buff.capacity();
     }
 
     /**

@@ -177,6 +177,7 @@ final public class Iteration {
      * <p>
      * <b>Note:</b> Java 7+ users should prefer {@link Collections#emptyListIterator()}.
      * 
+     * @param <E> the element type
      * @return an immutable empty {@code ListIterator}
      */
     @SuppressWarnings("unchecked")
@@ -187,6 +188,7 @@ final public class Iteration {
     /**
      * Returns an immutable empty {@code PeekingIterator}.
      * 
+     * @param <E> the element type
      * @return an immutable empty {@code PeekingIterator}
      */
     @SuppressWarnings("unchecked")
@@ -213,6 +215,7 @@ final public class Iteration {
      * }
      *             </pre>
      * 
+     * @param <T>      the element type
      * @param iterator the underlying iterator
      * @return an {@code Iterable} which returns the underlying iterator on the first call to {@link Iterable#iterator()}
      */
@@ -243,6 +246,7 @@ final public class Iteration {
      * <p>
      * If {@code k} exceeds the size of the given iterable the returned list will contain all of its elements.
      * 
+     * @param <T>        the element type
      * @param population the given {@code Iterable}
      * @param k          the number of random items to chose
      * @return a random sample of {@code k} elements from the given {@code Iterable}
@@ -257,6 +261,7 @@ final public class Iteration {
      * <p>
      * If {@code k} exceeds the size of the given iterable the returned list will contain all of its elements.
      * 
+     * @param <T>        the element type
      * @param population the given {@code Iterable}
      * @param k          the number of random items to chose
      * @param random     the {@code Random} number generator
@@ -273,6 +278,7 @@ final public class Iteration {
      * <p>
      * If {@code k} exceeds the size of the given iterator the returned list will contain all of its elements.
      * 
+     * @param <T>        the element type
      * @param population the given {@code Iterator}
      * @param k          the number of random items to chose
      * @return a random sample of {@code k} elements from the given {@code Iterator}
@@ -287,7 +293,7 @@ final public class Iteration {
      * <p>
      * If {@code k} exceeds the size of the given iterator the returned list will contain all of its elements.
      * 
-     * 
+     * @param <T>        the element type
      * @param population the given {@code Iterator}
      * @param k          the number of random items to chose
      * @param random     the {@code Random} number generator
@@ -299,7 +305,7 @@ final public class Iteration {
         checkArgument(k > 0, "k < 1");
 
         final List<T> items = Lists.newArrayListWithCapacity(k);
-        int count = 0;
+        int           count = 0;
 
         while (population.hasNext()) {
             final T item = population.next();
@@ -324,7 +330,7 @@ final public class Iteration {
      * The returned list iterator does not support {@code add(E)} and {@code set(E)} but does support {@code remove()} if
      * the given list iterator does.
      * 
-     * @param <E>      the type of elements traversed by the given list iterator
+     * @param <E>      the element type traversed by the given list iterator
      * @param <T>      the type of output of the specified function
      * @param from     the given list iterator
      * @param function the specified function
@@ -368,6 +374,7 @@ final public class Iteration {
      * Decorates the specified {@code ListIterator} to prevent {@link ListIterator#remove() remove()},
      * {@link ListIterator#add(Object) add(E)}, and {@link ListIterator#set(Object) set(E)}.
      * 
+     * @param <E>          the element type
      * @param listIterator the underlying {@code ListIterator}
      * @return an unmodifiable view of {@code listIterator}
      */
@@ -410,6 +417,7 @@ final public class Iteration {
     /**
      * Decorates the specified {@code PeekingIterator} to prevent {@link PeekingIterator#remove() remove()}.
      * 
+     * @param <E>             the element type
      * @param peekingIterator the underlying {@code PeekingIterator}
      * @return an unmodifiable view of {@code peekingIterator}
      */
@@ -440,6 +448,7 @@ final public class Iteration {
      * specified iterable. The returned iterable produces iterators that lazily traverse the {@code first} element followed
      * by the {@code rest} of the elements.
      * 
+     * @param <E>   the element type
      * @param first the first element
      * @param rest  the rest of the elements
      * @return an iterable which combines a single element with the specified iterable
@@ -454,6 +463,7 @@ final public class Iteration {
      * single element. The returned iterable produces iterators that lazily traverse all the {@code first} elements followed
      * by {@code last}.
      * 
+     * @param <E>   the element type
      * @param first the first elements
      * @param last  the last element
      * @return an iterable which combines the specified iterable with a single element

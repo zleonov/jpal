@@ -47,6 +47,7 @@ final public class Holder<T> {
     /**
      * Returns a new {@code Holder} with no value.
      * 
+     * @param <T> the type of value
      * @return a new {@code Holder} with no value
      */
     public static <T> Holder<T> empty() {
@@ -56,6 +57,7 @@ final public class Holder<T> {
     /**
      * Returns a new {@code Holder} with the specified initial value.
      * 
+     * @param <T>   the type of value
      * @param value the initial value
      * @return a new {@code Holder} with the specified initial value
      */

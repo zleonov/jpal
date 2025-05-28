@@ -1,0 +1,33 @@
+-classpath
+'C:/Users/eleonov/.m2/repository/com/google/guava/guava/26.0-jre/guava-26.0-jre.jar;C:/Users/eleonov/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar;C:/Users/eleonov/.m2/repository/org/checkerframework/checker-qual/2.5.2/checker-qual-2.5.2.jar;C:/Users/eleonov/.m2/repository/com/google/errorprone/error_prone_annotations/2.1.3/error_prone_annotations-2.1.3.jar;C:/Users/eleonov/.m2/repository/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar;C:/Users/eleonov/.m2/repository/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'11'
+-sourcepath
+'C:/eclipse-workspace/jpal/src/main/java;C:/Program Files/Java/jdk1.8.0_281/src;C:/eclipse-workspace/jpal/third-party/guava-26.0-jre-sources'
+-subpackages
+software.leonov
+-author
+-bottom
+'Copyright &#169; 2025. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/eclipse-workspace/jpal/docs/api/latest'
+-docencoding
+'UTF-8'
+-Xdoclint:reference,missing,-html
+-doctitle
+'jpal 0.0.1-SNAPSHOT                             <p>                             <div style=\'font-weight:normal; font-size:smaller\'>Core utilities for Java-based projects: string processing, new 		collection types, concurrency utilities, I/O, and so forth.</div>'
+-link
+'https://guava.dev/releases/26.0-jre/api/docs'
+-linkoffline
+'https://docs.oracle.com/en/java/javase/11/docs/api' 'C:/eclipse-workspace/jpal/target/javadoc-bundle-options'
+-linksource
+-notimestamp
+-use
+-version
+-windowtitle
+'jpal 0.0.1-SNAPSHOT API'

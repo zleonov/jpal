@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">package software.leonov.common.base;</a>
+<span class="sourceLineNo">002</span><a id="line.2"></a>
+<span class="sourceLineNo">003</span><a id="line.3">import static com.google.common.base.Preconditions.checkNotNull;</a>
+<span class="sourceLineNo">004</span><a id="line.4"></a>
+<span class="sourceLineNo">005</span><a id="line.5">import java.util.Optional;</a>
+<span class="sourceLineNo">006</span><a id="line.6">import java.util.function.Supplier;</a>
+<span class="sourceLineNo">007</span><a id="line.7"></a>
+<span class="sourceLineNo">008</span><a id="line.8">import com.google.common.collect.Iterables;</a>
+<span class="sourceLineNo">009</span><a id="line.9"></a>
+<span class="sourceLineNo">010</span><a id="line.10">/**</a>
+<span class="sourceLineNo">011</span><a id="line.11"> * Static utility methods for working with {@link Optional}s.</a>
+<span class="sourceLineNo">012</span><a id="line.12"> * </a>
+<span class="sourceLineNo">013</span><a id="line.13"> * @author Zhenya Leonov</a>
+<span class="sourceLineNo">014</span><a id="line.14"> */</a>
+<span class="sourceLineNo">015</span><a id="line.15">public final class Optionals {</a>
+<span class="sourceLineNo">016</span><a id="line.16"></a>
+<span class="sourceLineNo">017</span><a id="line.17">//    /**</a>
+<span class="sourceLineNo">018</span><a id="line.18">//     * Return the {@code first} optional if it is present or the {@code other} optional if it is not.</a>
+<span class="sourceLineNo">019</span><a id="line.19">//     * &lt;p&gt;</a>
+<span class="sourceLineNo">020</span><a id="line.20">//     * &lt;b&gt;Java 9 equivalent:&lt;/b&gt; {@link Optional#or(Supplier) Optional.or(Supplier&amp;lt;? extends Optional&amp;lt;? extends</a>
+<span class="sourceLineNo">021</span><a id="line.21">//     * T&amp;gt;&amp;gt;)}</a>
+<span class="sourceLineNo">022</span><a id="line.22">//     * </a>
+<span class="sourceLineNo">023</span><a id="line.23">//     * @param &lt;T&gt;   the type of optional value</a>
+<span class="sourceLineNo">024</span><a id="line.24">//     * @param first the first optional</a>
+<span class="sourceLineNo">025</span><a id="line.25">//     * @param other the second choice optional</a>
+<span class="sourceLineNo">026</span><a id="line.26">//     * @return the {@code first} optional if it is present or the {@code other} optional if it is not</a>
+<span class="sourceLineNo">027</span><a id="line.27">//     */</a>
+<span class="sourceLineNo">028</span><a id="line.28">//    @SuppressWarnings("unchecked")</a>
+<span class="sourceLineNo">029</span><a id="line.29">//    public static &lt;T&gt; Optional&lt;T&gt; or(final Optional&lt;? extends T&gt; first, final Optional&lt;? extends T&gt; other) {</a>
+<span class="sourceLineNo">030</span><a id="line.30">//        checkNotNull(first, "first == null");</a>
+<span class="sourceLineNo">031</span><a id="line.31">//        checkNotNull(other, "other == null");</a>
+<span class="sourceLineNo">032</span><a id="line.32">//        if (first.isPresent()) {</a>
+<span class="sourceLineNo">033</span><a id="line.33">//            return (Optional&lt;T&gt;) first;</a>
+<span class="sourceLineNo">034</span><a id="line.34">//        } else {</a>
+<span class="sourceLineNo">035</span><a id="line.35">//            return (Optional&lt;T&gt;) other;</a>
+<span class="sourceLineNo">036</span><a id="line.36">//        }</a>
+<span class="sourceLineNo">037</span><a id="line.37">//</a>
+<span class="sourceLineNo">038</span><a id="line.38">//    }</a>
+<span class="sourceLineNo">039</span><a id="line.39"></a>
+<span class="sourceLineNo">040</span><a id="line.40">    /**</a>
+<span class="sourceLineNo">041</span><a id="line.41">     * Return the {@code first} optional if it is present or the optional provided by the {@code other} supplier if it is</a>
+<span class="sourceLineNo">042</span><a id="line.42">     * not.</a>
+<span class="sourceLineNo">043</span><a id="line.43">     * &lt;p&gt;</a>
+<span class="sourceLineNo">044</span><a id="line.44">     * &lt;b&gt;Java 9 equivalent:&lt;/b&gt; {@link Optional#or(Supplier) Optional.or(Supplier&amp;lt;? extends Optional&amp;lt;? extends</a>
+<span class="sourceLineNo">045</span><a id="line.45">     * T&amp;gt;&amp;gt;)}</a>
+<span class="sourceLineNo">046</span><a id="line.46">     * </a>
+<span class="sourceLineNo">047</span><a id="line.47">     * @param &lt;T&gt;   the type of optional value</a>
+<span class="sourceLineNo">048</span><a id="line.48">     * @param first the first optional</a>
+<span class="sourceLineNo">049</span><a id="line.49">     * @param other the supplier that produces the second choice optional</a>
+<span class="sourceLineNo">050</span><a id="line.50">     * @return the {@code first} optional if it is present or the optional provided by the {@code other} supplier if it is</a>
+<span class="sourceLineNo">051</span><a id="line.51">     *         not</a>
+<span class="sourceLineNo">052</span><a id="line.52">     */</a>
+<span class="sourceLineNo">053</span><a id="line.53">    @SuppressWarnings("unchecked")</a>
+<span class="sourceLineNo">054</span><a id="line.54">    public static &lt;T&gt; Optional&lt;T&gt; or(final Optional&lt;? extends T&gt; first, final Supplier&lt;? extends Optional&lt;? extends T&gt;&gt; other) {</a>
+<span class="sourceLineNo">055</span><a id="line.55">        checkNotNull(first, "first == null");</a>
+<span class="sourceLineNo">056</span><a id="line.56">        checkNotNull(other, "other == null");</a>
+<span class="sourceLineNo">057</span><a id="line.57">        if (first.isPresent()) {</a>
+<span class="sourceLineNo">058</span><a id="line.58">            return (Optional&lt;T&gt;) first;</a>
+<span class="sourceLineNo">059</span><a id="line.59">        } else</a>
+<span class="sourceLineNo">060</span><a id="line.60">            return (Optional&lt;T&gt;) checkNotNull(other.get(), "other.get() == null");</a>
+<span class="sourceLineNo">061</span><a id="line.61">    }</a>
+<span class="sourceLineNo">062</span><a id="line.62"></a>
+<span class="sourceLineNo">063</span><a id="line.63">    /**</a>
+<span class="sourceLineNo">064</span><a id="line.64">     * Returns the first {@link Optional#isPresent() present} {@code Optional} from the specified {@code Optional}s or</a>
+<span class="sourceLineNo">065</span><a id="line.65">     * {@link Optional#empty()} otherwise.</a>
+<span class="sourceLineNo">066</span><a id="line.66">     * </a>
+<span class="sourceLineNo">067</span><a id="line.67">     * @param &lt;T&gt;    the type of values held by the {@code Optional}s</a>
+<span class="sourceLineNo">068</span><a id="line.68">     * @param first  the {@code Optional}</a>
+<span class="sourceLineNo">069</span><a id="line.69">     * @param second the second {@code Optional}</a>
+<span class="sourceLineNo">070</span><a id="line.70">     * @param rest   additional {@code Optional}s</a>
+<span class="sourceLineNo">071</span><a id="line.71">     * @return the first {@link Optional#isPresent() present} {@code Optional} from the specified {@code Optional}s or</a>
+<span class="sourceLineNo">072</span><a id="line.72">     *         {@link Optional#empty()} otherwise</a>
+<span class="sourceLineNo">073</span><a id="line.73">     */</a>
+<span class="sourceLineNo">074</span><a id="line.74">    @SuppressWarnings("unchecked")</a>
+<span class="sourceLineNo">075</span><a id="line.75">    @SafeVarargs</a>
+<span class="sourceLineNo">076</span><a id="line.76">    public static &lt;T&gt; Optional&lt;T&gt; firstPresent(final Optional&lt;? extends T&gt; first, final Optional&lt;? extends T&gt; second, final Optional&lt;? extends T&gt;... rest) {</a>
+<span class="sourceLineNo">077</span><a id="line.77">        checkNotNull(first, "first == null");</a>
+<span class="sourceLineNo">078</span><a id="line.78">        checkNotNull(second, "second == null");</a>
+<span class="sourceLineNo">079</span><a id="line.79">        checkNotNull(rest, "rest == null");</a>
+<span class="sourceLineNo">080</span><a id="line.80"></a>
+<span class="sourceLineNo">081</span><a id="line.81">        // return Streams.concat(Stream.of(first, second), Stream.of(rest)).filter(Optional::isPresent).findFirst();</a>
+<span class="sourceLineNo">082</span><a id="line.82"></a>
+<span class="sourceLineNo">083</span><a id="line.83">        if (first.isPresent())</a>
+<span class="sourceLineNo">084</span><a id="line.84">            return (Optional&lt;T&gt;) first;</a>
+<span class="sourceLineNo">085</span><a id="line.85"></a>
+<span class="sourceLineNo">086</span><a id="line.86">        if (second.isPresent())</a>
+<span class="sourceLineNo">087</span><a id="line.87">            return (Optional&lt;T&gt;) second;</a>
+<span class="sourceLineNo">088</span><a id="line.88"></a>
+<span class="sourceLineNo">089</span><a id="line.89">        for (final Optional&lt;? extends T&gt; opt : rest)</a>
+<span class="sourceLineNo">090</span><a id="line.90">            if (opt.isPresent())</a>
+<span class="sourceLineNo">091</span><a id="line.91">                return (Optional&lt;T&gt;) opt;</a>
+<span class="sourceLineNo">092</span><a id="line.92"></a>
+<span class="sourceLineNo">093</span><a id="line.93">        return Optional.empty();</a>
+<span class="sourceLineNo">094</span><a id="line.94">    }</a>
+<span class="sourceLineNo">095</span><a id="line.95"></a>
+<span class="sourceLineNo">096</span><a id="line.96">    /**</a>
+<span class="sourceLineNo">097</span><a id="line.97">     * Returns all {@link Optional#isPresent() present} values of the specified {@code Optional} instances.</a>
+<span class="sourceLineNo">098</span><a id="line.98">     * </a>
+<span class="sourceLineNo">099</span><a id="line.99">     * @param &lt;T&gt;       the type of optional value</a>
+<span class="sourceLineNo">100</span><a id="line.100">     * @param optionals the specified {@code Optional} instances</a>
+<span class="sourceLineNo">101</span><a id="line.101">     * @return all {@link Optional#isPresent() present} values of the specified {@code Optional} instances</a>
+<span class="sourceLineNo">102</span><a id="line.102">     */</a>
+<span class="sourceLineNo">103</span><a id="line.103">    public static &lt;T&gt; Iterable&lt;T&gt; present(final Iterable&lt;? extends Optional&lt;? extends T&gt;&gt; optionals) {</a>
+<span class="sourceLineNo">104</span><a id="line.104">        checkNotNull(optionals, "optionals == null");</a>
+<span class="sourceLineNo">105</span><a id="line.105">        return Iterables.transform(Iterables.filter(optionals, Optional::isPresent), Optional::get);</a>
+<span class="sourceLineNo">106</span><a id="line.106">    }</a>
+<span class="sourceLineNo">107</span><a id="line.107"></a>
+<span class="sourceLineNo">108</span><a id="line.108">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

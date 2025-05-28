@@ -218,6 +218,7 @@ public final class Obj {
      * Exceptions are thrown for classes that should not be deserialized. All exceptions are fatal. Any underlying streams
      * will be closed before returning to the caller.
      * 
+     * @param <T>  the type of object
      * @param path the specified file
      * @param type the class type of the object
      * @throws ClassNotFoundException   if the class of the serialized object cannot be found

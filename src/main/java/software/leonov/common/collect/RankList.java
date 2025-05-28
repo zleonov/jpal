@@ -138,13 +138,13 @@ import com.google.common.collect.Iterables;
  */
 public final class RankList<E> extends AbstractList<E> implements List<E>, RandomAccess, Serializable, Cloneable {
 
-    private static final long serialVersionUID = 1L;
-    private static final double P = .5;
-    private static final int MAX_LEVEL = 32;
-    private transient int size = 0;
-    private transient int level = 1;
-    private transient Random random = ThreadLocalRandom.current();
-    private transient Node<E> head = new Node<E>(null, MAX_LEVEL);
+    private static final long   serialVersionUID = 1L;
+    private static final double P                = .5;
+    private static final int    MAX_LEVEL        = 32;
+    private transient int       size             = 0;
+    private transient int       level            = 1;
+    private transient Random    random           = ThreadLocalRandom.current();
+    private transient Node<E>   head             = new Node<E>(null, MAX_LEVEL);
 
     private RankList() {
         for (int i = 0; i < MAX_LEVEL; i++) {
@@ -156,7 +156,8 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
 
     /**
      * Creates a new {@code RankList}.
-     * 
+     *
+     * @param <E> the element type
      * @return a new {@code RankList}
      */
     public static <E> RankList<E> create() {
@@ -166,6 +167,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     /**
      * Creates a new {@code RankList} containing the elements of the specified {@code Iterable}.
      * 
+     * @param <E>      the element type
      * @param elements the iterable whose elements are to be placed into the list
      * @return a new {@code RankList} containing the elements of the specified iterable
      */
@@ -189,10 +191,10 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     @Override
     public void add(int index, E element) {
         checkPositionIndex(index, size);
-        Node<E> curr = head;
-        int pos = 0;
-        final int newLevel = randomLevel();
-        final Node<E> newNode = new Node<E>(element, newLevel);
+        Node<E>       curr     = head;
+        int           pos      = 0;
+        final int     newLevel = randomLevel();
+        final Node<E> newNode  = new Node<E>(element, newLevel);
         if (newLevel > level) {
             for (int i = level; i < newLevel; i++)
                 head.dist[i] = size + 1;
@@ -200,19 +202,19 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
         }
         for (int i = level - 1; i >= 0; i--) {
             while (pos + curr.dist[i] <= index) {
-                pos += curr.dist[i];
-                curr = curr.next[i];
+                pos  += curr.dist[i];
+                curr  = curr.next[i];
             }
             if (i > newLevel - 1)
                 curr.dist[i]++;
             else {
                 newNode.next[i] = curr.next[i];
-                curr.next[i] = newNode;
+                curr.next[i]    = newNode;
                 newNode.dist[i] = pos + curr.dist[i] - index;
-                curr.dist[i] = index + 1 - pos;
+                curr.dist[i]    = index + 1 - pos;
             }
         }
-        newNode.prev = curr;
+        newNode.prev         = curr;
         newNode.next[0].prev = newNode;
         modCount++;
         size++;
@@ -245,17 +247,17 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     public ListIterator<E> listIterator(final int index) {
         checkPositionIndex(index, size);
         return new ListIterator<E>() {
-            private Node<E> next = (index == 0) ? head.next[0] : search(index);
-            private Node<E> last = null;
-            private int nextIndex = index;
-            private int expectedModCount = modCount;
+            private Node<E> next             = (index == 0) ? head.next[0] : search(index);
+            private Node<E> last             = null;
+            private int     nextIndex        = index;
+            private int     expectedModCount = modCount;
 
             @Override
             public void add(E element) {
                 checkForConcurrentModification();
                 RankList.this.add(nextIndex++, element);
                 expectedModCount = modCount;
-                last = null;
+                last             = null;
             }
 
             @Override
@@ -310,7 +312,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
                     RankList.this.remove(nextIndex);
                 }
                 expectedModCount = modCount;
-                last = null;
+                last             = null;
             }
 
             @Override
@@ -332,12 +334,12 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     public E remove(int index) {
         checkElementIndex(index, size);
         final Node<E>[] update = new Node[level];
-        Node<E> node = head;
-        int pos = 0;
+        Node<E>         node   = head;
+        int             pos    = 0;
         for (int i = level - 1; i >= 0; i--) {
             while (pos + node.dist[i] <= index) {
-                pos += node.dist[i];
-                node = node.next[i];
+                pos  += node.dist[i];
+                node  = node.next[i];
             }
             update[i] = node;
         }
@@ -361,7 +363,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     public E set(int index, E element) {
         checkElementIndex(index, size);
         Node<E> node = search(index);
-        E e = node.element;
+        E       e    = node.element;
         node.element = element;
         return e;
     }
@@ -385,10 +387,10 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
             clone.head.dist[i] = 1;
         }
         clone.head.prev = clone.head;
-        clone.random = ThreadLocalRandom.current();
-        clone.level = 1;
-        clone.modCount = 0;
-        clone.size = 0;
+        clone.random    = ThreadLocalRandom.current();
+        clone.level     = 1;
+        clone.modCount  = 0;
+        clone.size      = 0;
         clone.addAll(this);
         return clone;
     }
@@ -409,8 +411,8 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
             head.dist[i] = 1;
         }
         head.prev = head;
-        random = ThreadLocalRandom.current();
-        level = 1;
+        random    = ThreadLocalRandom.current();
+        level     = 1;
         int size = ois.readInt();
         for (int i = 0; i < size; i++)
             add((E) ois.readObject());
@@ -419,25 +421,25 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
     // skip list
 
     private static class Node<E> {
-        private E element;
-        private Node<E> prev;
+        private E               element;
+        private Node<E>         prev;
         private final Node<E>[] next;
-        private final int[] dist;
+        private final int[]     dist;
 
         @SuppressWarnings("unchecked")
         private Node(final E element, final int size) {
             this.element = element;
-            next = new Node[size];
-            dist = new int[size];
+            next         = new Node[size];
+            dist         = new int[size];
         }
     }
 
     private Node<E> search(final int index) {
         Node<E> curr = head;
-        int pos = -1;
+        int     pos  = -1;
         for (int i = level - 1; i >= 0; i--)
             while (pos + curr.dist[i] <= index) {
-                pos = pos + curr.dist[i];
+                pos  = pos + curr.dist[i];
                 curr = curr.next[i];
             }
         return curr;
@@ -447,7 +449,7 @@ public final class RankList<E> extends AbstractList<E> implements List<E>, Rando
         node.next[0].prev = node.prev;
         for (int i = 0; i < level; i++)
             if (update[i].next[i] == node) {
-                update[i].next[i] = node.next[i];
+                update[i].next[i]  = node.next[i];
                 update[i].dist[i] += node.dist[i] - 1;
             } else
                 update[i].dist[i]--;

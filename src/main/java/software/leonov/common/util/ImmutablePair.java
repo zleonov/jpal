@@ -43,6 +43,8 @@ final public class ImmutablePair<T, U> extends Pair<T, U> implements Serializabl
     /**
      * Returns an immutable {@code Pair} containing the specified objects.
      * 
+     * @param <T>    The type of the first object
+     * @param <U>    The type of the second object
      * @param first  the first object
      * @param second the second object
      * @return an immutable {@code Pair} containing the specified objects
@@ -89,7 +91,7 @@ final public class ImmutablePair<T, U> extends Pair<T, U> implements Serializabl
         if (t == null || u == null)
             throw new InvalidObjectException("values cannot be null");
 
-        first = t;
+        first  = t;
         second = u;
     }
 

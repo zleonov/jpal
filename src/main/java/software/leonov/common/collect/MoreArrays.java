@@ -138,6 +138,7 @@ final public class MoreArrays {
     /**
      * Returns {@code true} if the specified array contains the given element, {@code false} otherwise.
      * 
+     * @param <T>     the element type
      * @param array   the specified array
      * @param element the object to look find
      * @return {@code true} if the specified array contains the given element, {@code false} otherwise
@@ -153,6 +154,7 @@ final public class MoreArrays {
      * <b>Note:</b> If the array contains {@code null} elements the predicate must be able to handle {@code null} inputs to
      * avoid a {@code NullPointerException}.
      * 
+     * @param <T>       the element type
      * @param array     the specified array
      * @param predicate the given predicate
      * @return {@code true} if the specified array contains the an element which satisfies the given predicate,
@@ -166,6 +168,7 @@ final public class MoreArrays {
      * Returns the index of the first occurrence of the specified element in the given array, or -1 if there is no such
      * element.
      * 
+     * @param <T>     the element type
      * @param array   the given array
      * @param element the element to look for
      * @return the index of the first occurrence in the specified element in the given array, or -1 if there is no such
@@ -179,6 +182,7 @@ final public class MoreArrays {
      * Returns the index of the first occurrence of the specified element in the given array, starting the search at
      * {@code fromIndex}, or -1 if there is no such element.
      * 
+     * @param <T>       the element type
      * @param array     the given array
      * @param element   the element to look for
      * @param fromIndex the index to start the search from
@@ -201,6 +205,7 @@ final public class MoreArrays {
      * <b>Note:</b> If the array contains {@code null} elements the predicate must be able to handle {@code null} inputs to
      * avoid a {@code NullPointerException}.
      * 
+     * @param <T>       the element type
      * @param array     the specified array
      * @param predicate the given predicate
      * @return the index of the first occurrence in the specified array of an element which satisfies the given predicate,
@@ -217,6 +222,7 @@ final public class MoreArrays {
      * <b>Note:</b> If the array contains {@code null} elements the predicate must be able to handle {@code null} inputs to
      * avoid a {@code NullPointerException}.
      * 
+     * @param <T>       the element type
      * @param array     the specified array
      * @param predicate the given predicate
      * @param fromIndex the index to start the search from
@@ -237,6 +243,7 @@ final public class MoreArrays {
      * Returns the index of the last occurrence in the specified element in the given array, or -1 if there is no such
      * element.
      * 
+     * @param <T>     the element type
      * @param array   the given array
      * @param element the element to look for
      * @return the index of the last occurrence in the specified element in the given array, or -1 if there is no such
@@ -251,6 +258,7 @@ final public class MoreArrays {
      * Returns the index of the last occurrence in the specified element in the given array, searching backward starting at
      * {@code fromIndex}, or -1 if there is no such element.
      * 
+     * @param <T>       the element type
      * @param array     the given array
      * @param element   the element to look for
      * @param fromIndex the index to start the search from
@@ -273,6 +281,7 @@ final public class MoreArrays {
      * <b>Note:</b> If the array contains {@code null} elements the predicate must be able to handle {@code null} inputs to
      * avoid a {@code NullPointerException}.
      * 
+     * @param <T>       the element type
      * @param array     the specified array
      * @param predicate the given predicate
      * @return the index of the last occurrence in the specified array of an element which satisfies the given predicate, or
@@ -290,6 +299,7 @@ final public class MoreArrays {
      * <b>Note:</b> If the array contains {@code null} elements the predicate must be able to handle {@code null} inputs to
      * avoid a {@code NullPointerException}.
      * 
+     * @param <T>       the element type
      * @param array     the specified array
      * @param predicate the given predicate
      * @param fromIndex the index to start the search from

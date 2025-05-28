@@ -46,8 +46,6 @@ final public class MappedFileSource extends ByteSource {
      * file.
      * 
      * @param path the specified file
-     * @return a new {@code MappedFileSource} backed by one or more {@code MappedByteBuffer}s mapped to the specified
-     *         file
      * @throws IOException if an I/O error occurs
      */
     public MappedFileSource(final Path path) throws IOException {

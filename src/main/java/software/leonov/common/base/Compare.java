@@ -27,7 +27,7 @@ import com.google.common.collect.Ordering;
 public final class Compare {
 
     private static final Ordering<Comparable<?>> NATURAL_ORDERING_NULLS_FIRST = Ordering.natural().nullsFirst();
-    private static final Ordering<Comparable<?>> NATURAL_ORDERING_NULLS_LAST = Ordering.natural().nullsLast();
+    private static final Ordering<Comparable<?>> NATURAL_ORDERING_NULLS_LAST  = Ordering.natural().nullsLast();
 
     private Compare() {
     }
@@ -36,6 +36,7 @@ public final class Compare {
      * Returns a serializable {@code Ordering} that orders elements according to their <i>natural order</i> and treats
      * {@code null}s as less than all other values.
      * 
+     * @param <T> the type of elements being compared
      * @return a serializable {@code Ordering} that orders elements according to their <i>natural order</i> and treats
      *         {@code null}s as less than all other values
      */
@@ -49,6 +50,7 @@ public final class Compare {
      * Returns a serializable {@code Ordering} that orders elements according to their <i>natural order</i> and treats
      * {@code null}s as greater than all other values.
      * 
+     * @param <T> the type of elements being compared
      * @return a serializable {@code Ordering} that orders elements according to their <i>natural order</i> and treats
      *         {@code null}s as greater than all other values
      */

@@ -68,6 +68,7 @@ public class MoreQueues {
      * preferable to {@link Collections#addAll(Collection, Object...) Collections.addAll(Queue, E...)} which can fail to
      * insert an element only by throwing an exception.
      * 
+     * @param <E>      the element type
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
      * @return {@code true} if at least one elements was inserted into the queue, {@code false} otherwise
@@ -94,6 +95,7 @@ public class MoreQueues {
      * preferable to {@link Iterables#addAll(Collection, Iterable) Iterables.addAll(Queue, Iterable)} which can fail to
      * insert an element only by throwing an exception.
      * 
+     * @param <E>      the element type
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
      * @return {@code true} if at least one elements was inserted into the queue, {@code false} otherwise
@@ -115,6 +117,7 @@ public class MoreQueues {
      * preferable to {@link Iterators#addAll(Collection, Iterator) Iterators.addAll(Queue, Iterator)} which can fail to
      * insert an element only by throwing an exception.
      * 
+     * @param <E>      the element type
      * @param queue    the specified queue
      * @param elements the elements to insert into the queue
      * @return {@code true} if at least one elements was inserted into the queue, {@code false} otherwise
@@ -140,17 +143,18 @@ public class MoreQueues {
      * {@link BlockingQueue#drainTo(Collection) drainTo(Collection)} may fail to remove some elements, this method iterates
      * through {@link Collection#toArray() queue.toArray()} and transfers the remaining elements one by one.
      * 
+     * @param <E>        the element type
      * @param queue      the specified queue
      * @param collection the collection to transfer elements into
      * @return the number of elements transferred
      */
     @SuppressWarnings("unchecked")
-    public static <T> int drainFully(final BlockingQueue<? extends T> queue, final Collection<? super T> collection) {
+    public static <E> int drainFully(final BlockingQueue<? extends E> queue, final Collection<? super E> collection) {
         checkNotNull(queue, "queue == null");
         checkNotNull(collection, "collection == null");
         int count = queue.drainTo(collection);
         if (!queue.isEmpty())
-            for (final T r : (T[]) queue.toArray())
+            for (final E r : (E[]) queue.toArray())
                 if (queue.remove(r)) {
                     collection.add(r);
                     count++;
@@ -163,7 +167,7 @@ public class MoreQueues {
      * "read through" to the specified queue, and attempts to modify the returned queue, whether direct or via its iterator,
      * will result in an {@code UnsupportedOperationException}.
      * 
-     * @param <E>   the type of elements in the queue
+     * @param <E>   the element type
      * @param queue the specified queue
      * @return an unmodifiable view of the specified queue
      */

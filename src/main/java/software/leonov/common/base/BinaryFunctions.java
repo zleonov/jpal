@@ -45,7 +45,7 @@ public final class BinaryFunctions {
 
     private static final class ConstantBinaryFunction<E> implements BinaryFunction<Object, Object, E>, Serializable {
         private static final long serialVersionUID = -3035505608495294198L;
-        
+
         private final E value;
 
         public ConstantBinaryFunction(final E value) {
@@ -80,6 +80,7 @@ public final class BinaryFunctions {
     /**
      * Returns a {@code BinaryFunction} that always returns the specified {@code value}.
      *
+     * @param <E>   the type of return value
      * @param value the constant value for the {@code BinaryFunction} to return
      * @return a {@code BinaryFunction} that always returns the specified {@code value}
      */
@@ -89,7 +90,7 @@ public final class BinaryFunctions {
 
     private static final class SupplierBinaryFunction<E> implements BinaryFunction<Object, Object, E>, Serializable {
         private static final long serialVersionUID = 9041489237895725564L;
-        
+
         private final Supplier<E> supplier;
 
         private SupplierBinaryFunction(final Supplier<E> supplier) {
@@ -125,6 +126,7 @@ public final class BinaryFunctions {
      * Returns a {@code BinaryFunction} that always returns the result of invoking {@link Supplier#get()} on the specified
      * {@code supplier}, regardless of its inputs.
      *
+     *@param <E> the type of value returned by the supplier
      * @param supplier the specified supplier
      * @return a {@code BinaryFunction} that always returns the result of invoking {@link Supplier#get()} on the specified
      *         {@code supplier}

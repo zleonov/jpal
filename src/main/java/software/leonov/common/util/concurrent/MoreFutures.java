@@ -28,6 +28,7 @@ public final class MoreFutures {
      * <p>
      * Shorthand for creating a {@code FutureCallback} for {@code Runnable} tasks which return nothing.
      * 
+     * @param <V>    the type of value accepted by {@code FutureCallback}
      * @param failed the specified consumer
      * @return a {@code FutureCallback} which does nothing {@link FutureCallback#onSuccess(Object) on success} and invokes
      *         the specified {@code failed} consumer if the future {@link FutureCallback#onFailure(Throwable) fails}
@@ -43,6 +44,7 @@ public final class MoreFutures {
      * <p>
      * Shorthand for creating a {@code FutureCallback} using Java's lambda facility.
      * 
+     * @param <V>       the type of value passed to the {@code succeeded} consumer
      * @param succeeded the consumer to invoke on success
      * @param failed    the consumer to invoke on failure
      * @return a {@code FutureCallback} which invokes the {@code succeeded} and {@code failed} consumers if the future
@@ -74,9 +76,9 @@ public final class MoreFutures {
      * and lightweight. See {@link ListenableFuture#addListener ListenableFuture.addListener} documentation. Similar
      * overloaded methods were removed from Guava because of this danger.
      * 
+     * @param <V>      the type of value produced by the {@code future}
      * @param future   the specified future
      * @param callback the callback to register
-     * @param executor the executor that will run the callback
      * @return the specified future
      */
     public static <V> ListenableFuture<V> addCallback(final ListenableFuture<V> future, final FutureCallback<? super V> callback) {

@@ -55,9 +55,10 @@ public final class Throwing {
      * Exceptions — The Controversy</a> for further discussion. It is only safe to use if you ensure the caller will catch
      * all possible checked exceptions that could occur. If in doubt <b>do not use</b>.
      * 
-     * @param t the specified throwable
+     * @param <T> the type of throwable
+     * @param t   the specified throwable
      * @return this method does not return - the return type is only for your convenience to make the compiler happy
-     * @throws the specified throwable - always
+     * @throws T always
      */
     @SuppressWarnings("unchecked")
     public static <T extends Throwable> RuntimeException uncheckedException(final Throwable t) throws T {

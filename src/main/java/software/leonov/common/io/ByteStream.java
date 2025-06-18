@@ -29,7 +29,6 @@ import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
-import com.google.common.primitives.Ints;
 
 import software.leonov.common.base.MessageDigests;
 
@@ -44,6 +43,7 @@ import software.leonov.common.base.MessageDigests;
 final public class ByteStream {
 
     private final static int DEFAULT_BUFFER_SIZE = 8192;
+    private final static int MAX_ARRAY_SIZE      = Integer.MAX_VALUE - 8;
 
     private ByteStream() {
     }
@@ -130,7 +130,7 @@ final public class ByteStream {
         checkNotNull(in, "in == null");
         checkNotNull(func, "func == null");
 
-        final byte[] buff = new byte[DEFAULT_BUFFER_SIZE];
+        final byte[] buff   = new byte[DEFAULT_BUFFER_SIZE];
         final Hasher hasher = func.newHasher();
 
         for (int r = in.read(buff); r != -1; r = in.read(buff))
@@ -158,21 +158,22 @@ final public class ByteStream {
     static byte[] toByteArray(final InputStream in, final long size) throws IOException {
 
         // size is a suggestion but it is not guaranteed to be accurate so we don't throw an OOME if it's too large
-        int length = size < 1 ? DEFAULT_BUFFER_SIZE : Ints.saturatedCast(size); // do we need the saturated cast?
-        byte[] bytes = new byte[length];
-        int total = 0;
-        int n;
+        long   length = size < 1 ? DEFAULT_BUFFER_SIZE : size > MAX_ARRAY_SIZE ? MAX_ARRAY_SIZE : size;
+        byte[] bytes  = new byte[(int) length];
+        int    total  = 0;
+        int    n;
 
         do {
             /*
              * a loop is required because we are not guaranteed that InputStream.read will return all the requested bytes in a
              * single call, even if they are available
              */
-            while ((n = in.read(bytes, total, length - total)) > 0)
+            while ((n = in.read(bytes, total, (int) length - total)) > 0)
                 total += n;
 
             if ((n = in.read()) != -1) {
-                bytes = Arrays.copyOf(bytes, (length *= 2) > Integer.MAX_VALUE ? Integer.MAX_VALUE : length);
+                length         = (length *= 2) > MAX_ARRAY_SIZE ? MAX_ARRAY_SIZE : length;
+                bytes          = Arrays.copyOf(bytes, (int) length);
                 bytes[total++] = (byte) n;
             }
         } while (n != -1);
@@ -181,4 +182,3 @@ final public class ByteStream {
     }
 
 }
-

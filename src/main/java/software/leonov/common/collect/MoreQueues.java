@@ -41,12 +41,13 @@ import com.google.common.collect.Sets;
  * 
  * @author Zhenya Leonov
  * @see Maps
- * @see MoreMaps
+ * @see MoreMultimaps
  * @see Collections
  * @see Collections2
  * @see Lists
  * @see MoreLists
  * @see Sets
+ * @see MoreSets
  * @see Iterables
  * @see Iterators
  * @see Iteration

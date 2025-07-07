@@ -37,7 +37,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
 /**
- * Static utility methods for working with {@code Map}s.
+ * Static utility methods which operate on or return {@code Map}s.
  * 
  * @author Zhenya Leonov
  * @see Maps
@@ -46,6 +46,7 @@ import com.google.common.collect.Sets;
  * @see Lists
  * @see MoreLists
  * @see Sets
+ * @see MoreSets
  * @see Iterables
  * @see Iterators
  * @see Iteration
@@ -56,9 +57,9 @@ import com.google.common.collect.Sets;
  * @see MoreArrays
  */
 // See: https://bugs.openjdk.java.net/browse/JDK-6394757
-final public class MoreMaps {
+final public class MoreMultimaps {
 
-    private MoreMaps() {
+    private MoreMultimaps() {
     }
 
     /**

@@ -15,10 +15,10 @@
  */
 package software.leonov.common.base;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -210,8 +210,54 @@ public final class Obj {
         }
     }
 
+//    /**
+//     * Returns an object read from the specified file.
+//     * <p>
+//     * See {@link ObjectInputStream#readObject()} for more information.
+//     * <p>
+//     * Exceptions are thrown for classes that should not be deserialized. All exceptions are fatal. Any underlying streams
+//     * will be closed before returning to the caller.
+//     * 
+//     * @param <T>  the type of object
+//     * @param path the specified file
+//     * @param type the class type of the object
+//     * @throws ClassNotFoundException   if the class of the serialized object cannot be found
+//     * @throws InvalidClassException    if something is wrong with a class used by serialization
+//     * @throws IllegalArgumentException if the object is not assignable to the type {@code T}
+//     * @throws IOException              if an I/O error occurs
+//     * @return the object read from the specified file
+//     * 
+//     */
+//    public static <T> T readObject(final Path path, final Class<T> type) throws IOException, ClassNotFoundException {
+//        checkNotNull(path, "path == null");
+//        checkNotNull(type, "type == null");
+//
+//        try (final ObjectInputStream in = new ObjectInputStream(Fs.newBufferedInputStream(path))) {
+//            final Object o = in.readObject();
+//            checkArgument(type.isAssignableFrom(o.getClass()), "%s cannot be cast to %s", o.getClass(), type);
+//            return type.cast(o);
+//        }
+//    }
+//
+//    public static <T> T readObject(final Path path, final TypeToken<T> typeToken) throws IOException, ClassNotFoundException {
+//        checkNotNull(path, "path == null");
+//        checkNotNull(typeToken, "typeToken == null");
+//
+//        typeToken.getType();
+//
+//        try (final ObjectInputStream in = new ObjectInputStream(Fs.newBufferedInputStream(path))) {
+//            final Object           o       = in.readObject();
+//            final Class<? super T> rawType = typeToken.getRawType();
+//            checkArgument(rawType.isAssignableFrom(o.getClass()), "%s cannot be cast to %s", o.getClass(), rawType);
+//
+//            @SuppressWarnings("unchecked")
+//            final T result = (T) o;
+//            return result;
+//        }
+//    }
+
     /**
-     * Returns an object read from the specified file.
+     * Returns an object deserialized from the specified file.
      * <p>
      * See {@link ObjectInputStream#readObject()} for more information.
      * <p>
@@ -220,22 +266,38 @@ public final class Obj {
      * 
      * @param <T>  the type of object
      * @param path the specified file
-     * @param type the class type of the object
-     * @throws ClassNotFoundException   if the class of the serialized object cannot be found
-     * @throws InvalidClassException    if something is wrong with a class used by serialization
-     * @throws IllegalArgumentException if the object is not assignable to the type {@code T}
-     * @throws IOException              if an I/O error occurs
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     * @throws InvalidClassException  if something is wrong with a class used by serialization
+     * @throws IOException            if an I/O error occurs
      * @return the object read from the specified file
-     * 
      */
-    public static <T> T readObject(final Path path, final Class<? extends T> type) throws IOException, ClassNotFoundException {
+    public static <T> T readObject(final Path path) throws IOException, InvalidClassException, ClassNotFoundException {
         checkNotNull(path, "path == null");
-        checkNotNull(type, "type == null");
+        return readObject(Fs.newBufferedInputStream(path));
+    }
 
-        try (final ObjectInputStream in = new ObjectInputStream(Fs.newBufferedInputStream(path))) {
-            final Object o = in.readObject();
-            checkArgument(type.isAssignableFrom(o.getClass()), "%s cannot be cast to %s", o.getClass(), type);
-            return type.cast(o);
+    /**
+     * Returns an object deserialized from the specified input stream (does not buffer the stream).
+     * <p>
+     * See {@link ObjectInputStream#readObject()} for more information.
+     * <p>
+     * Exceptions are thrown for classes that should not be deserialized. All exceptions are fatal. Any underlying streams
+     * will be closed before returning to the caller.
+     * 
+     * @param <T> the type of object
+     * @param in  the specified input stream
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     * @throws InvalidClassException  if something is wrong with a class used by serialization
+     * @throws IOException            if an I/O error occurs
+     * @return the object read from the specified file
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T readObject(final InputStream in) throws IOException, InvalidClassException, ClassNotFoundException {
+        checkNotNull(in, "in == null");
+
+        try (final ObjectInputStream ois = new ObjectInputStream(in)) {
+            final Object o = ois.readObject();
+            return (T) o;
         }
     }
 

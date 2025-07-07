@@ -30,7 +30,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -104,15 +103,15 @@ import com.google.common.collect.Ordering;
  */
 public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>, Cloneable, Serializable {
 
-    private static final long serialVersionUID = 1L;
-    transient int size = 0;
-    private transient Node nil = new Node();
-    private transient Node min = nil;
-    private transient Node max = nil;
-    private transient Node root = nil;
-    transient int modCount = 0;
+    private static final long           serialVersionUID = 1L;
+    transient int                       size             = 0;
+    private transient Node              nil              = new Node();
+    private transient Node              min              = nil;
+    private transient Node              max              = nil;
+    private transient Node              root             = nil;
+    transient int                       modCount         = 0;
     private final Comparator<? super E> comparator;
-    private transient final List<E> asList = new ListView();
+    private transient final List<E>     asList           = new ListView();
 
     private Treelist(final Comparator<? super E> comparator) {
         this.comparator = comparator;
@@ -267,7 +266,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     public int indexOf(Object o) {
         if (o != null) {
             @SuppressWarnings("unchecked")
-            final E e = (E) o;
+            final E               e    = (E) o;
             final ListIterator<E> itor = listIterator();
             while (itor.hasNext())
                 if (comparator.compare(itor.next(), e) == 0)
@@ -280,7 +279,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     public int lastIndexOf(Object o) {
         if (o != null) {
             @SuppressWarnings("unchecked")
-            final E e = (E) o;
+            final E               e    = (E) o;
             final ListIterator<E> itor = listIterator();
             while (itor.hasNext())
                 if (comparator.compare(itor.next(), e) == 0) {
@@ -303,11 +302,11 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @Override
     public ListIterator<E> listIterator() {
         return new ListIterator<E>() {
-            private int index = 0;
-            private Node next = min;
-            private Node prev = nil;
-            private Node last = nil;
-            private int expectedModCount = modCount;
+            private int  index            = 0;
+            private Node next             = min;
+            private Node prev             = nil;
+            private Node last             = nil;
+            private int  expectedModCount = modCount;
 
             @Override
             public void add(E e) {
@@ -367,7 +366,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
                 delete(last);
                 index--;
                 expectedModCount = modCount;
-                last = nil;
+                last             = nil;
             }
 
             @Override
@@ -407,7 +406,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     public E remove(int index) {
         checkElementIndex(index, size);
         ListIterator<E> li = listIterator(index);
-        E e = li.next();
+        E               e  = li.next();
         li.remove();
         return e;
     }
@@ -421,8 +420,8 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     public void clear() {
         modCount++;
         root = nil;
-        min = nil;
-        max = nil;
+        min  = nil;
+        max  = nil;
         size = 0;
     }
 
@@ -475,11 +474,11 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         } catch (final CloneNotSupportedException e) {
             throw new InternalError();
         }
-        clone.nil = new Node();
-        clone.min = clone.nil;
-        clone.max = clone.nil;
-        clone.root = clone.nil;
-        clone.size = 0;
+        clone.nil      = new Node();
+        clone.min      = clone.nil;
+        clone.max      = clone.nil;
+        clone.root     = clone.nil;
+        clone.size     = 0;
         clone.modCount = 0;
         clone.addAll(this);
         return clone;
@@ -495,10 +494,10 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @SuppressWarnings("unchecked")
     private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
-        nil = new Node();
+        nil  = new Node();
         root = nil;
-        min = nil;
-        max = nil;
+        min  = nil;
+        max  = nil;
         int size = ois.readInt();
         for (int i = 0; i < size; i++)
             add((E) ois.readObject());
@@ -507,9 +506,9 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     @SuppressWarnings("serial")
     private class Sublist extends Treelist<E> {
         private final Treelist<E> list;
-        private final int offset;
-        private Node from;
-        private Node to;
+        private final int         offset;
+        private Node              from;
+        private Node              to;
 
         private void checkForConcurrentModification() {
             if (this.modCount != list.modCount)
@@ -518,11 +517,11 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
 
         public Sublist(final Treelist<E> list, int fromIndex, int toIndex) {
             super(list.comparator);
-            this.list = list;
-            from = list.min;
-            offset = fromIndex;
+            this.list     = list;
+            from          = list.min;
+            offset        = fromIndex;
             this.modCount = list.modCount;
-            this.size = toIndex - fromIndex;
+            this.size     = toIndex - fromIndex;
             int i = 0;
             for (; i < fromIndex; i++)
                 from = successor(from);
@@ -689,7 +688,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         @Override
         Node search(final E e) {
             final int compareFrom = comparator.compare(e, from.element);
-            final int compareTo = comparator.compare(e, to.element);
+            final int compareTo   = comparator.compare(e, to.element);
             if (compareFrom < 0 || compareTo > 0)
                 return null;
             if (compareFrom == 0)
@@ -789,21 +788,21 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
     }
 
     private class Node {
-        private E element = null;
-        private Node parent, left, right;
-        private Color color = BLACK;
+        private E     element = null;
+        private Node  parent, left, right;
+        private Color color   = BLACK;
 
         private Node() {
             parent = this;
-            right = this;
-            left = this;
+            right  = this;
+            left   = this;
         }
 
         private Node(final E element) {
             this.element = element;
-            parent = nil;
-            right = nil;
-            left = nil;
+            parent       = nil;
+            right        = nil;
+            left         = nil;
         }
     }
 
@@ -1005,7 +1004,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
                 x.parent.left = n;
             else
                 x.parent.right = n;
-            n.left = x;
+            n.left   = x;
             x.parent = n;
         }
     }
@@ -1023,7 +1022,7 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
                 x.parent.right = n;
             else
                 x.parent.left = n;
-            n.right = x;
+            n.right  = x;
             x.parent = n;
         }
     }
@@ -1058,32 +1057,32 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             if (z.parent == z.parent.parent.left) {
                 Node y = z.parent.parent.right;
                 if (y.color == RED) {
-                    z.parent.color = BLACK;
-                    y.color = BLACK;
+                    z.parent.color        = BLACK;
+                    y.color               = BLACK;
                     z.parent.parent.color = RED;
-                    z = z.parent.parent;
+                    z                     = z.parent.parent;
                 } else {
                     if (z == z.parent.right) {
                         z = z.parent;
                         leftRotate(z);
                     }
-                    z.parent.color = BLACK;
+                    z.parent.color        = BLACK;
                     z.parent.parent.color = RED;
                     rightRotate(z.parent.parent);
                 }
             } else {
                 Node y = z.parent.parent.left;
                 if (y.color == RED) {
-                    z.parent.color = BLACK;
-                    y.color = BLACK;
+                    z.parent.color        = BLACK;
+                    y.color               = BLACK;
                     z.parent.parent.color = RED;
-                    z = z.parent.parent;
+                    z                     = z.parent.parent;
                 } else {
                     if (z == z.parent.left) {
                         z = z.parent;
                         rightRotate(z);
                     }
-                    z.parent.color = BLACK;
+                    z.parent.color        = BLACK;
                     z.parent.parent.color = RED;
                     leftRotate(z.parent.parent);
                 }
@@ -1127,48 +1126,48 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
             if (x == x.parent.left) {
                 Node w = x.parent.right;
                 if (w.color == RED) {
-                    w.color = BLACK;
+                    w.color        = BLACK;
                     x.parent.color = RED;
                     leftRotate(x.parent);
                     w = x.parent.right;
                 }
                 if (w.left.color == BLACK && w.right.color == BLACK) {
                     w.color = RED;
-                    x = x.parent;
+                    x       = x.parent;
                 } else {
                     if (w.right.color == BLACK) {
                         w.left.color = BLACK;
-                        w.color = RED;
+                        w.color      = RED;
                         rightRotate(w);
                         w = x.parent.right;
                     }
-                    w.color = x.parent.color;
+                    w.color        = x.parent.color;
                     x.parent.color = BLACK;
-                    w.right.color = BLACK;
+                    w.right.color  = BLACK;
                     leftRotate(x.parent);
                     x = root;
                 }
             } else {
                 Node w = x.parent.left;
                 if (w.color == RED) {
-                    w.color = BLACK;
+                    w.color        = BLACK;
                     x.parent.color = RED;
                     rightRotate(w.parent);
                     w = x.parent.left;
                 }
                 if (w.right.color == BLACK && w.left.color == BLACK) {
                     w.color = RED;
-                    x = x.parent;
+                    x       = x.parent;
                 } else {
                     if (w.left.color == BLACK) {
                         w.right.color = BLACK;
-                        w.color = RED;
+                        w.color       = RED;
                         leftRotate(w);
                         w = x.parent.left;
                     }
-                    w.color = x.parent.color;
+                    w.color        = x.parent.color;
                     w.parent.color = BLACK;
-                    w.left.color = BLACK;
+                    w.left.color   = BLACK;
                     rightRotate(x.parent);
                     x = root;
                 }
@@ -1177,11 +1176,4 @@ public class Treelist<E> extends AbstractCollection<E> implements Sortedlist<E>,
         x.color = BLACK;
     }
 
-    public static void main(String[] args) {
-        Treelist<String> tl = Treelist.create();
-
-        Iterables.addAll(tl, Arrays.asList("a", "b", "c"));
-
-        tl.asList().replaceAll(i -> new Character((char) ((int) i.charAt(0) + 1)).toString());
-    }
 }

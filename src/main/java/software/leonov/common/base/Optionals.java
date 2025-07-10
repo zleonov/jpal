@@ -3,6 +3,7 @@ package software.leonov.common.base;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Iterables;
@@ -103,6 +104,24 @@ public final class Optionals {
     public static <T> Iterable<T> present(final Iterable<? extends Optional<? extends T>> optionals) {
         checkNotNull(optionals, "optionals == null");
         return Iterables.transform(Iterables.filter(optionals, Optional::isPresent), Optional::get);
+    }
+
+    /**
+     * Performs the given action with the value if a value is present, otherwise performs the given empty-based action.
+     * <p>
+     * <b>Java 9 equivalent:</b> {@link Optional#ifPresentOrElse(Consumer, Runnable) Optional.ifPresentOrElse(Consumer&lt;?
+     * super T&gt;, Runnable)}
+     *
+     * @param <T>           the type of the value
+     * @param optional      the {@code Optional} to check
+     * @param presentAction the action to perform if the value is present
+     * @param emptyAction   the action to perform if the value is absent
+     */
+    public static <T> void ifPresentOrElse(final Optional<? extends T> optional, Consumer<? super T> presentAction, final Runnable emptyAction) {
+        if (optional.isPresent())
+            presentAction.accept(optional.get());
+        else
+            emptyAction.run();
     }
 
 }

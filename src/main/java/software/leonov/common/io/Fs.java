@@ -279,7 +279,7 @@ import software.leonov.common.io.FileWalker.VisitResult;
 @SuppressWarnings("deprecation")
 final public class Fs {
 
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+    static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     private static final CharMatcher SEPARATORS = CharMatcher.anyOf("\\/");
 

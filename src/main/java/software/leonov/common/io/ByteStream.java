@@ -16,6 +16,7 @@
 package software.leonov.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static software.leonov.common.io.Fs.MAX_ARRAY_SIZE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +44,6 @@ import software.leonov.common.base.MessageDigests;
 final public class ByteStream {
 
     private final static int DEFAULT_BUFFER_SIZE = 8192;
-    private final static int MAX_ARRAY_SIZE      = Integer.MAX_VALUE - 8;
 
     private ByteStream() {
     }

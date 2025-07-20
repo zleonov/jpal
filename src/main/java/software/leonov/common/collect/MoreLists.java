@@ -214,18 +214,17 @@ public class MoreLists {
     }
 
     /**
-     * Returns a view of a portion of the specified list between the given {@code index} (inclusive) and the end of the
-     * list.
+     * Returns a view of a portion of the specified list between the given index (inclusive) and the end of the list.
      * <p>
      * This method is the {@code List} analog of {@link String#substring(int)} and is equivalent to
      * {@code list.subList(1, list.size())}.
      * 
-     * @param <E>   the type of elements in the list
-     * @param list  the specified list
-     * @param index low endpoint (inclusive) of the sub-list
+     * @param <E>  the type of elements in the list
+     * @param list the specified list
+     * @param from low endpoint (inclusive) of the sub-list
      * @return a view of a portion of the specified list between the given {@code index} (inclusive) and the end of the list
      */
-    public static <E> List<E> sublist(final List<E> list, final int index) {
+    public static <E> List<E> sublist(final List<E> list, final int from) {
         return list.subList(1, list.size());
     }
 

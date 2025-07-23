@@ -15,6 +15,7 @@
  */
 package software.leonov.common.collect;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -217,15 +218,104 @@ public class MoreLists {
      * Returns a view of a portion of the specified list between the given index (inclusive) and the end of the list.
      * <p>
      * This method is the {@code List} analog of {@link String#substring(int)} and is equivalent to
-     * {@code list.subList(1, list.size())}.
+     * {@code list.subList(int, list.size())}.
      * 
      * @param <E>  the type of elements in the list
      * @param list the specified list
      * @param from low endpoint (inclusive) of the sub-list
-     * @return a view of a portion of the specified list between the given {@code index} (inclusive) and the end of the list
+     * @return a view of a portion of the specified list between the given {@code from} index (inclusive) and the end of the
+     *         list
      */
     public static <E> List<E> sublist(final List<E> list, final int from) {
-        return list.subList(1, list.size());
+        checkNotNull(list, "list == null");
+        checkArgument(from >= 0, "from < 0", from);
+        checkArgument(from <= list.size(), "from > list.size()", from, list.size());
+        return list.subList(from, list.size());
+    }
+
+    /**
+     * Returns the first element in the specified list.
+     * 
+     * @param <E>  the type of elements in the list
+     * @param list the specified list
+     * @return the first element in the specified list
+     */
+    public static <E> E getFirst(final List<? extends E> list) {
+        checkNotNull(list, "list == null");
+        return list.get(0);
+    }
+
+    /**
+     * Returns the last element in the specified list.
+     * 
+     * @param <E>  the type of elements in the list
+     * @param list the specified list
+     * @return the last element in the specified list
+     */
+    public static <E> E getLast(final List<? extends E> list) {
+        checkNotNull(list, "list == null");
+        return list.get(list.size() - 1);
+    }
+
+    /**
+     * Adds the specified element to the beginning of the list.
+     * 
+     * @param <E>     the type of elements in the list
+     * @param list    the list to modify
+     * @param element the element to add
+     */
+    public static <E> void addFirst(final List<? super E> list, final E element) {
+        checkNotNull(list, "list == null");
+        list.add(0, element);
+    }
+
+    /**
+     * Adds the specified element to the end of the list.
+     * 
+     * @param <E>     the type of elements in the list
+     * @param list    the list to modify
+     * @param element the element to add
+     */
+    public static <E> void addLast(final List<? super E> list, final E element) {
+        checkNotNull(list, "list == null");
+        list.add(element);
+    }
+
+    /**
+     * Removes the first element in the specified list.
+     * 
+     * @param <E>  the type of elements in the list
+     * @param list the list to modify
+     * @return the removed element
+     */
+    public static <E> E removeFirst(final List<E> list) {
+        checkNotNull(list, "list == null");
+        return list.remove(0);
+    }
+
+    /**
+     * Removes the last element in the specified list.
+     * 
+     * @param <E>  the type of elements in the list
+     * @param list the list to modify
+     * @return the removed element
+     */
+    public static <E> E removeLast(final List<E> list) {
+        checkNotNull(list, "list == null");
+        return list.remove(list.size() - 1);
+    }
+
+    /**
+     * Returns a {@link List#listIterator(int) list iterator} over the elements in this list positioned at the end of the
+     * list. An initial call to {@link ListIterator#previous previous} will return the last element of the list.
+     * 
+     * @param <E> the type of elements in the list
+     * @return a {@link List#listIterator(int) list iterator} over the elements in this list positioned at the end of the
+     *         list
+     */
+    public static <E> ListIterator<E> fromLast(final List<E> list) {
+        checkNotNull(list, "list == null");
+        return list.listIterator(list.size());
     }
 
 }

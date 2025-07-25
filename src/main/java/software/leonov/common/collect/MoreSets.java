@@ -61,10 +61,15 @@ final public class MoreSets {
      * Replaces an equivalent element in the set with the specified element, or adds it if no equivalent element exists.
      * <p>
      * This method first removes any element equivalent to the specified element, then adds the specified element. This is
-     * useful when you want to update an element in a set while maintaining set semantics.
+     * useful when you want to update an element in a set while maintaining equivalence semantics.
      * <p>
-     * Example use case: updating a case-insensitive string set where you want to replace "hello" with "HELLO" while
+     * Example use case: updating a case-insensitive string set where you want to replace "john" with "John" while
      * maintaining the same logical element.
+     * <p>
+     * <b>Warning: This method is prone to misuse.</b> Its main use cases assume rare scenarios where a set's ordering is
+     * well-defined but inconsistent with equals (like a {@code TreeSet} with a {@link String#CASE_INSENSITIVE_ORDER
+     * case-insensitive comparator}). Which means the set does not obey the general contract of the {@code Set} interface
+     * (which is defined in terms of the equals operation).
      *
      * @param <T>     the type of elements in the set
      * @param set     the set to modify

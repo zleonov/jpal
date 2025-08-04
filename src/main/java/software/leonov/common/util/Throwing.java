@@ -15,7 +15,7 @@ public final class Throwing {
     }
 
     /**
-     * {@link Throwable#addSuppressed(Throwable) Appends} all {@code thrown} exceptions to the {@code first} exception.
+     * {@link Throwable#addSuppressed(Throwable) Suppresses} all {@code thrown} exceptions to the {@code first} exception.
      * 
      * @param <X>    the type of the {@code first} exception
      * @param first  the first exception

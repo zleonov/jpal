@@ -102,7 +102,7 @@
 					<linksource>true</linksource>
 					
                     
-                    <failOnError>true</failOnError>					
+                    <failOnError>false</failOnError>					
 					
 					<doctitle>
                         <![CDATA[

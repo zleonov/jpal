@@ -4,7 +4,7 @@
 'UTF-8'
 -protected
 -source
-'11'
+'8'
 -sourcepath
 'C:/eclipse-workspace/jpal/src/main/java;C:/Program Files/Java/jdk1.8.0_281/src;C:/eclipse-workspace/jpal/third-party/guava-26.0-jre-sources'
 -subpackages
@@ -24,7 +24,7 @@ software.leonov
 -link
 'https://guava.dev/releases/26.0-jre/api/docs'
 -linkoffline
-'https://docs.oracle.com/en/java/javase/11/docs/api' 'C:/eclipse-workspace/jpal/target/javadoc-bundle-options'
+'https://docs.oracle.com/javase/8/docs/api' 'C:/eclipse-workspace/jpal/target/javadoc-bundle-options'
 -linksource
 -notimestamp
 -use

@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"software.leonov.common.base"},{"l":"software.leonov.common.collect"},{"l":"software.leonov.common.io"},{"l":"software.leonov.common.swing"},{"l":"software.leonov.common.util"},{"l":"software.leonov.common.util.concurrent"}]

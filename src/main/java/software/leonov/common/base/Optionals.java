@@ -107,7 +107,7 @@ public final class Optionals {
     }
 
     /**
-     * Performs the given action with the value if a value is present, otherwise performs the given empty-based action.
+     * Performs the given action if the value is present, otherwise performs the given empty-based action.
      * <p>
      * <b>Java 9 equivalent:</b> {@link Optional#ifPresentOrElse(Consumer, Runnable) Optional.ifPresentOrElse(Consumer&lt;?
      * super T&gt;, Runnable)}

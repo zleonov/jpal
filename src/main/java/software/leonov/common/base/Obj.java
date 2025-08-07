@@ -289,7 +289,7 @@ public final class Obj {
      * @throws ClassNotFoundException if the class of the serialized object cannot be found
      * @throws InvalidClassException  if something is wrong with a class used by serialization
      * @throws IOException            if an I/O error occurs
-     * @return the object read from the specified file
+     * @return the object read from the specified input stream
      */
     @SuppressWarnings("unchecked")
     public static <T> T readObject(final InputStream in) throws IOException, InvalidClassException, ClassNotFoundException {

@@ -31,6 +31,7 @@ import java.util.Date;
  * 
  * @author Zhenya Leonov
  */
+@Deprecated
 public final class Dates {
 
     private Dates() {

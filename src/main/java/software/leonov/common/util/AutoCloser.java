@@ -1,18 +1,16 @@
 package software.leonov.common.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Throwables.propagateIfPossible;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import com.google.common.io.Closer;
-
 /**
  * An {@link AutoCloseable} that collects {@code AutoCloseable} resources and closes them all when it is {@link #close
- * closed}. This class is the {@code AutoCloseable} analog to Guava's {@link Closer} class. See Guava's
- * <a href="https://github.com/google/guava/issues/3450" target="_blank">Issue 3450</a>,
- * <a href="https://github.com/google/guava/issues/3068" target="_blank">Issue 3068</a>, and
+ * closed}. This class is the {@code AutoCloseable} analog to Guava's
+ * <a href="https://guava.dev/releases/26.0-jre/api/docs/index.html?com/google/common/io/Closer.html" target=
+ * "_blank">Closer</a> class. See Guava's <a href="https://github.com/google/guava/issues/3450" target="_blank">Issue
+ * 3450</a>, <a href="https://github.com/google/guava/issues/3068" target="_blank">Issue 3068</a>, and
  * <a href="https://github.com/google/guava/issues/1020" target="_blank">Issue 1020</a> for further discussion.
  * <p>
  * {@code AutoCloseable} class has two main use cases:
@@ -87,10 +85,9 @@ public final class AutoCloser implements AutoCloseable {
      * @throws Exception
      */
     public RuntimeException rethrow(final Throwable th) throws Exception {
-        checkNotNull(th, "th == null");
+        requireNonNull(th, "th == null");
         thrown = th;
-        propagateIfPossible(th, Exception.class); // throws Exception or RuntimeException or Error
-        throw new RuntimeException(th); // this should never happen unless we actually caught a Throwable instance
+        throw exception(th);
     }
 
     @Override
@@ -108,7 +105,17 @@ public final class AutoCloser implements AutoCloseable {
             }
 
         if (thrown == null && th != null)
-            propagateIfPossible(th, Exception.class); // throws Exception or RuntimeException or Error
+            throw exception(th);
+    }
+
+    // Always throws; return type enables 'throw propagate(th)' pattern
+    private RuntimeException exception(final Throwable th) throws Exception {
+        if (th instanceof Exception)
+            throw (Exception) th;
+        else if (th instanceof Error)
+            throw (Error) th;
+        else
+            throw new RuntimeException(th); // this should never happen unless we actually caught a Throwable instance
     }
 
 }

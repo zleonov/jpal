@@ -34,9 +34,9 @@ final public class Swing {
 
     /**
      * Causes the specified {@code Runnable} be executed synchronously on the
-     * <a target="_blank" href="http://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html" ><i>AWT Event Dispatching
-     * Thread</i></a>. If the current thread is the AWT Event Dispatching Thread the {@link Runnable#run()} method is
-     * invoked immediately. This method blocks until the specified runnable is finished executing.
+     * <a target="_blank" href="http://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html" ><i>AWT Event
+     * Dispatching Thread</i></a>. If the current thread is the AWT Event Dispatching Thread the {@link Runnable#run()}
+     * method is invoked immediately. This method blocks until the specified runnable is finished executing.
      * 
      * @param runnable the specified {@code Runnable}
      * @throws InvocationTargetException if we're interrupted while waiting for the event dispatching thread to finish
@@ -44,12 +44,13 @@ final public class Swing {
      * @throws InterruptedException      if an exception is thrown while executing
      * @see SwingUtilities#invokeLater(Runnable)
      */
-    public static void edt(final Runnable runnable) throws InvocationTargetException, InterruptedException {
+    public static void onEdt(final Runnable runnable) throws InvocationTargetException, InterruptedException {
         checkNotNull(runnable, "runnable == null");
-        if (!SwingUtilities.isEventDispatchThread())
-            SwingUtilities.invokeAndWait(runnable);
-        else
+        if (SwingUtilities.isEventDispatchThread())
             runnable.run();
+        else
+            SwingUtilities.invokeAndWait(runnable);
+
     }
 
 }
